@@ -23,6 +23,7 @@
   "dependencies": {
     "@mikro-orm/cli": "^4.5.9",
     "@mikro-orm/core": "^4.5.9",
+    "@mikro-orm/migrations": "^4.5.9",
     "@mikro-orm/nestjs": "^4.3.0",
     "@mikro-orm/postgresql": "^4.5.9",
     "@mikro-orm/reflection": "^4.5.9",

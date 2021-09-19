@@ -3,6 +3,7 @@ lockfileVersion: 5.3
 specifiers:
   '@mikro-orm/cli': ^4.5.9
   '@mikro-orm/core': ^4.5.9
+  '@mikro-orm/migrations': ^4.5.9
   '@mikro-orm/nestjs': ^4.3.0
   '@mikro-orm/postgresql': ^4.5.9
   '@mikro-orm/reflection': ^4.5.9
@@ -43,9 +44,10 @@ specifiers:
 
 dependencies:
   '@mikro-orm/cli': 4.5.9_@mikro-orm+postgresql@4.5.9
-  '@mikro-orm/core': 4.5.9_@mikro-orm+postgresql@4.5.9
+  '@mikro-orm/core': 4.5.9_40bc058361f12b4a6a81884bbe496c64
+  '@mikro-orm/migrations': 4.5.9_@mikro-orm+core@4.5.9
   '@mikro-orm/nestjs': 4.3.0_c7ca310874dac987dc54e248601ee218
-  '@mikro-orm/postgresql': 4.5.9_@mikro-orm+core@4.5.9
+  '@mikro-orm/postgresql': 4.5.9_c5924a60946be4b9f3a0784c71d54059
   '@mikro-orm/reflection': 4.5.9_@mikro-orm+core@4.5.9
   '@mikro-orm/sql-highlighter': 1.0.1
   '@nestjs/common': 8.0.6_7de7ece315067f012f2001b6a7f20971
@@ -765,7 +767,7 @@ packages:
       '@mikro-orm/entity-generator': 4.5.9_c5924a60946be4b9f3a0784c71d54059
       '@mikro-orm/knex': 4.5.9_c83947ec43c319be4518f424aba30af0
       '@mikro-orm/migrations': 4.5.9_d0d358c2e5be95607e9d3bd64a1ffd2d
-      '@mikro-orm/postgresql': 4.5.9_@mikro-orm+core@4.5.9
+      '@mikro-orm/postgresql': 4.5.9_c5924a60946be4b9f3a0784c71d54059
       ansi-colors: 4.1.1
       cli-table3: 0.6.0
       fs-extra: 9.1.0
@@ -810,7 +812,7 @@ packages:
     dependencies:
       '@mikro-orm/entity-generator': 4.5.9_c5924a60946be4b9f3a0784c71d54059
       '@mikro-orm/migrations': 4.5.9_d0d358c2e5be95607e9d3bd64a1ffd2d
-      '@mikro-orm/postgresql': 4.5.9_@mikro-orm+core@4.5.9
+      '@mikro-orm/postgresql': 4.5.9_c5924a60946be4b9f3a0784c71d54059
       ansi-colors: 4.1.1
       clone: 2.1.2
       dotenv: 8.2.0
@@ -821,7 +823,7 @@ packages:
       strip-json-comments: 3.1.1
     dev: false
 
-  /@mikro-orm/core/4.5.9_@mikro-orm+postgresql@4.5.9:
+  /@mikro-orm/core/4.5.9_40bc058361f12b4a6a81884bbe496c64:
     resolution: {integrity: sha512-kG7nnchwhtDNjsAJ7Lau9ZsyNQo2rBqZg+6T54A/c6v4/yFRltbg3gv6eMd4vefH6PS2AKa71H5L49P105qYmQ==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
@@ -848,7 +850,8 @@ packages:
       '@mikro-orm/sqlite':
         optional: true
     dependencies:
-      '@mikro-orm/postgresql': 4.5.9_@mikro-orm+core@4.5.9
+      '@mikro-orm/migrations': 4.5.9_@mikro-orm+core@4.5.9
+      '@mikro-orm/postgresql': 4.5.9_c5924a60946be4b9f3a0784c71d54059
       ansi-colors: 4.1.1
       clone: 2.1.2
       dotenv: 8.2.0
@@ -878,7 +881,7 @@ packages:
       - supports-color
     dev: false
 
-  /@mikro-orm/knex/4.5.9_@mikro-orm+core@4.5.9+pg@8.6.0:
+  /@mikro-orm/knex/4.5.9_c5924a60946be4b9f3a0784c71d54059:
     resolution: {integrity: sha512-6dVwTKV3LMsEWDdYu5AlBSS4/0BaqEXTgAu4Ryyl95r7G+Y717RXI3fE9snRNE3uJU44Pi0O3TuhFYhdCb9arw==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
@@ -906,10 +909,10 @@ packages:
       sqlite3:
         optional: true
     dependencies:
-      '@mikro-orm/core': 4.5.9_@mikro-orm+postgresql@4.5.9
+      '@mikro-orm/core': 4.5.9_40bc058361f12b4a6a81884bbe496c64
+      '@mikro-orm/migrations': 4.5.9_@mikro-orm+core@4.5.9
       fs-extra: 9.1.0
-      knex: 0.21.19_pg@8.6.0
-      pg: 8.6.0
+      knex: 0.21.19
       sqlstring: 2.3.2
     transitivePeerDependencies:
       - supports-color
@@ -953,6 +956,66 @@ packages:
       - supports-color
     dev: false
 
+  /@mikro-orm/knex/4.5.9_d03aa2ba3badef4bd7cda1ae748ed3e9:
+    resolution: {integrity: sha512-6dVwTKV3LMsEWDdYu5AlBSS4/0BaqEXTgAu4Ryyl95r7G+Y717RXI3fE9snRNE3uJU44Pi0O3TuhFYhdCb9arw==}
+    engines: {node: '>= 10.13.0'}
+    peerDependencies:
+      '@mikro-orm/core': ^4.0.0
+      '@mikro-orm/entity-generator': ^4.0.0
+      '@mikro-orm/migrations': ^4.0.0
+      mssql: ^7.0.0
+      mysql: ^2.18.1
+      mysql2: ^2.1.0
+      pg: ^8.0.3
+      sqlite3: ^5.0.0
+    peerDependenciesMeta:
+      '@mikro-orm/entity-generator':
+        optional: true
+      '@mikro-orm/migrations':
+        optional: true
+      mssql:
+        optional: true
+      mysql:
+        optional: true
+      mysql2:
+        optional: true
+      pg:
+        optional: true
+      sqlite3:
+        optional: true
+    dependencies:
+      '@mikro-orm/core': 4.5.9_40bc058361f12b4a6a81884bbe496c64
+      '@mikro-orm/migrations': 4.5.9_@mikro-orm+core@4.5.9
+      fs-extra: 9.1.0
+      knex: 0.21.19_pg@8.6.0
+      pg: 8.6.0
+      sqlstring: 2.3.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /@mikro-orm/migrations/4.5.9_@mikro-orm+core@4.5.9:
+    resolution: {integrity: sha512-lOCPkhc4V+HzVtTfKUVqX5msdfxvmY9wvPTMbhdIJ0Wp4C78T/YrXy9FD9EUzrY4Sfu6QKgTG7A509GjPjhgoQ==}
+    engines: {node: '>= 10.13.0'}
+    peerDependencies:
+      '@mikro-orm/core': ^4.0.0
+    dependencies:
+      '@mikro-orm/core': 4.5.9_40bc058361f12b4a6a81884bbe496c64
+      '@mikro-orm/knex': 4.5.9_c5924a60946be4b9f3a0784c71d54059
+      '@types/umzug': 2.3.0
+      fs-extra: 9.1.0
+      knex: 0.21.19
+      umzug: 2.3.0
+    transitivePeerDependencies:
+      - '@mikro-orm/entity-generator'
+      - mssql
+      - mysql
+      - mysql2
+      - pg
+      - sqlite3
+      - supports-color
+    dev: false
+
   /@mikro-orm/migrations/4.5.9_d0d358c2e5be95607e9d3bd64a1ffd2d:
     resolution: {integrity: sha512-lOCPkhc4V+HzVtTfKUVqX5msdfxvmY9wvPTMbhdIJ0Wp4C78T/YrXy9FD9EUzrY4Sfu6QKgTG7A509GjPjhgoQ==}
     engines: {node: '>= 10.13.0'}
@@ -983,19 +1046,19 @@ packages:
       '@nestjs/common': ^7.0.0||^8.0.0
       '@nestjs/core': ^7.0.0||^8.0.0
     dependencies:
-      '@mikro-orm/core': 4.5.9_@mikro-orm+postgresql@4.5.9
+      '@mikro-orm/core': 4.5.9_40bc058361f12b4a6a81884bbe496c64
       '@nestjs/common': 8.0.6_7de7ece315067f012f2001b6a7f20971
       '@nestjs/core': 8.0.6_a4d6c832897073857f471f32139e452f
     dev: false
 
-  /@mikro-orm/postgresql/4.5.9_@mikro-orm+core@4.5.9:
+  /@mikro-orm/postgresql/4.5.9_c5924a60946be4b9f3a0784c71d54059:
     resolution: {integrity: sha512-hIXJlPTmf1NUqK8kqeo33qdaXeVlQQOQI03wm8Mfv+mQ0efNZ6VtQnx27tSi5rIJHhVXEzq4ap0CUMxgj/5EQA==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
       '@mikro-orm/core': ^4.0.0
     dependencies:
-      '@mikro-orm/core': 4.5.9_@mikro-orm+postgresql@4.5.9
-      '@mikro-orm/knex': 4.5.9_@mikro-orm+core@4.5.9+pg@8.6.0
+      '@mikro-orm/core': 4.5.9_40bc058361f12b4a6a81884bbe496c64
+      '@mikro-orm/knex': 4.5.9_d03aa2ba3badef4bd7cda1ae748ed3e9
       pg: 8.6.0
     transitivePeerDependencies:
       - '@mikro-orm/entity-generator'
@@ -1014,7 +1077,7 @@ packages:
     peerDependencies:
       '@mikro-orm/core': ^4.0.0
     dependencies:
-      '@mikro-orm/core': 4.5.9_@mikro-orm+postgresql@4.5.9
+      '@mikro-orm/core': 4.5.9_40bc058361f12b4a6a81884bbe496c64
       globby: 11.0.3
       ts-morph: 10.0.2
     dev: false
