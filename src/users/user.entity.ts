@@ -1,19 +1,9 @@
 import { IsEmail } from 'class-validator';
-import {
-  Entity,
-  EntityRepositoryType,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/core';
-import { UserRepository } from './user.repository';
+import { Entity, Property } from '@mikro-orm/core';
+import { BaseEntity } from '../base.entity';
 
 @Entity()
-export class User {
-  [EntityRepositoryType]?: UserRepository;
-
-  @PrimaryKey()
-  id: number;
-
+export class User extends BaseEntity {
   @Property()
   username: string;
 
@@ -21,18 +11,12 @@ export class User {
   @IsEmail()
   email: string;
 
-  @Property()
+  @Property({ hidden: true })
   password: string;
 
   @Property({ nullable: true, columnType: 'text' })
-  bio: string;
+  bio?: string;
 
   @Property({ nullable: true })
-  image: string;
-
-  @Property({ columnType: 'timestamp' })
-  created_at = Date.now;
-
-  @Property({ columnType: 'timestamp' })
-  updated_at = Date.now;
+  image?: string;
 }
