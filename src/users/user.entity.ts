@@ -22,11 +22,17 @@ export class User {
   email: string;
 
   @Property()
-  bio = '';
-
-  @Property()
-  image = '';
-
-  @Property({ hidden: true })
   password: string;
+
+  @Property({ nullable: true, columnType: 'text' })
+  bio: string;
+
+  @Property({ nullable: true })
+  image: string;
+
+  @Property({ columnType: 'timestamp' })
+  created_at = Date.now;
+
+  @Property({ columnType: 'timestamp' })
+  updated_at = Date.now;
 }
