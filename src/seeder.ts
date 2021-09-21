@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { name, internet, lorem, random, datatype, unique, date } from 'faker';
 import { User } from './users/user.entity';
 import { EntityManager } from '@mikro-orm/core';
