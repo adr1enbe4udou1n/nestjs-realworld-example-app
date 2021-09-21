@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { name, internet, lorem } from 'faker';
+import { name, internet, lorem, random, datatype } from 'faker';
 import { hash } from 'argon2';
 import { User } from './users/user.entity';
 import { EntityManager } from '@mikro-orm/core';
@@ -25,7 +25,16 @@ export class Seeder {
       this.em.persist(user);
     }
 
+    await this.em.flush();
+
+    const users = await this.em.find(User, {});
+
+    users.forEach((u) => {
+      u.followers.add(...random.arrayElements(users, datatype.number(5)));
+    });
+
     this.em.flush();
+
     this.logger.debug('Successfuly completed seeding users...');
   }
 }
