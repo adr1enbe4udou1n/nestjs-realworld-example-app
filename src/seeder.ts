@@ -6,7 +6,6 @@ import { Comment } from './article/comment.entity';
 import { Article } from './article/article.entity';
 import { Tag } from './tag/tag.entity';
 import { hash } from 'argon2';
-import slugify from 'slugify';
 import { capitalize } from 'lodash';
 
 @Injectable()
@@ -47,9 +46,6 @@ export class Seeder {
 
       const article = this.em.create(Article, {
         title,
-        slug: slugify(title, {
-          lower: true,
-        }),
         description: lorem.paragraph(),
         body: lorem.paragraphs(5),
         author: random.arrayElement(users),

@@ -1,4 +1,5 @@
 import {
+  BeforeCreate,
   Collection,
   Entity,
   ManyToMany,
@@ -11,6 +12,7 @@ import { User } from '../users/user.entity';
 import { Comment } from './comment.entity';
 import { Tag } from '../tag/tag.entity';
 import { HasTimestamps } from '../has-timestamps';
+import slugify from 'slugify';
 
 @Entity({ collection: 'articles' })
 export class Article implements HasTimestamps {
@@ -61,4 +63,11 @@ export class Article implements HasTimestamps {
 
   @Property({ columnType: 'timestamp' })
   updated_at: Date;
+
+  @BeforeCreate()
+  async beforeCreate() {
+    if (!this.slug) {
+      this.slug = slugify(this.title, { lower: true });
+    }
+  }
 }
