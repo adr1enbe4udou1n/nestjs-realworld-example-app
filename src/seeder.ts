@@ -10,10 +10,7 @@ import { capitalize } from 'lodash';
 
 @Injectable()
 export class Seeder {
-  constructor(
-    private readonly em: EntityManager,
-    private readonly logger: Logger,
-  ) {}
+  constructor(private readonly em: EntityManager) {}
   async seed() {
     await this.em.nativeDelete(Tag, {});
     await this.em.nativeDelete(Comment, {});
