@@ -4,18 +4,22 @@ import {
   Entity,
   ManyToMany,
   OneToMany,
+  PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { BaseEntity } from '../base.entity';
 import { Article } from '../article/article.entity';
 import { Comment } from '../article/comment.entity';
+import { HasTimestamps } from '../has-timestamps';
 
 @Entity({ collection: 'users' })
-export class User extends BaseEntity {
+export class User implements HasTimestamps {
+  @PrimaryKey()
+  id: number;
+
   @Property()
   username: string;
 
-  @Property()
+  @Property({ unique: true })
   @IsEmail()
   email: string;
 
@@ -33,13 +37,11 @@ export class User extends BaseEntity {
   })
   following = new Collection<User>(this);
 
-  @ManyToMany({
-    entity: () => User,
-    inversedBy: (u) => u.following,
+  @ManyToMany(() => User, (u) => u.following, {
     owner: true,
     pivotTable: 'follower_user',
-    joinColumn: 'follower_id',
-    inverseJoinColumn: 'following_id',
+    joinColumn: 'following_id',
+    inverseJoinColumn: 'follower_id',
     hidden: true,
   })
   followers = new Collection<User>(this);
@@ -57,10 +59,13 @@ export class User extends BaseEntity {
   comments = new Collection<Comment>(this);
 
   @ManyToMany(() => Article, (a) => a.favoredUsers, {
-    pivotTable: 'article_favorite',
-    joinColumn: 'article_id',
-    inverseJoinColumn: 'user_id',
     hidden: true,
   })
   favoriteArticles = new Collection<Article>(this);
+
+  @Property({ columnType: 'timestamp' })
+  created_at: Date;
+
+  @Property({ columnType: 'timestamp' })
+  updated_at: Date;
 }

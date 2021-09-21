@@ -1,17 +1,29 @@
-import { Collection, Entity, ManyToMany, Property } from '@mikro-orm/core';
+import {
+  Collection,
+  Entity,
+  ManyToMany,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { Article } from '../article/article.entity';
-import { BaseEntity } from '../base.entity';
+import { HasTimestamps } from '../has-timestamps';
 
 @Entity({ collection: 'tags' })
-export class Tag extends BaseEntity {
-  @Property()
+export class Tag implements HasTimestamps {
+  @PrimaryKey()
+  id: number;
+
+  @Property({ unique: true })
   name: string;
 
   @ManyToMany(() => Article, (a) => a.tags, {
-    pivotTable: 'article_tag',
-    joinColumn: 'article_id',
-    inverseJoinColumn: 'tag_id',
     hidden: true,
   })
   articles = new Collection<Article>(this);
+
+  @Property({ columnType: 'timestamp' })
+  created_at: Date;
+
+  @Property({ columnType: 'timestamp' })
+  updated_at: Date;
 }

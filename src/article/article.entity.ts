@@ -4,19 +4,26 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
+  PrimaryKey,
   Property,
 } from '@mikro-orm/core';
 import { User } from '../users/user.entity';
-import { BaseEntity } from '../base.entity';
 import { Comment } from './comment.entity';
 import { Tag } from '../tag/tag.entity';
+import { HasTimestamps } from '../has-timestamps';
 
 @Entity({ collection: 'articles' })
-export class Article extends BaseEntity {
+export class Article implements HasTimestamps {
+  @PrimaryKey()
+  id: number;
+
+  @ManyToOne({ joinColumn: 'user_id' })
+  author: User;
+
   @Property()
   title: string;
 
-  @Property()
+  @Property({ unique: true })
   slug: string;
 
   @Property({ columnType: 'text' })
@@ -25,29 +32,33 @@ export class Article extends BaseEntity {
   @Property({ columnType: 'text' })
   body: string;
 
-  @ManyToOne({ joinColumn: 'user_id' })
-  author: User;
-
   @ManyToMany(() => Tag, (t) => t.articles, {
+    owner: true,
     pivotTable: 'article_tag',
-    joinColumn: 'tag_id',
-    inverseJoinColumn: 'article_id',
+    joinColumn: 'article_id',
+    inverseJoinColumn: 'tag_id',
     hidden: true,
   })
   tags = new Collection<Tag>(this);
 
   @OneToMany(() => Comment, (c) => c.article, {
     inverseJoinColumn: 'article_id',
-    eager: true,
-    orphanRemoval: true,
+    hidden: true,
   })
   comments = new Collection<Comment>(this);
 
   @ManyToMany(() => User, (t) => t.favoriteArticles, {
+    owner: true,
     pivotTable: 'article_favorite',
-    joinColumn: 'user_id',
-    inverseJoinColumn: 'article_id',
+    joinColumn: 'article_id',
+    inverseJoinColumn: 'user_id',
     hidden: true,
   })
   favoredUsers = new Collection<User>(this);
+
+  @Property({ columnType: 'timestamp' })
+  created_at: Date;
+
+  @Property({ columnType: 'timestamp' })
+  updated_at: Date;
 }
