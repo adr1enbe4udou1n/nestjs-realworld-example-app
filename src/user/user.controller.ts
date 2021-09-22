@@ -7,12 +7,11 @@ export class UserController {
   @Get()
   async current(): Promise<UserEnvelope> {
     const user = {
-      email: 'sdf@sdf.fr',
-      password: 'sdfsdf',
-      username: 'john',
+      email: '',
+      username: '',
       bio: '',
       image: '',
-      token: 'token',
+      token: '',
     };
     return { user };
   }
@@ -22,12 +21,11 @@ export class UserController {
     @Body() updateUserCommand: UpdateUserCommand,
   ): Promise<UserEnvelope> {
     const user = {
-      email: 'sdf@sdf.fr',
-      password: 'sdfsdf',
-      username: 'john',
+      email: updateUserCommand.user.email,
+      username: '',
       bio: '',
       image: '',
-      token: 'token',
+      token: '',
     };
     return { user };
   }

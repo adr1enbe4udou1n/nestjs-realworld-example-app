@@ -22,12 +22,11 @@ export class UsersController {
   @Post('login')
   async login(@Body() loginCommand: LoginCommand): Promise<UserEnvelope> {
     const user = {
-      email: 'sdf@sdf.fr',
-      password: 'sdfsdf',
-      username: 'john',
+      email: loginCommand.user.email,
+      username: '',
       bio: '',
       image: '',
-      token: 'token',
+      token: '',
     };
     return { user };
   }
