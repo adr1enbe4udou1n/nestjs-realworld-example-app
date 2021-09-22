@@ -1,7 +1,7 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
-import { HasTimestamps } from '../has-timestamps';
-import { User } from '../users/user.entity';
-import { Article } from './article.entity';
+import { HasTimestamps } from '../../has-timestamps';
+import { User } from '../../users/user.entity';
+import { Article } from '../article.entity';
 
 @Entity({ collection: 'comments' })
 export class Comment implements HasTimestamps {

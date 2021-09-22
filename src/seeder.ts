@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { name, internet, lorem, random, datatype, unique, date } from 'faker';
 import { User } from './users/user.entity';
 import { EntityManager } from '@mikro-orm/core';
-import { Comment } from './article/comment.entity';
-import { Article } from './article/article.entity';
-import { Tag } from './tag/tag.entity';
+import { Comment } from './articles/comments/comment.entity';
+import { Article } from './articles/article.entity';
+import { Tag } from './tags/tag.entity';
 import { hash } from 'argon2';
 import { capitalize } from 'lodash';
 

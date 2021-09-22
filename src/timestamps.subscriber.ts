@@ -1,5 +1,5 @@
 import { EventArgs, EventSubscriber } from '@mikro-orm/core';
-import { Article } from './article/article.entity';
+import { Article } from './articles/article.entity';
 import { HasTimestamps } from './has-timestamps';
 
 export class TimestampsSubscriber implements EventSubscriber {

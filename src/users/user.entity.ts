@@ -7,8 +7,8 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { Article } from '../article/article.entity';
-import { Comment } from '../article/comment.entity';
+import { Article } from '../articles/article.entity';
+import { Comment } from '../articles/comments/comment.entity';
 import { HasTimestamps } from '../has-timestamps';
 
 @Entity({ collection: 'users' })

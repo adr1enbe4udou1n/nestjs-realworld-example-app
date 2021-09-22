@@ -9,8 +9,8 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { User } from '../users/user.entity';
-import { Comment } from './comment.entity';
-import { Tag } from '../tag/tag.entity';
+import { Comment } from './comments/comment.entity';
+import { Tag } from '../tags/tag.entity';
 import { HasTimestamps } from '../has-timestamps';
 import slugify from 'slugify';
 

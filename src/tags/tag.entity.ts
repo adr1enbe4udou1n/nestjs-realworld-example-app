@@ -5,7 +5,7 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { Article } from '../article/article.entity';
+import { Article } from '../articles/article.entity';
 import { HasTimestamps } from '../has-timestamps';
 
 @Entity({ collection: 'tags' })
