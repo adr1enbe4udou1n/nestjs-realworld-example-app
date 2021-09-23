@@ -1,5 +1,6 @@
 import { Logger, Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { ConfigModule } from '@nestjs/config';
 import { Seeder } from './seeder';
 
 /**
@@ -8,7 +9,7 @@ import { Seeder } from './seeder';
  * @module
  */
 @Module({
-  imports: [MikroOrmModule.forRoot()],
+  imports: [ConfigModule.forRoot(), MikroOrmModule.forRoot()],
   providers: [Logger, Seeder],
 })
 export class SeederModule {}

@@ -22,6 +22,10 @@
     "seed": "ts-node src/seed.ts"
   },
   "dependencies": {
+    "@automapper/classes": "^6.2.1",
+    "@automapper/core": "^6.2.1",
+    "@automapper/nestjs": "^6.2.1",
+    "@automapper/types": "^6.2.1",
     "@mikro-orm/cli": "^4.5.9",
     "@mikro-orm/core": "^4.5.9",
     "@mikro-orm/migrations": "^4.5.9",
@@ -30,6 +34,7 @@
     "@mikro-orm/reflection": "^4.5.9",
     "@mikro-orm/sql-highlighter": "^1.0.1",
     "@nestjs/common": "^8.0.6",
+    "@nestjs/config": "^1.0.1",
     "@nestjs/core": "^8.0.6",
     "@nestjs/cqrs": "^8.0.0",
     "@nestjs/platform-express": "^8.0.6",
