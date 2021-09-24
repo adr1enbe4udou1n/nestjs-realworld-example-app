@@ -1,3 +1,4 @@
+import { AutoMap } from '@automapper/classes';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 
@@ -5,6 +6,7 @@ export class RegisterDTO {
   @ApiProperty()
   @IsNotEmpty()
   @IsEmail()
+  @AutoMap()
   email: string;
 
   @ApiProperty()

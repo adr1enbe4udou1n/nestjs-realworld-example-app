@@ -18,10 +18,12 @@ export class UsersService {
   ) {}
 
   public async register(data: RegisterDTO) {
-    const user = this.mapper.map(data, User, RegisterDTO);
-    user.password = await hash(data.password);
+    // const user = this.mapper.map(data, User, RegisterDTO);
+    //user.password = await hash(data.password);
 
     //await this.userRepository.persistAndFlush(data);
+
+    const user = new User();
 
     return this.mapper.map(user, CurrentUserDTO, User);
   }
