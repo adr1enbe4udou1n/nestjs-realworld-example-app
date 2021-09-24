@@ -17,7 +17,7 @@ export class User implements HasTimestamps {
   id: number;
 
   @Property()
-  username: string;
+  name: string;
 
   @Property({ unique: true })
   @IsEmail()

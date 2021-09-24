@@ -6,7 +6,7 @@ import { User } from './user.entity';
 import { hash } from 'argon2';
 import { Mapper } from '@automapper/types';
 import { InjectMapper } from '@automapper/nestjs';
-import { UserDTO } from '../user/dto/current-user-dto';
+import { CurrentUserDTO } from '../user/dto/current-user-dto';
 
 @Injectable()
 export class UsersService {
@@ -18,10 +18,11 @@ export class UsersService {
   ) {}
 
   public async register(data: RegisterDTO) {
-    data.password = await hash(data.password);
+    const user = this.mapper.map(data, User, RegisterDTO);
+    user.password = await hash(data.password);
 
-    const user = this.userRepository.create(data);
+    //await this.userRepository.persistAndFlush(data);
 
-    return this.mapper.map(user, UserDTO, User);
+    return this.mapper.map(user, CurrentUserDTO, User);
   }
 }

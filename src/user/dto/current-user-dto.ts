@@ -1,4 +1,4 @@
-export class UserDTO {
+export class CurrentUserDTO {
   email: string;
   username: string;
   bio?: string;
@@ -7,5 +7,5 @@ export class UserDTO {
 }
 
 export class UserEnvelope {
-  user: UserDTO;
+  user: CurrentUserDTO;
 }
