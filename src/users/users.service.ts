@@ -5,6 +5,8 @@ import { RegisterDTO } from './dto/register-dto';
 import { User } from './user.entity';
 import { CurrentUserDTO } from '../user/dto/current-user-dto';
 import { JwtService } from '@nestjs/jwt';
+import { LoginDTO } from './dto/login-dto';
+import { verify } from 'argon2';
 
 @Injectable()
 export class UsersService {
@@ -22,6 +24,19 @@ export class UsersService {
     }
 
     await this.userRepository.persistAndFlush(user);
+
+    return CurrentUserDTO.fromUser(
+      user,
+      this.jwtService.sign({ id: user.id, name: user.name, email: user.email }),
+    );
+  }
+
+  public async login(data: LoginDTO) {
+    const user = await this.userRepository.findOne({ email: data.email });
+
+    if (user === null || !(await verify(user.password, data.password))) {
+      throw new BadRequestException('Bad credentials');
+    }
 
     return CurrentUserDTO.fromUser(
       user,

@@ -17,13 +17,6 @@ export class UsersController {
 
   @Post('login')
   async login(@Body() loginCommand: LoginCommand): Promise<UserEnvelope> {
-    const user = {
-      email: loginCommand.user.email,
-      username: '',
-      bio: '',
-      image: '',
-      token: '',
-    };
-    return { user };
+    return { user: await this.usersService.login(loginCommand.user) };
   }
 }

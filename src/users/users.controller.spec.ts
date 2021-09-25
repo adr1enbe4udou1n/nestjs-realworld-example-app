@@ -1,8 +1,10 @@
 import { MikroORM } from '@mikro-orm/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { hash } from 'argon2';
 import { plainToClass } from 'class-transformer';
 import { InitializeDbTestBase } from '../db-test-base';
+import { LoginDTO } from './dto/login-dto';
 import { RegisterDTO } from './dto/register-dto';
 import { User } from './user.entity';
 import { UsersController } from './users.controller';
@@ -99,5 +101,60 @@ describe('UsersController', () => {
         }),
       }),
     ).rejects.toThrow(BadRequestException);
+  });
+
+  it.each([
+    {
+      email: 'jane.doe@example.com',
+      password: 'password',
+    },
+    {
+      email: 'john.doe@example.com',
+      password: 'badpassword',
+    },
+  ])('should not login with invalid data', async (data) => {
+    await orm.em.getRepository(User).persistAndFlush(
+      plainToClass(User, {
+        email: 'john.doe@example.com',
+        name: 'John Doe',
+        password: await hash('password'),
+      }),
+    );
+
+    await expect(() =>
+      controller.login({
+        user: plainToClass(LoginDTO, data),
+      }),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('should login', async () => {
+    await orm.em.getRepository(User).persistAndFlush(
+      plainToClass(User, {
+        email: 'john.doe@example.com',
+        name: 'John Doe',
+        password: await hash('password'),
+      }),
+    );
+
+    const data = await controller.login({
+      user: plainToClass(LoginDTO, {
+        email: 'john.doe@example.com',
+        password: 'password',
+      }),
+    });
+
+    expect(data).toMatchObject({
+      user: {
+        email: 'john.doe@example.com',
+        username: 'John Doe',
+        bio: null,
+        image: null,
+      },
+    });
+
+    const payload = jwt.decode(data.user.token);
+    expect(payload['name']).toBe('John Doe');
+    expect(payload['email']).toBe('john.doe@example.com');
   });
 });
