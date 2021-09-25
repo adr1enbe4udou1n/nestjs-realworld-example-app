@@ -1,6 +1,8 @@
+import { Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { User } from 'src/users/user.entity';
 
+@Injectable()
 export class CurrentUserDTO {
   email: string;
   username: string;
@@ -8,13 +10,13 @@ export class CurrentUserDTO {
   image?: string;
   token: string;
 
-  public static fromUser(user: User): CurrentUserDTO {
+  static fromUser(user: User, token: string): CurrentUserDTO {
     return plainToClass(CurrentUserDTO, {
       username: user.name,
       email: user.email,
       bio: user.bio,
       image: user.image,
-      token: 'token',
+      token,
     });
   }
 }

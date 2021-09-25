@@ -1,10 +1,8 @@
 import { MikroORM } from '@mikro-orm/core';
-import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { plainToClass } from 'class-transformer';
-import { CurrentUserDTO } from '../user/dto/current-user-dto';
+import { InitializeDbTestBase } from '../db-test-base';
 import { RegisterDTO } from './dto/register-dto';
 import { User } from './user.entity';
 import { UsersController } from './users.controller';
@@ -13,22 +11,21 @@ import { UsersService } from './users.service';
 describe('UsersController', () => {
   let controller: UsersController;
   let orm: MikroORM;
+  let jwt: JwtService;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({ envFilePath: '.env.testing' }),
-        MikroOrmModule.forRoot(),
-        MikroOrmModule.forFeature([User]),
-      ],
+    const module = await InitializeDbTestBase({
       controllers: [UsersController],
       providers: [UsersService],
-    }).compile();
+    });
 
-    controller = module.get<UsersController>(UsersController);
-    orm = module.get<MikroORM>(MikroORM);
+    controller = module.get(UsersController);
+    orm = module.get(MikroORM);
+    jwt = module.get(JwtService);
+  });
 
-    await orm.em.nativeDelete(User, {});
+  afterEach(async () => {
+    await orm.close(true);
   });
 
   it.each([
@@ -55,22 +52,52 @@ describe('UsersController', () => {
   });
 
   it('should register new users', async () => {
-    expect(
-      await controller.register({
+    const data = await controller.register({
+      user: plainToClass(RegisterDTO, {
+        email: 'john.doe@example.com',
+        username: 'John Doe',
+        password: 'password',
+      }),
+    });
+
+    expect(data).toMatchObject({
+      user: {
+        email: 'john.doe@example.com',
+        username: 'John Doe',
+        bio: null,
+        image: null,
+      },
+    });
+
+    const user = await orm.em
+      .getRepository(User)
+      .findOne({ email: 'john.doe@example.com' });
+
+    expect(user).not.toBeNull();
+
+    const payload = jwt.decode(data.user.token);
+    expect(payload['id']).toBe(user.id);
+    expect(payload['name']).toBe('John Doe');
+    expect(payload['email']).toBe('john.doe@example.com');
+  });
+
+  it('cannot register twice', async () => {
+    await orm.em.getRepository(User).persistAndFlush(
+      plainToClass(User, {
+        email: 'john.doe@example.com',
+        name: 'John Doe',
+        password: 'password',
+      }),
+    );
+
+    await expect(() =>
+      controller.register({
         user: plainToClass(RegisterDTO, {
           email: 'john.doe@example.com',
           username: 'John Doe',
           password: 'password',
         }),
       }),
-    ).toStrictEqual({
-      user: plainToClass(CurrentUserDTO, {
-        email: 'john.doe@example.com',
-        username: 'John Doe',
-        bio: null,
-        image: null,
-        token: 'token',
-      }),
-    });
+    ).rejects.toThrow(BadRequestException);
   });
 });
