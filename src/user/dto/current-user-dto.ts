@@ -1,18 +1,22 @@
-import { AutoMap } from '@automapper/classes';
+import { plainToClass } from 'class-transformer';
+import { User } from 'src/users/user.entity';
 
 export class CurrentUserDTO {
-  @AutoMap()
   email: string;
-
   username: string;
-
-  @AutoMap()
   bio?: string;
-
-  @AutoMap()
   image?: string;
-
   token: string;
+
+  public static fromUser(user: User): CurrentUserDTO {
+    return plainToClass(CurrentUserDTO, {
+      username: user.name,
+      email: user.email,
+      bio: user.bio,
+      image: user.image,
+      token: 'token',
+    });
+  }
 }
 
 export class UserEnvelope {

@@ -10,7 +10,6 @@ import {
 import { Article } from '../articles/article.entity';
 import { Comment } from '../articles/comments/comment.entity';
 import { HasTimestamps } from '../has-timestamps';
-import { AutoMap } from '@automapper/classes';
 
 @Entity({ collection: 'users' })
 export class User implements HasTimestamps {
@@ -22,19 +21,16 @@ export class User implements HasTimestamps {
 
   @Property({ unique: true })
   @IsEmail()
-  @AutoMap()
   email: string;
 
   @Property({ hidden: true })
   password: string;
 
   @Property({ nullable: true, columnType: 'text' })
-  @AutoMap()
-  bio?: string;
+  bio?: string = null;
 
   @Property({ nullable: true })
-  @AutoMap()
-  image?: string;
+  image?: string = null;
 
   @ManyToMany(() => User, (u) => u.followers, {
     hidden: true,

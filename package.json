@@ -22,10 +22,6 @@
     "seed": "ts-node src/seed.ts"
   },
   "dependencies": {
-    "@automapper/classes": "^6.2.1",
-    "@automapper/core": "^6.2.1",
-    "@automapper/nestjs": "^6.2.1",
-    "@automapper/types": "^6.2.1",
     "@mikro-orm/cli": "^4.5.9",
     "@mikro-orm/core": "^4.5.9",
     "@mikro-orm/migrations": "^4.5.9",

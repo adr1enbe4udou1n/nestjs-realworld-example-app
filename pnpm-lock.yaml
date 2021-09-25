@@ -1,10 +1,6 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@automapper/classes': ^6.2.1
-  '@automapper/core': ^6.2.1
-  '@automapper/nestjs': ^6.2.1
-  '@automapper/types': ^6.2.1
   '@mikro-orm/cli': ^4.5.9
   '@mikro-orm/core': ^4.5.9
   '@mikro-orm/migrations': ^4.5.9
@@ -53,10 +49,6 @@ specifiers:
   webpack: ^5.54.0
 
 dependencies:
-  '@automapper/classes': 6.2.1_4bb65ec57233afe3cfac89733bac292d
-  '@automapper/core': 6.2.1_@automapper+types@6.2.1
-  '@automapper/nestjs': 6.2.1_1285dc2379e1a03d87c9af2d1c3523bc
-  '@automapper/types': 6.2.1
   '@mikro-orm/cli': 4.5.9_@mikro-orm+postgresql@4.5.9
   '@mikro-orm/core': 4.5.9_40bc058361f12b4a6a81884bbe496c64
   '@mikro-orm/migrations': 4.5.9_@mikro-orm+core@4.5.9
@@ -162,48 +154,6 @@ packages:
       ora: 5.4.1
       rxjs: 6.6.7
     dev: true
-
-  /@automapper/classes/6.2.1_4bb65ec57233afe3cfac89733bac292d:
-    resolution: {integrity: sha512-jg+DnAGVvGWzyVMc05uaW6VgRIPsqO6QndOVGDqmEwWLfcEXCh3oXL6QgHfuEQQWkGyjhyaxUScvK2uHxKJASA==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      '@automapper/core': 6.2.1
-      '@automapper/types': 6.2.1
-      reflect-metadata: ~0.1.13
-    dependencies:
-      '@automapper/core': 6.2.1_@automapper+types@6.2.1
-      '@automapper/types': 6.2.1
-      reflect-metadata: 0.1.13
-    dev: false
-
-  /@automapper/core/6.2.1_@automapper+types@6.2.1:
-    resolution: {integrity: sha512-vz51AubIafpD5DXrMB7AjMzx4qM9pmqMwolpFtR9glWSJCDHAsuuNNtyVfGU6WKmXtnWsZQyUeh9uIQBmjw8+g==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      '@automapper/types': 6.2.1
-    dependencies:
-      '@automapper/types': 6.2.1
-    dev: false
-
-  /@automapper/nestjs/6.2.1_1285dc2379e1a03d87c9af2d1c3523bc:
-    resolution: {integrity: sha512-2JkRXWn9vn0LepjxtEOcaUr9ttYor6Uc7+xrrdQdIsvYRVIyppPfjte3yPk8R9/UVX9y7FcKy8dow1Lc1MSpdw==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      '@automapper/core': 6.2.1
-      '@automapper/types': 6.2.1
-      '@nestjs/common': ^7.0.0 || ^8.0.0
-      '@nestjs/core': ^7.0.0 || ^8.0.0
-    dependencies:
-      '@automapper/core': 6.2.1_@automapper+types@6.2.1
-      '@automapper/types': 6.2.1
-      '@nestjs/common': 8.0.7_7de7ece315067f012f2001b6a7f20971
-      '@nestjs/core': 8.0.7_89a1b2f707b1c5de9d83624ae0c6b3b1
-    dev: false
-
-  /@automapper/types/6.2.1:
-    resolution: {integrity: sha512-a/hSzV4ETeUJf7l3XJNlfv3TRNCD03Dvv2IpR0o7X9lEFox2mPV5PtbD7HsfJpTenMinueaOwKDnnM53RJeZuQ==}
-    engines: {node: '>=10.0.0'}
-    dev: false
 
   /@babel/code-frame/7.12.11:
     resolution: {integrity: sha512-Zt1yodBx1UcyiePMSkWnU4hPqhwq7hGi2nFL1LeA3EUl+q2LQx16MISgJ0+z7dnmgvP9QtIleuETGOiOH1RcIw==}

@@ -1,19 +1,17 @@
-import { classes } from '@automapper/classes';
-import { AutomapperModule } from '@automapper/nestjs';
 import { MikroORM } from '@mikro-orm/core';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { plainToClass } from 'class-transformer';
+import { CurrentUserDTO } from '../user/dto/current-user-dto';
 import { RegisterDTO } from './dto/register-dto';
-import { UserProfile } from './profile/user-profile';
 import { User } from './user.entity';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
 describe('UsersController', () => {
   let controller: UsersController;
-  let service: UsersService;
   let orm: MikroORM;
 
   beforeEach(async () => {
@@ -22,18 +20,15 @@ describe('UsersController', () => {
         ConfigModule.forRoot({ envFilePath: '.env.testing' }),
         MikroOrmModule.forRoot(),
         MikroOrmModule.forFeature([User]),
-        AutomapperModule.forRoot({
-          options: [{ name: 'auto', pluginInitializer: classes }],
-          singular: true,
-        }),
       ],
       controllers: [UsersController],
-      providers: [UsersService, UserProfile],
+      providers: [UsersService],
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
-    service = module.get<UsersService>(UsersService);
     orm = module.get<MikroORM>(MikroORM);
+
+    await orm.em.nativeDelete(User, {});
   });
 
   it.each([
@@ -62,20 +57,20 @@ describe('UsersController', () => {
   it('should register new users', async () => {
     expect(
       await controller.register({
-        user: {
+        user: plainToClass(RegisterDTO, {
           email: 'john.doe@example.com',
           username: 'John Doe',
           password: 'password',
-        },
+        }),
       }),
     ).toStrictEqual({
-      user: {
+      user: plainToClass(CurrentUserDTO, {
         email: 'john.doe@example.com',
         username: 'John Doe',
-        bio: '',
-        image: '',
+        bio: null,
+        image: null,
         token: 'token',
-      },
+      }),
     });
   });
 });
