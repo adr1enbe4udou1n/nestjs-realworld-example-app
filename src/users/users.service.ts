@@ -6,7 +6,8 @@ import { User } from './user.entity';
 import { CurrentUserDTO } from '../user/dto/current-user-dto';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDTO } from './dto/login-dto';
-import { verify } from 'argon2';
+import { hash, verify } from 'argon2';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +18,11 @@ export class UsersService {
   ) {}
 
   public async register(data: RegisterDTO) {
-    const user = await data.makeUser();
+    const user = await plainToClass(User, {
+      name: data.username,
+      email: data.email,
+      password: await hash(data.password),
+    });
 
     if ((await this.userRepository.count({ email: user.email })) > 0) {
       throw new BadRequestException('This email is already used');

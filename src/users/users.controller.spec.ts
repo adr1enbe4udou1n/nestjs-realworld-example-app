@@ -4,7 +4,6 @@ import { JwtService } from '@nestjs/jwt';
 import { hash } from 'argon2';
 import { plainToClass } from 'class-transformer';
 import { InitializeDbTestBase } from '../db-test-base';
-import { LoginDTO } from './dto/login-dto';
 import { RegisterDTO } from './dto/register-dto';
 import { User } from './user.entity';
 import { UsersController } from './users.controller';
@@ -55,11 +54,11 @@ describe('UsersController', () => {
 
   it('should register new users', async () => {
     const data = await controller.register({
-      user: plainToClass(RegisterDTO, {
+      user: {
         email: 'john.doe@example.com',
         username: 'John Doe',
         password: 'password',
-      }),
+      },
     });
 
     expect(data).toMatchObject({
@@ -123,7 +122,7 @@ describe('UsersController', () => {
 
     await expect(() =>
       controller.login({
-        user: plainToClass(LoginDTO, data),
+        user: data,
       }),
     ).rejects.toThrow(BadRequestException);
   });
@@ -138,10 +137,10 @@ describe('UsersController', () => {
     );
 
     const data = await controller.login({
-      user: plainToClass(LoginDTO, {
+      user: {
         email: 'john.doe@example.com',
         password: 'password',
-      }),
+      },
     });
 
     expect(data).toMatchObject({

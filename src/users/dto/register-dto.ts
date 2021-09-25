@@ -1,8 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { hash } from 'argon2';
-import { plainToClass } from 'class-transformer';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
-import { User } from '../user.entity';
 
 export class RegisterDTO {
   @ApiProperty()
@@ -18,14 +15,6 @@ export class RegisterDTO {
   @IsNotEmpty()
   @MinLength(8)
   public password: string;
-
-  async makeUser(): Promise<User> {
-    return plainToClass(User, {
-      name: this.username,
-      email: this.email,
-      password: await hash(this.password),
-    });
-  }
 }
 
 export class RegisterCommand {

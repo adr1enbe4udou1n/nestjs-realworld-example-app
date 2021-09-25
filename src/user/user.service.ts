@@ -8,7 +8,7 @@ import { UpdateUserDTO } from './dto/update-user-dto';
 
 @Injectable()
 export class UserService {
-  private _user: User;
+  private _user: User = null;
 
   public get user() {
     return this._user;
@@ -16,6 +16,10 @@ export class UserService {
 
   public set user(user: User) {
     this._user = user;
+  }
+
+  public get isAuthenticated() {
+    return this._user !== null;
   }
 
   constructor(
@@ -46,7 +50,7 @@ export class UserService {
   }
 
   public async setUserFromToken(token: string) {
-    const payload = this.jwtService.decode(token);
-    this.user = await this.userRepository.findOneOrFail(payload['id']);
+    const payload = this.jwtService.verify(token);
+    this.user = await this.userRepository.findOneOrFail(payload.id);
   }
 }

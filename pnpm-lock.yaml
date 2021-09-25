@@ -35,7 +35,6 @@ specifiers:
   faker: ^5.5.3
   jest: ^27.2.1
   lodash: ^4.17.21
-  passport-jwt: ^4.0.0
   prettier: ^2.4.1
   reflect-metadata: ^0.1.13
   rimraf: ^3.0.2
@@ -69,7 +68,6 @@ dependencies:
   class-validator: 0.13.1
   express: 4.17.1
   lodash: 4.17.21
-  passport-jwt: 4.0.0
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
   rxjs: 7.3.0
@@ -5692,18 +5690,6 @@ packages:
   /pascalcase/0.1.1:
     resolution: {integrity: sha1-s2PlXoAGym/iF4TS2yK9FdeRfxQ=}
     engines: {node: '>=0.10.0'}
-    dev: false
-
-  /passport-jwt/4.0.0:
-    resolution: {integrity: sha512-BwC0n2GP/1hMVjR4QpnvqA61TxenUMlmfNjYNgK0ZAs0HK4SOQkHcSv4L328blNTLtHq7DbmvyNJiH+bn6C5Mg==}
-    dependencies:
-      jsonwebtoken: 8.5.1
-      passport-strategy: 1.0.0
-    dev: false
-
-  /passport-strategy/1.0.0:
-    resolution: {integrity: sha1-tVOaqPwiWj0a0XlHbd8ja0QPUuQ=}
-    engines: {node: '>= 0.4.0'}
     dev: false
 
   /path-browserify/1.0.1:

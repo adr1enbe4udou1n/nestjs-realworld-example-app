@@ -23,7 +23,7 @@ export class Seeder {
     for (let i = 1; i <= 50; i++) {
       users.push(
         this.em.create(User, {
-          username: name.findName(),
+          name: name.findName(),
           email: internet.email(),
           password: await hash('password'),
           bio: lorem.paragraphs(3),
