@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth.guard';
 import { UserEnvelope } from './dto/current-user-dto';
 import { UpdateUserCommand } from './dto/update-user-dto';
@@ -13,12 +13,14 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Get()
+  @ApiResponse({ type: UserEnvelope })
   async current(): Promise<UserEnvelope> {
-    return { user: this.userService.current() };
+    return { user: await this.userService.current() };
   }
 
   @UseGuards(AuthGuard)
   @Put()
+  @ApiResponse({ type: UserEnvelope })
   async update(
     @Body() updateUserCommand: UpdateUserCommand,
   ): Promise<UserEnvelope> {

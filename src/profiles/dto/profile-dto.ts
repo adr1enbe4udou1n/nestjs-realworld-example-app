@@ -1,11 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
+import { UserService } from '../../user/user.service';
 import { User } from '../../users/user.entity';
 
-export class CurrentUserDTO {
-  @ApiProperty()
-  email: string;
-
+export class ProfileDTO {
   @ApiProperty()
   username: string;
 
@@ -16,20 +14,22 @@ export class CurrentUserDTO {
   image?: string;
 
   @ApiProperty()
-  token: string;
+  following: boolean;
 
-  static fromUser(user: User, token: string): CurrentUserDTO {
-    return plainToClass(CurrentUserDTO, {
+  static fromUser(user: User, userService: UserService) {
+    return plainToClass(ProfileDTO, {
       username: user.name,
       email: user.email,
       bio: user.bio,
       image: user.image,
-      token,
+      following: user.followers
+        .getItems()
+        .some((u) => u.id === userService.user.id),
     });
   }
 }
 
-export class UserEnvelope {
+export class ProfileEnvelope {
   @ApiProperty()
-  user: CurrentUserDTO;
+  profile: ProfileDTO;
 }

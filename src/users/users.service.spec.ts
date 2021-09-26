@@ -3,7 +3,8 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { hash } from 'argon2';
 import { plainToClass } from 'class-transformer';
-import { initializeDbTestBase } from '../db-test-base';
+import { CurrentUserDTO } from '../user/dto/current-user-dto';
+import { act, initializeDbTestBase } from '../db-test-base';
 import { RegisterDTO } from './dto/register-dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
@@ -51,11 +52,13 @@ describe('UsersService', () => {
   });
 
   it('can register new users', async () => {
-    const user = await service.register({
-      email: 'john.doe@example.com',
-      username: 'John Doe',
-      password: 'password',
-    });
+    const user = await act<CurrentUserDTO>(orm, () =>
+      service.register({
+        email: 'john.doe@example.com',
+        username: 'John Doe',
+        password: 'password',
+      }),
+    );
 
     expect(user).toMatchObject({
       email: 'john.doe@example.com',
@@ -86,12 +89,14 @@ describe('UsersService', () => {
     );
 
     await expect(() =>
-      service.register(
-        plainToClass(RegisterDTO, {
-          email: 'john.doe@example.com',
-          username: 'John Doe',
-          password: 'password',
-        }),
+      act(orm, () =>
+        service.register(
+          plainToClass(RegisterDTO, {
+            email: 'john.doe@example.com',
+            username: 'John Doe',
+            password: 'password',
+          }),
+        ),
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -114,7 +119,7 @@ describe('UsersService', () => {
       }),
     );
 
-    await expect(() => service.login(data)).rejects.toThrow(
+    await expect(() => act(orm, () => service.login(data))).rejects.toThrow(
       BadRequestException,
     );
   });
@@ -128,10 +133,12 @@ describe('UsersService', () => {
       }),
     );
 
-    const user = await service.login({
-      email: 'john.doe@example.com',
-      password: 'password',
-    });
+    const user = await act(orm, () =>
+      service.login({
+        email: 'john.doe@example.com',
+        password: 'password',
+      }),
+    );
 
     expect(user).toMatchObject({
       email: 'john.doe@example.com',

@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserEnvelope } from '../user/dto/current-user-dto';
 import { LoginCommand } from './dto/login-dto';
 import { RegisterCommand } from './dto/register-dto';
@@ -11,6 +11,7 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Post()
+  @ApiResponse({ type: UserEnvelope })
   async register(
     @Body() registerCommand: RegisterCommand,
   ): Promise<UserEnvelope> {
@@ -18,6 +19,7 @@ export class UsersController {
   }
 
   @Post('login')
+  @ApiResponse({ type: UserEnvelope })
   async login(@Body() loginCommand: LoginCommand): Promise<UserEnvelope> {
     return { user: await this.usersService.login(loginCommand.user) };
   }

@@ -2,8 +2,14 @@ import { MikroORM } from '@mikro-orm/core';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/user.entity';
-import { initializeDbTestBase, actingAs, createUser } from '../db-test-base';
+import {
+  initializeDbTestBase,
+  actingAs,
+  createUser,
+  act,
+} from '../db-test-base';
 import { UserService } from './user.service';
+import { CurrentUserDTO } from './dto/current-user-dto';
 
 describe('UsersService', () => {
   let service: UserService;
@@ -25,17 +31,17 @@ describe('UsersService', () => {
   });
 
   it('guest cannot fetch user infos', async () => {
-    expect(() => service.current()).toThrow(UnauthorizedException);
+    expect(() => service.current()).rejects.toThrow(UnauthorizedException);
   });
 
   it('guest cannot update infos', async () => {
-    expect(() => service.current()).toThrow(UnauthorizedException);
+    expect(() => service.current()).rejects.toThrow(UnauthorizedException);
   });
 
   it('can fetch user infos', async () => {
     await actingAs(orm, service);
 
-    const user = service.current();
+    const user = await act<CurrentUserDTO>(orm, () => service.current());
 
     expect(user).toMatchObject({
       email: 'john.doe@example.com',
@@ -50,9 +56,11 @@ describe('UsersService', () => {
   it('can update own email', async () => {
     await actingAs(orm, service);
 
-    const user = await service.update({
-      email: 'jane.doe@example.com',
-    });
+    const user = await act(orm, () =>
+      service.update({
+        email: 'jane.doe@example.com',
+      }),
+    );
 
     expect(user).toMatchObject({
       email: 'jane.doe@example.com',
@@ -74,9 +82,11 @@ describe('UsersService', () => {
     await actingAs(orm, service);
 
     await expect(() =>
-      service.update({
-        email: 'jane.doe@example.com',
-      }),
+      act(orm, () =>
+        service.update({
+          email: 'jane.doe@example.com',
+        }),
+      ),
     ).rejects.toThrow(BadRequestException);
   });
 });

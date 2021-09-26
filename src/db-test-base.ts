@@ -58,4 +58,13 @@ export const actingAs = async (
 ) => {
   const user = await createUser(orm, data);
   service.user = user;
+  return user;
+};
+
+export const act = async <T>(orm: MikroORM, action: () => Promise<T>) => {
+  orm.em.clear();
+  const result = await action();
+  orm.em.clear();
+
+  return result;
 };

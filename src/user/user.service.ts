@@ -32,7 +32,7 @@ export class UserService {
     private jwtService: JwtService,
   ) {}
 
-  public current() {
+  public async current() {
     if (!this.isAuthenticated) {
       throw new UnauthorizedException();
     }
