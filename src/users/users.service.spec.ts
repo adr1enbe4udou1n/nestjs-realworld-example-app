@@ -6,21 +6,19 @@ import { plainToClass } from 'class-transformer';
 import { initializeDbTestBase } from '../db-test-base';
 import { RegisterDTO } from './dto/register-dto';
 import { User } from './user.entity';
-import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
-describe('UsersController', () => {
-  let controller: UsersController;
+describe('UsersService', () => {
   let orm: MikroORM;
+  let service: UsersService;
   let jwt: JwtService;
 
   beforeEach(async () => {
     const module = await initializeDbTestBase({
-      controllers: [UsersController],
       providers: [UsersService],
     });
 
-    controller = module.get(UsersController);
+    service = module.get(UsersService);
     orm = module.get(MikroORM);
     jwt = module.get(JwtService);
   });
@@ -53,31 +51,27 @@ describe('UsersController', () => {
   });
 
   it('should register new users', async () => {
-    const data = await controller.register({
-      user: {
-        email: 'john.doe@example.com',
-        username: 'John Doe',
-        password: 'password',
-      },
+    const user = await service.register({
+      email: 'john.doe@example.com',
+      username: 'John Doe',
+      password: 'password',
     });
 
-    expect(data).toMatchObject({
-      user: {
-        email: 'john.doe@example.com',
-        username: 'John Doe',
-        bio: null,
-        image: null,
-      },
+    expect(user).toMatchObject({
+      email: 'john.doe@example.com',
+      username: 'John Doe',
+      bio: null,
+      image: null,
     });
 
-    const user = await orm.em
+    const entity = await orm.em
       .getRepository(User)
       .findOne({ email: 'john.doe@example.com' });
 
-    expect(user).not.toBeNull();
+    expect(entity).not.toBeNull();
 
-    const payload = jwt.decode(data.user.token);
-    expect(payload['id']).toBe(user.id);
+    const payload = jwt.decode(user.token);
+    expect(payload['id']).toBe(entity.id);
     expect(payload['name']).toBe('John Doe');
     expect(payload['email']).toBe('john.doe@example.com');
   });
@@ -92,13 +86,13 @@ describe('UsersController', () => {
     );
 
     await expect(() =>
-      controller.register({
-        user: plainToClass(RegisterDTO, {
+      service.register(
+        plainToClass(RegisterDTO, {
           email: 'john.doe@example.com',
           username: 'John Doe',
           password: 'password',
         }),
-      }),
+      ),
     ).rejects.toThrow(BadRequestException);
   });
 
@@ -120,11 +114,9 @@ describe('UsersController', () => {
       }),
     );
 
-    await expect(() =>
-      controller.login({
-        user: data,
-      }),
-    ).rejects.toThrow(BadRequestException);
+    await expect(() => service.login(data)).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('should login', async () => {
@@ -136,11 +128,9 @@ describe('UsersController', () => {
       }),
     );
 
-    const { user } = await controller.login({
-      user: {
-        email: 'john.doe@example.com',
-        password: 'password',
-      },
+    const user = await service.login({
+      email: 'john.doe@example.com',
+      password: 'password',
     });
 
     expect(user).toMatchObject({

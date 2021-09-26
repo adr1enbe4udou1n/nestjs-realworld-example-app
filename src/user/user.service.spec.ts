@@ -2,22 +2,18 @@ import { MikroORM } from '@mikro-orm/core';
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { initializeDbTestBase, actingAs } from '../db-test-base';
-import { UserController } from './user.controller';
 import { UserService } from './user.service';
 
-describe('UsersController', () => {
-  let controller: UserController;
+describe('UsersService', () => {
   let service: UserService;
   let orm: MikroORM;
   let jwt: JwtService;
 
   beforeEach(async () => {
     const module = await initializeDbTestBase({
-      controllers: [UserController],
       providers: [UserService],
     });
 
-    controller = module.get(UserController);
     service = module.get(UserService);
     orm = module.get(MikroORM);
     jwt = module.get(JwtService);
@@ -28,15 +24,13 @@ describe('UsersController', () => {
   });
 
   it('should not fetch user infos when anonymous', async () => {
-    await expect(() => controller.current()).rejects.toThrow(
-      UnauthorizedException,
-    );
+    expect(() => service.current()).toThrow(UnauthorizedException);
   });
 
   it('should fetch user infos when logged', async () => {
     await actingAs(orm, service);
 
-    const { user } = await controller.current();
+    const user = service.current();
 
     expect(user).toMatchObject({
       email: 'john.doe@example.com',
@@ -51,8 +45,8 @@ describe('UsersController', () => {
   it('should update own email when logged', async () => {
     await actingAs(orm, service);
 
-    const { user } = await controller.update({
-      user: { email: 'jane.doe@example.com' },
+    const user = await service.update({
+      email: 'jane.doe@example.com',
     });
 
     expect(user).toMatchObject({
