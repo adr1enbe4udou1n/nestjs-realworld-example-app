@@ -31,7 +31,7 @@ export class AuthMiddleware implements NestMiddleware {
         );
       }
 
-      req.user = this.userService.current();
+      req.user = await this.userService.current();
       req.user.id = this.userService.user.id;
     }
 
