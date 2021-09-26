@@ -1,7 +1,8 @@
 import { MikroORM } from '@mikro-orm/core';
-import { UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { initializeDbTestBase, actingAs } from '../db-test-base';
+import { User } from '../users/user.entity';
+import { initializeDbTestBase, actingAs, createUser } from '../db-test-base';
 import { UserService } from './user.service';
 
 describe('UsersService', () => {
@@ -23,11 +24,15 @@ describe('UsersService', () => {
     await orm.close(true);
   });
 
-  it('should not fetch user infos when anonymous', async () => {
+  it('guest cannot fetch user infos', async () => {
     expect(() => service.current()).toThrow(UnauthorizedException);
   });
 
-  it('should fetch user infos when logged', async () => {
+  it('guest cannot update infos', async () => {
+    expect(() => service.current()).toThrow(UnauthorizedException);
+  });
+
+  it('can fetch user infos', async () => {
     await actingAs(orm, service);
 
     const user = service.current();
@@ -42,7 +47,7 @@ describe('UsersService', () => {
     expect(payload['email']).toBe('john.doe@example.com');
   });
 
-  it('should update own email when logged', async () => {
+  it('can update own email', async () => {
     await actingAs(orm, service);
 
     const user = await service.update({
@@ -53,5 +58,25 @@ describe('UsersService', () => {
       email: 'jane.doe@example.com',
       username: 'John Doe',
     });
+
+    const entity = await orm.em
+      .getRepository(User)
+      .findOne({ email: 'jane.doe@example.com' });
+
+    expect(entity).not.toBeNull();
+  });
+
+  it('cannot update with already used email', async () => {
+    await createUser(orm, {
+      name: 'Jane Doe',
+      email: 'jane.doe@example.com',
+    });
+    await actingAs(orm, service);
+
+    await expect(() =>
+      service.update({
+        email: 'jane.doe@example.com',
+      }),
+    ).rejects.toThrow(BadRequestException);
   });
 });

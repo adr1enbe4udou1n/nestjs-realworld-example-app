@@ -38,11 +38,7 @@ export const initializeDbTestBase = async (metadata: ModuleMetadata) => {
   return module;
 };
 
-export const actingAs = async (
-  orm: MikroORM,
-  service: UserService,
-  data: Partial<User> = {},
-) => {
+export const createUser = async (orm: MikroORM, data: Partial<User> = {}) => {
   const user = plainToClass(User, {
     email: 'john.doe@example.com',
     name: 'John Doe',
@@ -51,5 +47,15 @@ export const actingAs = async (
   });
 
   await orm.em.getRepository(User).persistAndFlush(user);
+
+  return user;
+};
+
+export const actingAs = async (
+  orm: MikroORM,
+  service: UserService,
+  data: Partial<User> = {},
+) => {
+  const user = await createUser(orm, data);
   service.user = user;
 };

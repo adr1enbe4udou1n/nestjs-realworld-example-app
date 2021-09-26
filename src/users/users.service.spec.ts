@@ -41,7 +41,7 @@ describe('UsersService', () => {
       username: 'John Doe',
       password: 'pass',
     },
-  ])('should not register with invalid data', async (data) => {
+  ])('cannot register with invalid data', async (data) => {
     await expect(() =>
       new ValidationPipe().transform(data, {
         type: 'body',
@@ -50,7 +50,7 @@ describe('UsersService', () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  it('should register new users', async () => {
+  it('can register new users', async () => {
     const user = await service.register({
       email: 'john.doe@example.com',
       username: 'John Doe',
@@ -105,7 +105,7 @@ describe('UsersService', () => {
       email: 'john.doe@example.com',
       password: 'badpassword',
     },
-  ])('should not login with invalid data', async (data) => {
+  ])('cannot login with invalid data', async (data) => {
     await orm.em.getRepository(User).persistAndFlush(
       plainToClass(User, {
         email: 'john.doe@example.com',
@@ -119,7 +119,7 @@ describe('UsersService', () => {
     );
   });
 
-  it('should login', async () => {
+  it('can login', async () => {
     await orm.em.getRepository(User).persistAndFlush(
       plainToClass(User, {
         email: 'john.doe@example.com',

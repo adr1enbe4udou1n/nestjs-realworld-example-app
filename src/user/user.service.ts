@@ -1,6 +1,10 @@
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { User } from '../users/user.entity';
 import { CurrentUserDTO } from './dto/current-user-dto';
 import { JwtService } from '@nestjs/jwt';
@@ -44,6 +48,10 @@ export class UserService {
   }
 
   public async update(updateUserDTO: UpdateUserDTO) {
+    if ((await this.userRepository.count({ email: updateUserDTO.email })) > 0) {
+      throw new BadRequestException('This email is already used');
+    }
+
     this.user.email = updateUserDTO.email;
     await this.userRepository.persistAndFlush(this.user);
     return this.current();
