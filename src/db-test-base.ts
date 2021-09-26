@@ -4,12 +4,15 @@ import { ModuleMetadata } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
+import { hash } from 'argon2';
+import { plainToClass } from 'class-transformer';
 import { Article } from './articles/article.entity';
 import { Comment } from './articles/comments/comment.entity';
 import { Tag } from './tags/tag.entity';
+import { UserService } from './user/user.service';
 import { User } from './users/user.entity';
 
-export const InitializeDbTestBase = async (metadata: ModuleMetadata) => {
+export const initializeDbTestBase = async (metadata: ModuleMetadata) => {
   const module: TestingModule = await Test.createTestingModule({
     imports: [
       ConfigModule.forRoot({ envFilePath: '.env.testing' }),
@@ -33,4 +36,20 @@ export const InitializeDbTestBase = async (metadata: ModuleMetadata) => {
   await orm.em.nativeDelete(User, {});
 
   return module;
+};
+
+export const actingAs = async (
+  orm: MikroORM,
+  service: UserService,
+  data: Partial<User> = {},
+) => {
+  const user = plainToClass(User, {
+    email: 'john.doe@example.com',
+    name: 'John Doe',
+    password: await hash('password'),
+    ...data,
+  });
+
+  await orm.em.getRepository(User).persistAndFlush(user);
+  service.user = user;
 };

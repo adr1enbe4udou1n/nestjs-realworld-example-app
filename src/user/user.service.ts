@@ -29,7 +29,7 @@ export class UserService {
   ) {}
 
   public current() {
-    if (!this.user) {
+    if (!this.isAuthenticated) {
       throw new UnauthorizedException();
     }
 

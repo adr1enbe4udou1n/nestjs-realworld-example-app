@@ -3,7 +3,7 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { hash } from 'argon2';
 import { plainToClass } from 'class-transformer';
-import { InitializeDbTestBase } from '../db-test-base';
+import { initializeDbTestBase } from '../db-test-base';
 import { RegisterDTO } from './dto/register-dto';
 import { User } from './user.entity';
 import { UsersController } from './users.controller';
@@ -15,7 +15,7 @@ describe('UsersController', () => {
   let jwt: JwtService;
 
   beforeEach(async () => {
-    const module = await InitializeDbTestBase({
+    const module = await initializeDbTestBase({
       controllers: [UsersController],
       providers: [UsersService],
     });
@@ -136,23 +136,21 @@ describe('UsersController', () => {
       }),
     );
 
-    const data = await controller.login({
+    const { user } = await controller.login({
       user: {
         email: 'john.doe@example.com',
         password: 'password',
       },
     });
 
-    expect(data).toMatchObject({
-      user: {
-        email: 'john.doe@example.com',
-        username: 'John Doe',
-        bio: null,
-        image: null,
-      },
+    expect(user).toMatchObject({
+      email: 'john.doe@example.com',
+      username: 'John Doe',
+      bio: null,
+      image: null,
     });
 
-    const payload = jwt.decode(data.user.token);
+    const payload = jwt.decode(user.token);
     expect(payload['name']).toBe('John Doe');
     expect(payload['email']).toBe('john.doe@example.com');
   });
