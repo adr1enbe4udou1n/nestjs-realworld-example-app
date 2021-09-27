@@ -1,4 +1,16 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { TagsEnvelope } from './dto/tag.dto';
+import { TagsService } from './tags.service';
 
 @Controller('tags')
-export class TagsController {}
+@ApiTags('tags')
+export class TagsController {
+  constructor(private tagService: TagsService) {}
+
+  @Get()
+  @ApiResponse({ type: TagsEnvelope })
+  async get() {
+    return { profile: await this.tagService.list() };
+  }
+}

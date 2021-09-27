@@ -12,15 +12,13 @@ export class UsersController {
 
   @Post()
   @ApiResponse({ type: UserEnvelope })
-  async register(
-    @Body() registerCommand: RegisterCommand,
-  ): Promise<UserEnvelope> {
+  async register(@Body() registerCommand: RegisterCommand) {
     return { user: await this.usersService.register(registerCommand.user) };
   }
 
   @Post('login')
   @ApiResponse({ type: UserEnvelope })
-  async login(@Body() loginCommand: LoginCommand): Promise<UserEnvelope> {
+  async login(@Body() loginCommand: LoginCommand) {
     return { user: await this.usersService.login(loginCommand.user) };
   }
 }

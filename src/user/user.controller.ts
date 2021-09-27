@@ -14,16 +14,14 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Get()
   @ApiResponse({ type: UserEnvelope })
-  async current(): Promise<UserEnvelope> {
+  async current() {
     return { user: await this.userService.current() };
   }
 
   @UseGuards(AuthGuard)
   @Put()
   @ApiResponse({ type: UserEnvelope })
-  async update(
-    @Body() updateUserCommand: UpdateUserCommand,
-  ): Promise<UserEnvelope> {
+  async update(@Body() updateUserCommand: UpdateUserCommand) {
     return { user: await this.userService.update(updateUserCommand.user) };
   }
 }
