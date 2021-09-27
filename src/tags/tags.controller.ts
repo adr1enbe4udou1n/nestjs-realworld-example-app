@@ -11,6 +11,6 @@ export class TagsController {
   @Get()
   @ApiResponse({ type: TagsEnvelope })
   async get() {
-    return { profile: await this.tagService.list() };
+    return { tags: await this.tagService.list() };
   }
 }
