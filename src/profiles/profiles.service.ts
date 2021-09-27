@@ -3,7 +3,7 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { User } from '../users/user.entity';
-import { ProfileDTO } from './dto/profile-dto';
+import { ProfileDTO } from './dto/profile.dto';
 
 @Injectable()
 export class ProfilesService {

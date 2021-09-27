@@ -3,9 +3,9 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { hash } from 'argon2';
 import { plainToClass } from 'class-transformer';
-import { CurrentUserDTO } from '../user/dto/current-user-dto';
+import { CurrentUserDTO } from '../user/dto/current-user.dto';
 import { act, initializeDbTestBase } from '../db-test-base';
-import { RegisterDTO } from './dto/register-dto';
+import { RegisterDTO } from './dto/register.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 

@@ -1,6 +1,6 @@
 import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ProfileEnvelope } from './dto/profile-dto';
+import { ProfileEnvelope } from './dto/profile.dto';
 import { ProfilesService } from './profiles.service';
 
 @Controller('profiles')

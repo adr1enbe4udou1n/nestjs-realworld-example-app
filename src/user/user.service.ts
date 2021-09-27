@@ -6,9 +6,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { User } from '../users/user.entity';
-import { CurrentUserDTO } from './dto/current-user-dto';
+import { CurrentUserDTO } from './dto/current-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { UpdateUserDTO } from './dto/update-user-dto';
+import { UpdateUserDTO } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {

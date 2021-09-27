@@ -5,7 +5,7 @@ import {
   NestMiddleware,
 } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-import { CurrentUserDTO } from './dto/current-user-dto';
+import { CurrentUserDTO } from './dto/current-user.dto';
 import { UserService } from './user.service';
 
 @Injectable()

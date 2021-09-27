@@ -1,11 +1,11 @@
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { RegisterDTO } from './dto/register-dto';
+import { RegisterDTO } from './dto/register.dto';
 import { User } from './user.entity';
-import { CurrentUserDTO } from '../user/dto/current-user-dto';
+import { CurrentUserDTO } from '../user/dto/current-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDTO } from './dto/login-dto';
+import { LoginDTO } from './dto/login.dto';
 import { hash, verify } from 'argon2';
 import { plainToClass } from 'class-transformer';
 
