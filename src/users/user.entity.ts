@@ -19,22 +19,20 @@ export class User implements HasTimestamps {
   @Property()
   name: string;
 
-  @Property({ unique: true })
+  @Property()
   @IsEmail()
   email: string;
 
-  @Property({ hidden: true })
-  password: string;
+  @Property()
+  password?: string;
 
-  @Property({ nullable: true, columnType: 'text' })
+  @Property({ columnType: 'text' })
   bio?: string = null;
 
-  @Property({ nullable: true })
+  @Property()
   image?: string = null;
 
-  @ManyToMany(() => User, (u) => u.followers, {
-    hidden: true,
-  })
+  @ManyToMany(() => User, (u) => u.followers)
   following = new Collection<User>(this);
 
   @ManyToMany(() => User, (u) => u.following, {
@@ -42,25 +40,20 @@ export class User implements HasTimestamps {
     pivotTable: 'follower_user',
     joinColumn: 'following_id',
     inverseJoinColumn: 'follower_id',
-    hidden: true,
   })
   followers = new Collection<User>(this);
 
   @OneToMany(() => Article, (a) => a.author, {
-    hidden: true,
     inverseJoinColumn: 'author_id',
   })
   articles = new Collection<Article>(this);
 
   @OneToMany(() => Comment, (c) => c.author, {
-    hidden: true,
     inverseJoinColumn: 'author_id',
   })
   comments = new Collection<Comment>(this);
 
-  @ManyToMany(() => Article, (a) => a.favoredUsers, {
-    hidden: true,
-  })
+  @ManyToMany(() => Article, (a) => a.favoredUsers)
   favoriteArticles = new Collection<Article>(this);
 
   @Property({ columnType: 'timestamp' })

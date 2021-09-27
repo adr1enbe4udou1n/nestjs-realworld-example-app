@@ -39,13 +39,11 @@ export class Article implements HasTimestamps {
     pivotTable: 'article_tag',
     joinColumn: 'article_id',
     inverseJoinColumn: 'tag_id',
-    hidden: true,
   })
   tags = new Collection<Tag>(this);
 
   @OneToMany(() => Comment, (c) => c.article, {
     inverseJoinColumn: 'article_id',
-    hidden: true,
   })
   comments = new Collection<Comment>(this);
 
@@ -54,7 +52,6 @@ export class Article implements HasTimestamps {
     pivotTable: 'article_favorite',
     joinColumn: 'article_id',
     inverseJoinColumn: 'user_id',
-    hidden: true,
   })
   favoredUsers = new Collection<User>(this);
 

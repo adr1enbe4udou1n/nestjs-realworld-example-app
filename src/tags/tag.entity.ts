@@ -16,9 +16,7 @@ export class Tag implements HasTimestamps {
   @Property({ unique: true })
   name: string;
 
-  @ManyToMany(() => Article, (a) => a.tags, {
-    hidden: true,
-  })
+  @ManyToMany(() => Article, (a) => a.tags)
   articles = new Collection<Article>(this);
 
   @Property({ columnType: 'timestamp' })
