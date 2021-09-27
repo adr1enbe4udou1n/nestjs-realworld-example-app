@@ -21,7 +21,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Put()
   @ApiResponse({ type: UserEnvelope })
-  async update(@Body() updateUserCommand: UpdateUserCommand) {
-    return { user: await this.userService.update(updateUserCommand.user) };
+  async update(@Body() command: UpdateUserCommand) {
+    return { user: await this.userService.update(command.user) };
   }
 }

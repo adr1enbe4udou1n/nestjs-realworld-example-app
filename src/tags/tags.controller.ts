@@ -6,11 +6,11 @@ import { TagsService } from './tags.service';
 @Controller('tags')
 @ApiTags('tags')
 export class TagsController {
-  constructor(private tagService: TagsService) {}
+  constructor(private tagsService: TagsService) {}
 
   @Get()
   @ApiResponse({ type: TagsEnvelope })
   async get() {
-    return { tags: await this.tagService.list() };
+    return { tags: await this.tagsService.list() };
   }
 }

@@ -12,13 +12,13 @@ export class UsersController {
 
   @Post()
   @ApiResponse({ type: UserEnvelope })
-  async register(@Body() registerCommand: RegisterCommand) {
-    return { user: await this.usersService.register(registerCommand.user) };
+  async register(@Body() command: RegisterCommand) {
+    return { user: await this.usersService.register(command.user) };
   }
 
   @Post('login')
   @ApiResponse({ type: UserEnvelope })
-  async login(@Body() loginCommand: LoginCommand) {
-    return { user: await this.usersService.login(loginCommand.user) };
+  async login(@Body() command: LoginCommand) {
+    return { user: await this.usersService.login(command.user) };
   }
 }
