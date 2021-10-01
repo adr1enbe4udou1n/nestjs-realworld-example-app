@@ -24,7 +24,7 @@ export class UserController {
   })
   @Get()
   @ApiResponse({ type: UserResponse })
-  async current() {
+  async current(): Promise<UserResponse> {
     return { user: await this.userService.current() };
   }
 
@@ -38,7 +38,7 @@ export class UserController {
     type: UpdateUserRequest,
   })
   @ApiResponse({ type: UserResponse })
-  async update(@Body() command: UpdateUserRequest) {
+  async update(@Body() command: UpdateUserRequest): Promise<UserResponse> {
     return { user: await this.userService.update(command.user) };
   }
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AuthorDTO } from '../../dto/author.dto';
+import { ProfileDTO } from '../../../profiles/dto/profile.dto';
 
 export class CommentDTO {
   @ApiProperty()
@@ -15,15 +15,15 @@ export class CommentDTO {
   updated_at: Date;
 
   @ApiProperty()
-  author: AuthorDTO;
+  author: ProfileDTO;
 }
 
-export class CommentEnvelope {
+export class SingleCommentResponse {
   @ApiProperty()
   comment: CommentDTO;
 }
 
 export class MultipleCommentsResponse {
-  @ApiProperty()
+  @ApiProperty({ type: [CommentDTO] })
   comments: CommentDTO[];
 }

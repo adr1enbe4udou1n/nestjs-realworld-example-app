@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AuthorDTO } from './author.dto';
+import { ProfileDTO } from '../../profiles/dto/profile.dto';
 
 export class ArticleDTO {
   @ApiProperty()
@@ -24,7 +24,7 @@ export class ArticleDTO {
   tagList: string[];
 
   @ApiProperty()
-  author: AuthorDTO;
+  author: ProfileDTO;
 
   @ApiProperty()
   favorited: boolean;
@@ -35,11 +35,11 @@ export class ArticleDTO {
 
 export class SingleArticleResponse {
   @ApiProperty()
-  articles: ArticleDTO;
+  article: ArticleDTO;
 }
 
 export class MultipleArticlesResponse {
-  @ApiProperty()
+  @ApiProperty({ type: [ArticleDTO] })
   articles: ArticleDTO[];
 
   @ApiProperty()

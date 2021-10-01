@@ -14,11 +14,9 @@ import {
   ApiBody,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { type } from 'os';
 import { PagedQuery } from 'src/pagination';
 import { AuthGuard } from '../auth.guard';
 import { ArticlesService } from './articles.service';
@@ -42,8 +40,11 @@ export class ArticlesController {
   })
   @Get()
   @ApiResponse({ type: MultipleArticlesResponse })
-  async list(@Query() query: ArticlesListQuery) {
-    return { article: await this.articlesService.list(query) };
+  async list(
+    @Query() query: ArticlesListQuery,
+  ): Promise<MultipleArticlesResponse> {
+    const { items, count } = await this.articlesService.list(query);
+    return { articles: items, articlesCount: count };
   }
 
   @ApiBearerAuth()
@@ -56,8 +57,9 @@ export class ArticlesController {
   @UseGuards(AuthGuard)
   @Get('feed')
   @ApiResponse({ type: MultipleArticlesResponse })
-  async feed(@Query() query: PagedQuery) {
-    return { article: await this.articlesService.feed(query) };
+  async feed(@Query() query: PagedQuery): Promise<MultipleArticlesResponse> {
+    const { items, count } = await this.articlesService.feed(query);
+    return { articles: items, articlesCount: count };
   }
 
   @ApiTags('Articles')
@@ -68,7 +70,7 @@ export class ArticlesController {
   @Get(':slug')
   @ApiParam({ name: 'slug', description: 'Slug of the article to get' })
   @ApiResponse({ type: SingleArticleResponse })
-  async get(@Param() slug: string) {
+  async get(@Param() slug: string): Promise<SingleArticleResponse> {
     return { article: await this.articlesService.get(slug) };
   }
 
@@ -82,7 +84,10 @@ export class ArticlesController {
   @Post()
   @ApiBody({ description: 'Article to create', type: NewArticleRequest })
   @ApiResponse({ type: SingleArticleResponse })
-  async create(@Param() slug: string, @Body() command: NewArticleRequest) {
+  async create(
+    @Param() slug: string,
+    @Body() command: NewArticleRequest,
+  ): Promise<SingleArticleResponse> {
     return { article: await this.articlesService.create(slug, command) };
   }
 
@@ -100,7 +105,10 @@ export class ArticlesController {
     type: UpdateArticleRequest,
   })
   @ApiResponse({ type: SingleArticleResponse })
-  async update(@Param() slug: string, @Body() command: UpdateArticleRequest) {
+  async update(
+    @Param() slug: string,
+    @Body() command: UpdateArticleRequest,
+  ): Promise<SingleArticleResponse> {
     return { article: await this.articlesService.update(slug, command) };
   }
 
@@ -130,7 +138,7 @@ export class ArticlesController {
     description: 'Slug of the article that you want to favorite',
   })
   @ApiResponse({ type: SingleArticleResponse })
-  async favorite(@Param() slug: string) {
+  async favorite(@Param() slug: string): Promise<SingleArticleResponse> {
     return { article: await this.articlesService.favorite(slug, true) };
   }
 
@@ -147,7 +155,7 @@ export class ArticlesController {
     description: 'Slug of the article that you want to unfavorite',
   })
   @ApiResponse({ type: SingleArticleResponse })
-  async unfavorite(@Param() slug: string) {
+  async unfavorite(@Param() slug: string): Promise<SingleArticleResponse> {
     return { article: await this.articlesService.favorite(slug, false) };
   }
 }

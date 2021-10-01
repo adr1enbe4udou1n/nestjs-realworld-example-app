@@ -22,6 +22,7 @@ async function bootstrap() {
     .addTag('Tags')
     .addTag('User and Authentication')
     .build();
+
   const document = SwaggerModule.createDocument(app, config, {
     ignoreGlobalPrefix: true,
   });

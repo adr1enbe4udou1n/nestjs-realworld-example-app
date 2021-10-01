@@ -32,7 +32,7 @@ export class UserService {
     private jwtService: JwtService,
   ) {}
 
-  public async current() {
+  public async current(): Promise<UserDTO> {
     if (!this.isAuthenticated) {
       throw new UnauthorizedException();
     }
@@ -47,7 +47,7 @@ export class UserService {
     );
   }
 
-  public async update(updateUserDTO: UpdateUserDTO) {
+  public async update(updateUserDTO: UpdateUserDTO): Promise<UserDTO> {
     if ((await this.userRepository.count({ email: updateUserDTO.email })) > 0) {
       throw new BadRequestException('This email is already used');
     }

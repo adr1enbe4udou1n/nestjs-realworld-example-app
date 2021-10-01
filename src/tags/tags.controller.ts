@@ -14,7 +14,7 @@ export class TagsController {
   })
   @Get()
   @ApiResponse({ type: TagsResponse })
-  async get() {
+  async get(): Promise<TagsResponse> {
     return { tags: await this.tagsService.list() };
   }
 }

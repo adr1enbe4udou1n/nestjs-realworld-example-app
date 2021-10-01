@@ -20,7 +20,7 @@ export class UsersController {
     type: NewUserRequest,
   })
   @ApiResponse({ type: UserResponse })
-  async register(@Body() command: NewUserRequest) {
+  async register(@Body() command: NewUserRequest): Promise<UserResponse> {
     return { user: await this.usersService.register(command.user) };
   }
 
@@ -34,7 +34,7 @@ export class UsersController {
     type: LoginUserRequest,
   })
   @ApiResponse({ type: UserResponse })
-  async login(@Body() command: LoginUserRequest) {
+  async login(@Body() command: LoginUserRequest): Promise<UserResponse> {
     return { user: await this.usersService.login(command.user) };
   }
 }

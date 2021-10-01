@@ -32,7 +32,7 @@ export class ProfilesController {
     description: 'Username of the profile to get',
   })
   @ApiResponse({ type: ProfileResponse })
-  async get(@Param('username') username: string) {
+  async get(@Param('username') username: string): Promise<ProfileResponse> {
     return { profile: await this.profilesService.get(username) };
   }
 
@@ -48,7 +48,7 @@ export class ProfilesController {
     description: 'Username of the profile you want to follow',
   })
   @ApiResponse({ type: ProfileResponse })
-  async follow(@Param('username') username: string) {
+  async follow(@Param('username') username: string): Promise<ProfileResponse> {
     return { profile: await this.profilesService.follow(username, true) };
   }
 
@@ -64,7 +64,9 @@ export class ProfilesController {
     description: 'Username of the profile you want to unfollow',
   })
   @ApiResponse({ type: ProfileResponse })
-  async unfollow(@Param('username') username: string) {
+  async unfollow(
+    @Param('username') username: string,
+  ): Promise<ProfileResponse> {
     return { profile: await this.profilesService.follow(username, false) };
   }
 }

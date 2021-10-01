@@ -17,7 +17,7 @@ export class UsersService {
     private jwtService: JwtService,
   ) {}
 
-  public async register(data: NewUserDTO) {
+  public async register(data: NewUserDTO): Promise<UserDTO> {
     const user = await plainToClass(User, {
       name: data.username,
       email: data.email,
@@ -36,7 +36,7 @@ export class UsersService {
     );
   }
 
-  public async login(data: LoginUserDTO) {
+  public async login(data: LoginUserDTO): Promise<UserDTO> {
     const user = await this.userRepository.findOne({ email: data.email });
 
     if (user === null || !(await verify(user.password, data.password))) {

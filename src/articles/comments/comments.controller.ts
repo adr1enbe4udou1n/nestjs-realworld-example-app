@@ -18,7 +18,10 @@ import {
 import { AuthGuard } from '../../auth.guard';
 import { CommentsService } from './comments.service';
 import { NewCommentRequest } from './dto/comment-create.dto';
-import { CommentEnvelope, MultipleCommentsResponse } from './dto/comment.dto';
+import {
+  SingleCommentResponse,
+  MultipleCommentsResponse,
+} from './dto/comment.dto';
 
 @Controller('articles/:slug/comments')
 @ApiTags('Comments')
@@ -35,8 +38,8 @@ export class CommentsController {
     description: 'Slug of the article that you want to get comments for',
   })
   @ApiResponse({ type: MultipleCommentsResponse })
-  async get(@Param('slug') slug: string) {
-    return { comment: await this.commentsService.list(slug) };
+  async get(@Param('slug') slug: string): Promise<MultipleCommentsResponse> {
+    return { comments: await this.commentsService.list(slug) };
   }
 
   @ApiBearerAuth()
@@ -54,11 +57,11 @@ export class CommentsController {
     description: 'Comment you want to create',
     type: NewCommentRequest,
   })
-  @ApiResponse({ type: CommentEnvelope })
+  @ApiResponse({ type: SingleCommentResponse })
   async create(
     @Param('slug') slug: string,
     @Body() command: NewCommentRequest,
-  ) {
+  ): Promise<SingleCommentResponse> {
     return {
       comment: await this.commentsService.create(slug, command.comment),
     };

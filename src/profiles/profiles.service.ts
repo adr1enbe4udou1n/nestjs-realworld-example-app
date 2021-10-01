@@ -13,14 +13,14 @@ export class ProfilesService {
     private readonly userService: UserService,
   ) {}
 
-  async get(username: string) {
+  async get(username: string): Promise<ProfileDTO> {
     const user = await this.userRepository.findOneOrFail({ name: username }, [
       'followers',
     ]);
     return ProfileDTO.fromUser(user, this.userService);
   }
 
-  async follow(username: string, follow: boolean) {
+  async follow(username: string, follow: boolean): Promise<ProfileDTO> {
     const user = await this.userRepository.findOneOrFail({ name: username }, [
       'followers',
     ]);
