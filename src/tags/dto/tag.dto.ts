@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class TagsEnvelope {
+export class TagsResponse {
   @ApiProperty()
   tags: string[];
 }

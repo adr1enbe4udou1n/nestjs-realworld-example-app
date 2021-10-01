@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { TagsEnvelope } from './dto/tag.dto';
+import { TagsResponse } from './dto/tag.dto';
 import { TagsService } from './tags.service';
 
 @Controller('tags')
@@ -13,7 +13,7 @@ export class TagsController {
     description: 'Get tags. Auth not required',
   })
   @Get()
-  @ApiResponse({ type: TagsEnvelope })
+  @ApiResponse({ type: TagsResponse })
   async get() {
     return { tags: await this.tagsService.list() };
   }

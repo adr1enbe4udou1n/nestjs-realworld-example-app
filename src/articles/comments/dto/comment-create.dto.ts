@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CommentCreateDTO {
+export class NewCommentDTO {
   @ApiProperty()
   body: string;
 }
 
-export class CommentCreateCommand {
+export class NewCommentRequest {
   @ApiProperty()
-  comment: CommentCreateDTO;
+  comment: NewCommentDTO;
 }

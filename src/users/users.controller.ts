@@ -1,8 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserEnvelope } from '../user/dto/current-user.dto';
-import { LoginCommand } from './dto/login.dto';
-import { RegisterCommand } from './dto/register.dto';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserResponse } from '../user/dto/current-user.dto';
+import { LoginUserRequest } from './dto/login.dto';
+import { NewUserRequest } from './dto/register.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -15,8 +15,12 @@ export class UsersController {
     description: 'Register a new user',
   })
   @Post()
-  @ApiResponse({ type: UserEnvelope })
-  async register(@Body() command: RegisterCommand) {
+  @ApiBody({
+    description: 'Details of the new user to register',
+    type: NewUserRequest,
+  })
+  @ApiResponse({ type: UserResponse })
+  async register(@Body() command: NewUserRequest) {
     return { user: await this.usersService.register(command.user) };
   }
 
@@ -25,8 +29,12 @@ export class UsersController {
     description: 'Login for existing user',
   })
   @Post('login')
-  @ApiResponse({ type: UserEnvelope })
-  async login(@Body() command: LoginCommand) {
+  @ApiBody({
+    description: 'Credentials to use',
+    type: LoginUserRequest,
+  })
+  @ApiResponse({ type: UserResponse })
+  async login(@Body() command: LoginUserRequest) {
     return { user: await this.usersService.login(command.user) };
   }
 }

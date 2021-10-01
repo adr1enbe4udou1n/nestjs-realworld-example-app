@@ -2,7 +2,7 @@ import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
 import { Comment } from './comment.entity';
-import { CommentCreateDTO } from './dto/comment-create.dto';
+import { NewCommentDTO } from './dto/comment-create.dto';
 
 @Injectable()
 export class CommentsService {
@@ -14,7 +14,7 @@ export class CommentsService {
   list(slug: string) {
     throw new Error('Method not implemented.');
   }
-  create(slug: string, comment: CommentCreateDTO) {
+  create(slug: string, comment: NewCommentDTO) {
     throw new Error('Method not implemented.');
   }
   delete(slug: string, commentId: number) {

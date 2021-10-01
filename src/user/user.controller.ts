@@ -1,13 +1,14 @@
 import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthGuard } from '../auth.guard';
-import { UserEnvelope } from './dto/current-user.dto';
-import { UpdateUserCommand } from './dto/update-user.dto';
+import { UserResponse } from './dto/current-user.dto';
+import { UpdateUserRequest } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @ApiBearerAuth()
@@ -22,7 +23,7 @@ export class UserController {
     description: 'Gets the currently logged-in user',
   })
   @Get()
-  @ApiResponse({ type: UserEnvelope })
+  @ApiResponse({ type: UserResponse })
   async current() {
     return { user: await this.userService.current() };
   }
@@ -32,8 +33,12 @@ export class UserController {
     description: 'Updated user information for current user',
   })
   @Put()
-  @ApiResponse({ type: UserEnvelope })
-  async update(@Body() command: UpdateUserCommand) {
+  @ApiBody({
+    description: 'User details to update. At least one field is required.',
+    type: UpdateUserRequest,
+  })
+  @ApiResponse({ type: UserResponse })
+  async update(@Body() command: UpdateUserRequest) {
     return { user: await this.userService.update(command.user) };
   }
 }

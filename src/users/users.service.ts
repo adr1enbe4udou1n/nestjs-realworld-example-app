@@ -1,11 +1,11 @@
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { RegisterDTO } from './dto/register.dto';
+import { NewUserDTO } from './dto/register.dto';
 import { User } from './user.entity';
-import { CurrentUserDTO } from '../user/dto/current-user.dto';
+import { UserDTO } from '../user/dto/current-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDTO } from './dto/login.dto';
+import { LoginUserDTO } from './dto/login.dto';
 import { hash, verify } from 'argon2';
 import { plainToClass } from 'class-transformer';
 
@@ -17,7 +17,7 @@ export class UsersService {
     private jwtService: JwtService,
   ) {}
 
-  public async register(data: RegisterDTO) {
+  public async register(data: NewUserDTO) {
     const user = await plainToClass(User, {
       name: data.username,
       email: data.email,
@@ -30,20 +30,20 @@ export class UsersService {
 
     await this.userRepository.persistAndFlush(user);
 
-    return CurrentUserDTO.fromUser(
+    return UserDTO.fromUser(
       user,
       this.jwtService.sign({ id: user.id, name: user.name, email: user.email }),
     );
   }
 
-  public async login(data: LoginDTO) {
+  public async login(data: LoginUserDTO) {
     const user = await this.userRepository.findOne({ email: data.email });
 
     if (user === null || !(await verify(user.password, data.password))) {
       throw new BadRequestException('Bad credentials');
     }
 
-    return CurrentUserDTO.fromUser(
+    return UserDTO.fromUser(
       user,
       this.jwtService.sign({ id: user.id, name: user.name, email: user.email }),
     );

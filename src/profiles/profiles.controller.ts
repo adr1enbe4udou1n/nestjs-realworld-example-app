@@ -9,11 +9,12 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthGuard } from '../auth.guard';
-import { ProfileEnvelope } from './dto/profile.dto';
+import { ProfileResponse } from './dto/profile.dto';
 import { ProfilesService } from './profiles.service';
 
 @Controller('profiles')
@@ -26,7 +27,11 @@ export class ProfilesController {
     description: 'Get a profile of a user of the system. Auth is optional',
   })
   @Get('celeb_:username')
-  @ApiResponse({ type: ProfileEnvelope })
+  @ApiParam({
+    name: 'username',
+    description: 'Username of the profile to get',
+  })
+  @ApiResponse({ type: ProfileResponse })
   async get(@Param('username') username: string) {
     return { profile: await this.profilesService.get(username) };
   }
@@ -38,7 +43,11 @@ export class ProfilesController {
     description: 'Follow a user by username',
   })
   @Post('celeb_:username/follow')
-  @ApiResponse({ type: ProfileEnvelope })
+  @ApiParam({
+    name: 'username',
+    description: 'Username of the profile you want to follow',
+  })
+  @ApiResponse({ type: ProfileResponse })
   async follow(@Param('username') username: string) {
     return { profile: await this.profilesService.follow(username, true) };
   }
@@ -50,7 +59,11 @@ export class ProfilesController {
     description: 'Unfollow a user by username',
   })
   @Delete('celeb_:username/follow')
-  @ApiResponse({ type: ProfileEnvelope })
+  @ApiParam({
+    name: 'username',
+    description: 'Username of the profile you want to unfollow',
+  })
+  @ApiResponse({ type: ProfileResponse })
   async unfollow(@Param('username') username: string) {
     return { profile: await this.profilesService.follow(username, false) };
   }

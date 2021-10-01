@@ -9,14 +9,16 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthGuard } from '../../auth.guard';
 import { CommentsService } from './comments.service';
-import { CommentCreateCommand } from './dto/comment-create.dto';
-import { CommentEnvelope, CommentsEnvelope } from './dto/comment.dto';
+import { NewCommentRequest } from './dto/comment-create.dto';
+import { CommentEnvelope, MultipleCommentsResponse } from './dto/comment.dto';
 
 @Controller('articles/:slug/comments')
 @ApiTags('Comments')
@@ -28,7 +30,11 @@ export class CommentsController {
     description: 'Get the comments for an article. Auth is optional',
   })
   @Get()
-  @ApiResponse({ type: CommentsEnvelope })
+  @ApiParam({
+    name: 'slug',
+    description: 'Slug of the article that you want to get comments for',
+  })
+  @ApiResponse({ type: MultipleCommentsResponse })
   async get(@Param('slug') slug: string) {
     return { comment: await this.commentsService.list(slug) };
   }
@@ -40,10 +46,18 @@ export class CommentsController {
     description: 'Create a comment for an article. Auth is required',
   })
   @Post()
+  @ApiParam({
+    name: 'slug',
+    description: 'Slug of the article that you want to create a comment for',
+  })
+  @ApiBody({
+    description: 'Comment you want to create',
+    type: NewCommentRequest,
+  })
   @ApiResponse({ type: CommentEnvelope })
   async create(
     @Param('slug') slug: string,
-    @Body() command: CommentCreateCommand,
+    @Body() command: NewCommentRequest,
   ) {
     return {
       comment: await this.commentsService.create(slug, command.comment),
@@ -57,6 +71,14 @@ export class CommentsController {
     description: 'Delete a comment for an article. Auth is required',
   })
   @Delete(':commentId')
+  @ApiParam({
+    name: 'slug',
+    description: 'Slug of the article that you want to delete a comment for',
+  })
+  @ApiParam({
+    name: 'commentId',
+    description: 'ID of the comment you want to delete',
+  })
   async delete(
     @Param('slug') slug: string,
     @Param('commentId') commentId: number,

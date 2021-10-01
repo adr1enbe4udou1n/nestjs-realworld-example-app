@@ -9,7 +9,7 @@ import {
   act,
 } from '../db-test-base';
 import { UserService } from './user.service';
-import { CurrentUserDTO } from './dto/current-user.dto';
+import { UserDTO } from './dto/current-user.dto';
 
 describe('UsersService', () => {
   let service: UserService;
@@ -41,7 +41,7 @@ describe('UsersService', () => {
   it('can fetch user infos', async () => {
     await actingAs(orm, service);
 
-    const user = await act<CurrentUserDTO>(orm, () => service.current());
+    const user = await act<UserDTO>(orm, () => service.current());
 
     expect(user).toMatchObject({
       email: 'john.doe@example.com',

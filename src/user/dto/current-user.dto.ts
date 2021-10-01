@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
 import { User } from '../../users/user.entity';
 
-export class CurrentUserDTO {
+export class UserDTO {
   @ApiProperty()
   email: string;
 
@@ -18,8 +18,8 @@ export class CurrentUserDTO {
   @ApiProperty()
   token: string;
 
-  static fromUser(user: User, token: string): CurrentUserDTO {
-    return plainToClass(CurrentUserDTO, {
+  static fromUser(user: User, token: string): UserDTO {
+    return plainToClass(UserDTO, {
       username: user.name,
       email: user.email,
       bio: user.bio,
@@ -29,7 +29,7 @@ export class CurrentUserDTO {
   }
 }
 
-export class UserEnvelope {
+export class UserResponse {
   @ApiProperty()
-  user: CurrentUserDTO;
+  user: UserDTO;
 }

@@ -33,12 +33,12 @@ export class ArticleDTO {
   favoritesCount: number;
 }
 
-export class ArticleEnvelope {
+export class SingleArticleResponse {
   @ApiProperty()
   articles: ArticleDTO;
 }
 
-export class ArticlesEnvelope {
+export class MultipleArticlesResponse {
   @ApiProperty()
   articles: ArticleDTO[];
 

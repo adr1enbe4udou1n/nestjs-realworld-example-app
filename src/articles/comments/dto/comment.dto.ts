@@ -23,7 +23,7 @@ export class CommentEnvelope {
   comment: CommentDTO;
 }
 
-export class CommentsEnvelope {
+export class MultipleCommentsResponse {
   @ApiProperty()
   comments: CommentDTO[];
 }

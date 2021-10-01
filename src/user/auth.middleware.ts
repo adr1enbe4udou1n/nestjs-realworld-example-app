@@ -5,7 +5,7 @@ import {
   NestMiddleware,
 } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-import { CurrentUserDTO } from './dto/current-user.dto';
+import { UserDTO } from './dto/current-user.dto';
 import { UserService } from './user.service';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class AuthMiddleware implements NestMiddleware {
   constructor(private readonly userService: UserService) {}
 
   async use(
-    req: Request & { user?: CurrentUserDTO & { id?: number } },
+    req: Request & { user?: UserDTO & { id?: number } },
     res: Response,
     next: NextFunction,
   ) {

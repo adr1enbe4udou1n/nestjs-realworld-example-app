@@ -3,9 +3,9 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { hash } from 'argon2';
 import { plainToClass } from 'class-transformer';
-import { CurrentUserDTO } from '../user/dto/current-user.dto';
+import { UserDTO } from '../user/dto/current-user.dto';
 import { act, initializeDbTestBase } from '../db-test-base';
-import { RegisterDTO } from './dto/register.dto';
+import { NewUserDTO } from './dto/register.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 
@@ -46,13 +46,13 @@ describe('UsersService', () => {
     await expect(() =>
       new ValidationPipe().transform(data, {
         type: 'body',
-        metatype: RegisterDTO,
+        metatype: NewUserDTO,
       }),
     ).rejects.toThrow(BadRequestException);
   });
 
   it('can register new users', async () => {
-    const user = await act<CurrentUserDTO>(orm, () =>
+    const user = await act<UserDTO>(orm, () =>
       service.register({
         email: 'john.doe@example.com',
         username: 'John Doe',
@@ -91,7 +91,7 @@ describe('UsersService', () => {
     await expect(() =>
       act(orm, () =>
         service.register(
-          plainToClass(RegisterDTO, {
+          plainToClass(NewUserDTO, {
             email: 'john.doe@example.com',
             username: 'John Doe',
             password: 'password',

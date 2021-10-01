@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { User } from '../users/user.entity';
-import { CurrentUserDTO } from './dto/current-user.dto';
+import { UserDTO } from './dto/current-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateUserDTO } from './dto/update-user.dto';
 
@@ -37,7 +37,7 @@ export class UserService {
       throw new UnauthorizedException();
     }
 
-    return CurrentUserDTO.fromUser(
+    return UserDTO.fromUser(
       this.user,
       this.jwtService.sign({
         id: this.user.id,

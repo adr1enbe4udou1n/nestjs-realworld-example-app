@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ArticleCreateDTO {
+export class NewArticleDTO {
   @ApiProperty()
   title: string;
 
@@ -14,7 +14,7 @@ export class ArticleCreateDTO {
   tagList: string[];
 }
 
-export class ArticleCreateCommand {
+export class NewArticleRequest {
   @ApiProperty()
-  article: ArticleCreateDTO;
+  article: NewArticleDTO;
 }

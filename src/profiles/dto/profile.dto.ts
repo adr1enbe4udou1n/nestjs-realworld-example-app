@@ -29,7 +29,7 @@ export class ProfileDTO {
   }
 }
 
-export class ProfileEnvelope {
+export class ProfileResponse {
   @ApiProperty()
   profile: ProfileDTO;
 }
