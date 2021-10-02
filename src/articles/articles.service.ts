@@ -113,7 +113,9 @@ export class ArticlesService {
       );
     }
 
-    await this.articleRepository.persistAndFlush(dto.map(article));
+    await this.articleRepository.persistAndFlush(
+      UpdateArticleDTO.map(dto, article),
+    );
 
     return ArticleDTO.map(article, this.userService);
   }

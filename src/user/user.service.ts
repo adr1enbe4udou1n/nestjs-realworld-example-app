@@ -47,12 +47,20 @@ export class UserService {
     );
   }
 
-  public async update(updateUserDTO: UpdateUserDTO): Promise<UserDTO> {
-    if ((await this.userRepository.count({ email: updateUserDTO.email })) > 0) {
+  public async update(dto: UpdateUserDTO): Promise<UserDTO> {
+    if (
+      dto.email &&
+      (await this.userRepository.count({
+        email: dto.email,
+        id: { $ne: this.user.id },
+      })) > 0
+    ) {
       throw new BadRequestException('This email is already used');
     }
 
-    await this.userRepository.persistAndFlush(updateUserDTO.map(this.user));
+    await this.userRepository.persistAndFlush(
+      UpdateUserDTO.map(dto, this.user),
+    );
     return this.current();
   }
 

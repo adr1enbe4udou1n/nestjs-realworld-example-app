@@ -17,11 +17,11 @@ export class UpdateUserDTO {
   @ApiProperty()
   image?: string;
 
-  map(user: User) {
-    user.name = this.username ?? user.name;
-    user.email = this.email ?? user.email;
-    user.bio = this.bio ?? user.bio;
-    user.image = this.image ?? user.image;
+  static map(dto: UpdateUserDTO, user: User): User {
+    user.name = dto.username ?? user.name;
+    user.email = dto.email ?? user.email;
+    user.bio = dto.bio ?? user.bio;
+    user.image = dto.image ?? user.image;
     return user;
   }
 }
