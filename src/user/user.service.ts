@@ -37,7 +37,7 @@ export class UserService {
       throw new UnauthorizedException();
     }
 
-    return UserDTO.fromUser(
+    return UserDTO.map(
       this.user,
       this.jwtService.sign({
         id: this.user.id,
@@ -52,13 +52,16 @@ export class UserService {
       throw new BadRequestException('This email is already used');
     }
 
-    this.user.email = updateUserDTO.email;
-    await this.userRepository.persistAndFlush(this.user);
+    await this.userRepository.persistAndFlush(updateUserDTO.map(this.user));
     return this.current();
   }
 
   public async setUserFromToken(token: string) {
     const payload = this.jwtService.verify(token);
-    this.user = await this.userRepository.findOneOrFail(payload.id);
+    this.fresh(payload.id);
+  }
+
+  public async fresh(id: number) {
+    this.user = await this.userRepository.findOneOrFail(id);
   }
 }

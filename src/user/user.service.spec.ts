@@ -10,6 +10,8 @@ import {
 } from '../db-test-base';
 import { UserService } from './user.service';
 import { UserDTO } from './dto/current-user.dto';
+import { plainToClass } from 'class-transformer';
+import { UpdateUserDTO } from './dto/update-user.dto';
 
 describe('UsersService', () => {
   let service: UserService;
@@ -53,18 +55,22 @@ describe('UsersService', () => {
     expect(payload['email']).toBe('john.doe@example.com');
   });
 
-  it('can update own email', async () => {
+  it('can update infos', async () => {
     await actingAs(orm, service);
 
     const user = await act(orm, () =>
-      service.update({
-        email: 'jane.doe@example.com',
-      }),
+      service.update(
+        plainToClass(UpdateUserDTO, {
+          email: 'jane.doe@example.com',
+          bio: 'My Bio',
+        }),
+      ),
     );
 
     expect(user).toMatchObject({
       email: 'jane.doe@example.com',
       username: 'John Doe',
+      bio: 'My Bio',
     });
 
     const entity = await orm.em
@@ -83,9 +89,11 @@ describe('UsersService', () => {
 
     await expect(() =>
       act(orm, () =>
-        service.update({
-          email: 'jane.doe@example.com',
-        }),
+        service.update(
+          plainToClass(UpdateUserDTO, {
+            email: 'jane.doe@example.com',
+          }),
+        ),
       ),
     ).rejects.toThrow(BadRequestException);
   });

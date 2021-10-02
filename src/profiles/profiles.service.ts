@@ -17,7 +17,7 @@ export class ProfilesService {
     const user = await this.userRepository.findOneOrFail({ name: username }, [
       'followers',
     ]);
-    return ProfileDTO.fromUser(user, this.userService);
+    return ProfileDTO.map(user, this.userService);
   }
 
   async follow(username: string, follow: boolean): Promise<ProfileDTO> {
@@ -41,6 +41,6 @@ export class ProfilesService {
 
     await this.userRepository.flush();
 
-    return ProfileDTO.fromUser(user, this.userService);
+    return ProfileDTO.map(user, this.userService);
   }
 }

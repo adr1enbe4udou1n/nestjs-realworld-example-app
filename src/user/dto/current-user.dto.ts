@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { plainToClass } from 'class-transformer';
 import { User } from '../../users/user.entity';
 
 export class UserDTO {
@@ -18,14 +17,14 @@ export class UserDTO {
   @ApiProperty()
   token: string;
 
-  static fromUser(user: User, token: string): UserDTO {
-    return plainToClass(UserDTO, {
-      username: user.name,
-      email: user.email,
-      bio: user.bio,
-      image: user.image,
-      token,
-    });
+  static map(user: User, token: string): UserDTO {
+    const dto = new UserDTO();
+    dto.username = user.name;
+    dto.email = user.email;
+    dto.bio = user.bio;
+    dto.image = user.image;
+    dto.token = token;
+    return dto;
   }
 }
 

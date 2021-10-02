@@ -53,11 +53,13 @@ describe('UsersService', () => {
 
   it('can register new users', async () => {
     const user = await act<UserDTO>(orm, () =>
-      service.register({
-        email: 'john.doe@example.com',
-        username: 'John Doe',
-        password: 'password',
-      }),
+      service.register(
+        plainToClass(NewUserDTO, {
+          email: 'john.doe@example.com',
+          username: 'John Doe',
+          password: 'password',
+        }),
+      ),
     );
 
     expect(user).toMatchObject({

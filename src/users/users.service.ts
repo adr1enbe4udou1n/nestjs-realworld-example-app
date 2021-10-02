@@ -6,8 +6,7 @@ import { User } from './user.entity';
 import { UserDTO } from '../user/dto/current-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDTO } from './dto/login.dto';
-import { hash, verify } from 'argon2';
-import { plainToClass } from 'class-transformer';
+import { verify } from 'argon2';
 
 @Injectable()
 export class UsersService {
@@ -18,19 +17,14 @@ export class UsersService {
   ) {}
 
   public async register(data: NewUserDTO): Promise<UserDTO> {
-    const user = await plainToClass(User, {
-      name: data.username,
-      email: data.email,
-      password: await hash(data.password),
-    });
-
-    if ((await this.userRepository.count({ email: user.email })) > 0) {
+    if ((await this.userRepository.count({ email: data.email })) > 0) {
       throw new BadRequestException('This email is already used');
     }
 
+    const user = await data.map();
     await this.userRepository.persistAndFlush(user);
 
-    return UserDTO.fromUser(
+    return UserDTO.map(
       user,
       this.jwtService.sign({ id: user.id, name: user.name, email: user.email }),
     );
@@ -43,7 +37,7 @@ export class UsersService {
       throw new BadRequestException('Bad credentials');
     }
 
-    return UserDTO.fromUser(
+    return UserDTO.map(
       user,
       this.jwtService.sign({ id: user.id, name: user.name, email: user.email }),
     );
