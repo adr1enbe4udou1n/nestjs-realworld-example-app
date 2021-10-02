@@ -18,11 +18,11 @@ export class NewUserDTO {
   @MinLength(8)
   public password: string;
 
-  async map() {
+  static async map(dto: NewUserDTO): Promise<User> {
     const user = new User();
-    user.name = this.username;
-    user.email = this.email;
-    user.password = await hash(this.password);
+    user.name = dto.username;
+    user.email = dto.email;
+    user.password = await hash(dto.password);
     return user;
   }
 }

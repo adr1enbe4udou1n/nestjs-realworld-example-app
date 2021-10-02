@@ -16,12 +16,12 @@ export class UsersService {
     private jwtService: JwtService,
   ) {}
 
-  public async register(data: NewUserDTO): Promise<UserDTO> {
-    if ((await this.userRepository.count({ email: data.email })) > 0) {
+  public async register(dto: NewUserDTO): Promise<UserDTO> {
+    if ((await this.userRepository.count({ email: dto.email })) > 0) {
       throw new BadRequestException('This email is already used');
     }
 
-    const user = await data.map();
+    const user = await NewUserDTO.map(dto);
     await this.userRepository.persistAndFlush(user);
 
     return UserDTO.map(
