@@ -17,7 +17,7 @@ export class CommentsService {
   list(slug: string): CommentDTO[] {
     throw new Error('Method not implemented.');
   }
-  create(slug: string, comment: NewCommentDTO): CommentDTO {
+  create(slug: string, dto: NewCommentDTO): CommentDTO {
     throw new Error('Method not implemented.');
   }
   delete(slug: string, commentId: number) {

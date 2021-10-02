@@ -1,4 +1,4 @@
-import { MikroORM } from '@mikro-orm/core';
+import { MikroORM, NotFoundError } from '@mikro-orm/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { Tag } from '../tags/tag.entity';
@@ -59,12 +59,41 @@ describe('ArticlesService', () => {
    * Article Get
    */
 
-  it('can get article', () => {
-    expect(service).toBeDefined();
+  it('can get article', async () => {
+    await actingAs(orm, userService, {
+      bio: 'My Bio',
+      image: 'https://i.pravatar.cc/300',
+    });
+
+    await service.create(
+      plainToClass(NewArticleDTO, {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+        tagList: ['Test Tag 1', 'Test Tag 2'],
+      }),
+    );
+
+    const article = await act(orm, () => service.get('test-article'));
+
+    expect(article).toMatchObject({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      slug: 'test-article',
+      author: {
+        username: 'John Doe',
+        bio: 'My Bio',
+        image: 'https://i.pravatar.cc/300',
+      },
+      tagList: ['Test Tag 1', 'Test Tag 2'],
+    });
   });
 
-  it('cannot get non existent article', () => {
-    expect(service).toBeDefined();
+  it('cannot get non existent article', async () => {
+    await expect(() =>
+      act(orm, () => service.get('test-article')),
+    ).rejects.toThrow(NotFoundError);
   });
 
   /**
@@ -96,6 +125,7 @@ describe('ArticlesService', () => {
       title: 'Test Article',
       description: 'Test Description',
       body: 'Test Body',
+      slug: 'test-article',
       author: {
         username: 'John Doe',
         bio: 'My Bio',
@@ -104,8 +134,8 @@ describe('ArticlesService', () => {
       tagList: ['Test Tag 1', 'Test Tag 2', 'Existing Tag'],
     });
 
-    await expect(await orm.em.getRepository(Article).count()).resolves.toBe(1);
-    await expect(await orm.em.getRepository(Tag).count()).resolves.toBe(3);
+    expect(await orm.em.getRepository(Article).count()).toBe(1);
+    expect(await orm.em.getRepository(Tag).count()).toBe(3);
   });
 
   it.each([
@@ -133,14 +163,32 @@ describe('ArticlesService', () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  // it('cannot create article with same title', async (data) => {
-  // await expect(() =>
-  //   new ValidationPipe().transform(data, {
-  //     type: 'body',
-  //     metatype: NewArticleDTO,
-  //   }),
-  // ).rejects.toThrow(BadRequestException);
-  // });
+  it('cannot create article with same title', async () => {
+    await actingAs(orm, userService, {
+      bio: 'My Bio',
+      image: 'https://i.pravatar.cc/300',
+    });
+
+    await service.create(
+      plainToClass(NewArticleDTO, {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+      }),
+    );
+
+    await expect(() =>
+      act(orm, () =>
+        service.create(
+          plainToClass(NewArticleDTO, {
+            title: 'Test Article',
+            description: 'Test Description',
+            body: 'Test Body',
+          }),
+        ),
+      ),
+    ).rejects.toThrow(BadRequestException);
+  });
 
   /**
    * Article Update

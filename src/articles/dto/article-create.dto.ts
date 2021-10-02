@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
+import { Article } from '../article.entity';
 
 export class NewArticleDTO {
   @ApiProperty()
@@ -15,7 +16,15 @@ export class NewArticleDTO {
   body: string;
 
   @ApiProperty()
-  tagList: string[];
+  tagList: string[] = [];
+
+  map(): Article {
+    const article = new Article();
+    article.title = this.title;
+    article.description = this.description;
+    article.body = this.body;
+    return article;
+  }
 }
 
 export class NewArticleRequest {
