@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ProfileDTO } from '../../../profiles/dto/profile.dto';
+import { UserService } from '../../../user/user.service';
+import { Comment } from '../comment.entity';
 
 export class CommentDTO {
   @ApiProperty()
@@ -16,6 +18,15 @@ export class CommentDTO {
 
   @ApiProperty()
   author: ProfileDTO;
+
+  static map(comment: Comment, userService: UserService): CommentDTO {
+    const dto = new CommentDTO();
+    dto.body = comment.body;
+    dto.author = ProfileDTO.map(comment.author, userService);
+    dto.created_at = comment.created_at;
+    dto.updated_at = comment.updated_at;
+    return dto;
+  }
 }
 
 export class SingleCommentResponse {

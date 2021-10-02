@@ -19,7 +19,7 @@ export class Article implements HasTimestamps {
   @PrimaryKey()
   id: number;
 
-  @ManyToOne({ joinColumn: 'user_id' })
+  @ManyToOne()
   author: User;
 
   @Property()

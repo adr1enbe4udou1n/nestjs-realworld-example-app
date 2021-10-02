@@ -76,11 +76,34 @@ export class ArticlesService {
   }
 
   async update(slug: string, dto: UpdateArticleDTO): Promise<ArticleDTO> {
-    throw new Error('Method not implemented.');
+    const article = await this.articleRepository.findOneOrFail({ slug }, [
+      'author.followers',
+      'tags',
+    ]);
+
+    if (article.author.id !== this.userService.user.id) {
+      throw new BadRequestException(
+        'You cannot edit article from other authors',
+      );
+    }
+
+    await this.articleRepository.persistAndFlush(dto.map(article));
+
+    return ArticleDTO.map(article, this.userService);
   }
 
   async delete(slug: string) {
-    throw new Error('Method not implemented.');
+    const article = await this.articleRepository.findOneOrFail({ slug }, [
+      'comments',
+    ]);
+
+    if (article.author.id !== this.userService.user.id) {
+      throw new BadRequestException(
+        'You cannot edit article from other authors',
+      );
+    }
+
+    await this.articleRepository.removeAndFlush(article);
   }
 
   async favorite(slug: string, arg1: boolean): Promise<ArticleDTO> {

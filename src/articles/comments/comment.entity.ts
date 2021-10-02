@@ -8,10 +8,10 @@ export class Comment implements HasTimestamps {
   @PrimaryKey()
   id: number;
 
-  @ManyToOne({ joinColumn: 'article_id' })
+  @ManyToOne({ onDelete: 'cascade' })
   article: Article;
 
-  @ManyToOne({ joinColumn: 'author_id' })
+  @ManyToOne()
   author: User;
 
   @Property({ columnType: 'text' })

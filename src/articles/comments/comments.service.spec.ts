@@ -1,20 +1,28 @@
-import { MikroORM } from '@mikro-orm/core';
+import { MikroORM, NotFoundError } from '@mikro-orm/core';
 import { UserService } from '../../user/user.service';
-import { initializeDbTestBase } from '../../db-test-base';
+import { act, actingAs, initializeDbTestBase } from '../../db-test-base';
 import { CommentsService } from './comments.service';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { NewCommentDTO } from './dto/comment-create.dto';
+import { plainToClass } from 'class-transformer';
+import { Comment } from './comment.entity';
+import { ArticlesService } from '../articles.service';
+import { NewArticleDTO } from '../dto/article-create.dto';
 
 describe('CommentsService', () => {
   let orm: MikroORM;
   let service: CommentsService;
+  let articlesService: ArticlesService;
   let userService: UserService;
 
   beforeEach(async () => {
     const module = await initializeDbTestBase({
-      providers: [CommentsService, UserService],
+      providers: [CommentsService, ArticlesService, UserService],
     });
 
     orm = module.get(MikroORM);
     service = module.get(CommentsService);
+    articlesService = module.get(ArticlesService);
     userService = module.get(UserService);
   });
 
@@ -34,16 +42,62 @@ describe('CommentsService', () => {
    * Comment Create
    */
 
-  it('can create comment', () => {
-    expect(service).toBeDefined();
+  it('can create comment', async () => {
+    await actingAs(orm, userService);
+
+    await articlesService.create(
+      plainToClass(NewArticleDTO, {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+      }),
+    );
+
+    const comment = await act(orm, () =>
+      service.create(
+        'test-article',
+        plainToClass(NewCommentDTO, {
+          body: 'New Comment',
+        }),
+      ),
+    );
+
+    expect(comment).toMatchObject({
+      body: 'New Comment',
+      author: {
+        username: 'John Doe',
+      },
+    });
+
+    expect(
+      await orm.em.getRepository(Comment).count({ body: 'New Comment' }),
+    ).toBe(1);
   });
 
-  it('cannot create comment with invalid data', () => {
-    expect(service).toBeDefined();
+  it.each([
+    {
+      body: '',
+    },
+  ])('cannot create comment with invalid data', async (data) => {
+    await expect(() =>
+      new ValidationPipe().transform(data, {
+        type: 'body',
+        metatype: NewCommentDTO,
+      }),
+    ).rejects.toThrow(BadRequestException);
   });
 
-  it('cannot create comment to non existent article', () => {
-    expect(service).toBeDefined();
+  it('cannot create comment to non existent article', async () => {
+    await expect(() =>
+      act(orm, () =>
+        service.create(
+          'test-article',
+          plainToClass(NewCommentDTO, {
+            body: 'New Comment',
+          }),
+        ),
+      ),
+    ).rejects.toThrow(NotFoundError);
   });
 
   /**
