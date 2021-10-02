@@ -1,21 +1,61 @@
-import { Injectable } from '@nestjs/common';
-import { name, internet, lorem, random, datatype, unique, date } from 'faker';
-import { User } from './users/user.entity';
 import { EntityManager } from '@mikro-orm/core';
-import { Comment } from './articles/comments/comment.entity';
-import { Article } from './articles/article.entity';
-import { Tag } from './tags/tag.entity';
+import { Injectable } from '@nestjs/common';
+import { ConsoleService } from 'nestjs-console';
+import { Article } from '../articles/article.entity';
+import { Comment } from '../articles/comments/comment.entity';
+import { Tag } from '../tags/tag.entity';
+import { User } from '../users/user.entity';
 import { hash } from 'argon2';
 import { capitalize } from 'lodash';
+import { name, internet, lorem, random, datatype, unique, date } from 'faker';
 
 @Injectable()
-export class Seeder {
-  constructor(private readonly em: EntityManager) {}
-  async seed() {
+export class DatabaseRefreshService {
+  constructor(
+    private readonly consoleService: ConsoleService,
+    private readonly em: EntityManager,
+  ) {
+    const cli = this.consoleService.getCli();
+
+    const groupCommand = this.consoleService.createGroupCommand(
+      {
+        command: 'db',
+        description: 'Refresh and manage db data',
+      },
+      cli,
+    );
+
+    // create command
+    this.consoleService.createCommand(
+      {
+        command: 'fresh',
+        description: 'Reset database',
+      },
+      this.fresh,
+      groupCommand,
+    );
+
+    this.consoleService.createCommand(
+      {
+        command: 'seed',
+        description: 'Reset and seed fake data',
+      },
+      this.seed,
+      groupCommand,
+    );
+  }
+
+  fresh = async () => {
     await this.em.nativeDelete(Tag, {});
     await this.em.nativeDelete(Comment, {});
     await this.em.nativeDelete(Article, {});
     await this.em.nativeDelete(User, {});
+
+    console.info('Database wiped !');
+  };
+
+  seed = async () => {
+    await this.fresh();
 
     const users: User[] = [];
     const articles: Article[] = [];
@@ -33,6 +73,8 @@ export class Seeder {
     }
 
     this.em.persist(users);
+
+    console.info('Users generated !');
 
     users.forEach((u) => {
       u.followers.add(...random.arrayElements(users, datatype.number(5)));
@@ -65,6 +107,8 @@ export class Seeder {
 
     this.em.persist(articles);
 
+    console.info('Articles generated !');
+
     for (let i = 1; i <= 100; i++) {
       const tag = this.em.create(Tag, {
         name: `${lorem.word()} ${i}`,
@@ -74,6 +118,8 @@ export class Seeder {
       this.em.persist(tag);
     }
 
+    console.info('Tags generated !');
+
     await this.em.flush();
-  }
+  };
 }
