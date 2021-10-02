@@ -364,15 +364,53 @@ describe('ArticlesService', () => {
    * Article Favorite
    */
 
-  it('can favorite article', () => {
-    expect(service).toBeDefined();
+  it('can favorite article', async () => {
+    await actingAs(orm, userService);
+
+    await service.create(
+      plainToClass(NewArticleDTO, {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+      }),
+    );
+
+    const article = await act(orm, () =>
+      service.favorite('test-article', true),
+    );
+
+    expect(article).toMatchObject({
+      favorited: true,
+      favoritesCount: 1,
+    });
   });
 
-  it('can unfavorite article', () => {
-    expect(service).toBeDefined();
+  it('can unfavorite article', async () => {
+    await actingAs(orm, userService);
+
+    await service.create(
+      plainToClass(NewArticleDTO, {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+      }),
+    );
+
+    await service.favorite('test-article', true);
+
+    const article = await act(orm, () =>
+      service.favorite('test-article', false),
+    );
+
+    expect(article).toMatchObject({
+      favorited: false,
+      favoritesCount: 0,
+    });
   });
 
-  it('cannot favorite non existent article', () => {
-    expect(service).toBeDefined();
+  it('cannot favorite non existent article', async () => {
+    await expect(() =>
+      act(orm, () => service.favorite('test-article', true)),
+    ).rejects.toThrow(NotFoundError);
   });
 });

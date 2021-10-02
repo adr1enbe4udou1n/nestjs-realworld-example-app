@@ -37,6 +37,7 @@ export class ArticlesService {
     const article = await this.articleRepository.findOneOrFail({ slug }, [
       'author.followers',
       'tags',
+      'favoredUsers',
     ]);
 
     return ArticleDTO.map(article, this.userService);
@@ -79,6 +80,7 @@ export class ArticlesService {
     const article = await this.articleRepository.findOneOrFail({ slug }, [
       'author.followers',
       'tags',
+      'favoredUsers',
     ]);
 
     if (article.author.id !== this.userService.user.id) {
@@ -106,7 +108,29 @@ export class ArticlesService {
     await this.articleRepository.removeAndFlush(article);
   }
 
-  async favorite(slug: string, arg1: boolean): Promise<ArticleDTO> {
-    throw new Error('Method not implemented.');
+  async favorite(slug: string, favorite: boolean): Promise<ArticleDTO> {
+    const article = await this.articleRepository.findOneOrFail({ slug }, [
+      'tags',
+      'favoredUsers',
+      'author.followers',
+    ]);
+
+    const favoredUser = article.favoredUsers
+      .getItems()
+      .find((u) => u.id === this.userService.user.id);
+
+    if (favorite) {
+      if (!favoredUser) {
+        article.favoredUsers.add(this.userService.user);
+      }
+    } else {
+      if (favoredUser) {
+        article.favoredUsers.remove(favoredUser);
+      }
+    }
+
+    await this.articleRepository.flush();
+
+    return ArticleDTO.map(article, this.userService);
   }
 }
