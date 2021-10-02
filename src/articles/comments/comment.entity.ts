@@ -8,7 +8,7 @@ export class Comment implements HasTimestamps {
   @PrimaryKey()
   id: number;
 
-  @ManyToOne({ onDelete: 'cascade' })
+  @ManyToOne()
   article: Article;
 
   @ManyToOne()

@@ -1,5 +1,6 @@
 import {
   BeforeCreate,
+  Cascade,
   Collection,
   Entity,
   ManyToMany,
@@ -37,21 +38,15 @@ export class Article implements HasTimestamps {
   @ManyToMany(() => Tag, (t) => t.articles, {
     owner: true,
     pivotTable: 'article_tag',
-    joinColumn: 'article_id',
-    inverseJoinColumn: 'tag_id',
   })
   tags = new Collection<Tag>(this);
 
-  @OneToMany(() => Comment, (c) => c.article, {
-    inverseJoinColumn: 'article_id',
-  })
+  @OneToMany(() => Comment, (c) => c.article, { cascade: [Cascade.REMOVE] })
   comments = new Collection<Comment>(this);
 
   @ManyToMany(() => User, (t) => t.favoriteArticles, {
     owner: true,
     pivotTable: 'article_favorite',
-    joinColumn: 'article_id',
-    inverseJoinColumn: 'user_id',
   })
   favoredUsers = new Collection<User>(this);
 
