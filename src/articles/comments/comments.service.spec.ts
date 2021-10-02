@@ -34,8 +34,66 @@ describe('CommentsService', () => {
    * Comment List
    */
 
-  it('can list all comments of article', () => {
-    expect(service).toBeDefined();
+  it('can list all comments of article', async () => {
+    await actingAs(orm, userService, {
+      bio: 'My Bio',
+      image: 'https://i.pravatar.cc/300',
+    });
+
+    await articlesService.create(
+      plainToClass(NewArticleDTO, {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+      }),
+    );
+
+    for (let i = 1; i <= 5; i++) {
+      await act(orm, () =>
+        service.create(
+          'test-article',
+          plainToClass(NewCommentDTO, {
+            body: `New John Comment ${i}`,
+          }),
+        ),
+      );
+    }
+
+    await actingAs(orm, userService, {
+      name: 'Jane Doe',
+      email: 'jane.doe@example.com',
+      bio: 'My Bio',
+      image: 'https://i.pravatar.cc/300',
+    });
+
+    for (let i = 1; i <= 5; i++) {
+      await act(orm, () =>
+        service.create(
+          'test-article',
+          plainToClass(NewCommentDTO, {
+            body: `New Jane Comment ${i}`,
+          }),
+        ),
+      );
+    }
+
+    const comments = await act(orm, () => service.list('test-article'));
+
+    expect(comments.length).toBe(10);
+    expect(comments[0]).toMatchObject({
+      body: 'New Jane Comment 5',
+      author: {
+        username: 'Jane Doe',
+        bio: 'My Bio',
+        image: 'https://i.pravatar.cc/300',
+      },
+    });
+  });
+
+  it('cannot list all comments of non existent article', async () => {
+    await expect(() =>
+      act(orm, () => service.list('test-article')),
+    ).rejects.toThrow(NotFoundError);
   });
 
   /**
@@ -104,27 +162,144 @@ describe('CommentsService', () => {
    * Comment Delete
    */
 
-  it('can delete own comment', () => {
-    expect(service).toBeDefined();
+  it('can delete own comment', async () => {
+    await actingAs(orm, userService);
+
+    await articlesService.create(
+      plainToClass(NewArticleDTO, {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+      }),
+    );
+
+    const comment = await service.create(
+      'test-article',
+      plainToClass(NewCommentDTO, {
+        body: 'New Comment 1',
+      }),
+    );
+
+    await act(orm, () => service.delete('test-article', comment.id));
+
+    expect(await orm.em.getRepository(Comment).count()).toBe(0);
   });
 
-  it('can delete all comments of own article', () => {
-    expect(service).toBeDefined();
+  it('can delete all comments of own article', async () => {
+    const user = await actingAs(orm, userService);
+
+    await articlesService.create(
+      plainToClass(NewArticleDTO, {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+      }),
+    );
+
+    await service.create(
+      'test-article',
+      plainToClass(NewCommentDTO, {
+        body: 'New Comment 1',
+      }),
+    );
+
+    await actingAs(orm, userService, {
+      name: 'Jane Doe',
+      email: 'jane.doe@example.com',
+    });
+
+    const comment = await service.create(
+      'test-article',
+      plainToClass(NewCommentDTO, {
+        body: 'New Comment 2',
+      }),
+    );
+
+    userService.user = user;
+
+    await act(orm, () => service.delete('test-article', comment.id));
+
+    expect(await orm.em.getRepository(Comment).count()).toBe(1);
   });
 
-  it('cannot delete comment of other author', () => {
-    expect(service).toBeDefined();
+  it('cannot delete comment of other author', async () => {
+    await actingAs(orm, userService);
+
+    await articlesService.create(
+      plainToClass(NewArticleDTO, {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+      }),
+    );
+
+    const comment = await service.create(
+      'test-article',
+      plainToClass(NewCommentDTO, {
+        body: 'New Comment 1',
+      }),
+    );
+
+    await actingAs(orm, userService, {
+      name: 'Jane Doe',
+      email: 'jane.doe@example.com',
+    });
+
+    await expect(() =>
+      act(orm, () => service.delete('test-article', comment.id)),
+    ).rejects.toThrow(BadRequestException);
   });
 
-  it('cannot delete comment with bad article', () => {
-    expect(service).toBeDefined();
+  it('cannot delete comment with bad article', async () => {
+    await actingAs(orm, userService);
+
+    await articlesService.create(
+      plainToClass(NewArticleDTO, {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+      }),
+    );
+
+    await articlesService.create(
+      plainToClass(NewArticleDTO, {
+        title: 'Bad Article',
+        description: 'Bad Description',
+        body: 'Bad Body',
+      }),
+    );
+
+    const comment = await service.create(
+      'test-article',
+      plainToClass(NewCommentDTO, {
+        body: 'New Comment 1',
+      }),
+    );
+
+    await expect(() =>
+      act(orm, () => service.delete('bad-article', comment.id)),
+    ).rejects.toThrow(NotFoundError);
   });
 
-  it('cannot delete comment with inexisting article', () => {
-    expect(service).toBeDefined();
+  it('cannot delete comment with inexisting article', async () => {
+    await expect(() =>
+      act(orm, () => service.delete('test-article', 1)),
+    ).rejects.toThrow(NotFoundError);
   });
 
-  it('cannot delete non existent comment', () => {
-    expect(service).toBeDefined();
+  it('cannot delete non existent comment', async () => {
+    await actingAs(orm, userService);
+
+    await articlesService.create(
+      plainToClass(NewArticleDTO, {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+      }),
+    );
+
+    await expect(() =>
+      act(orm, () => service.delete('test-article', 1)),
+    ).rejects.toThrow(NotFoundError);
   });
 });

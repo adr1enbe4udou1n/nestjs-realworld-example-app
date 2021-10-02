@@ -21,6 +21,7 @@ export class CommentDTO {
 
   static map(comment: Comment, userService: UserService): CommentDTO {
     const dto = new CommentDTO();
+    dto.id = comment.id;
     dto.body = comment.body;
     dto.author = ProfileDTO.map(comment.author, userService);
     dto.created_at = comment.created_at;

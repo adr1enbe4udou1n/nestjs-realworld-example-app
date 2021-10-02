@@ -1,6 +1,6 @@
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserService } from '../../user/user.service';
 import { Article } from '../article.entity';
 import { Comment } from './comment.entity';
@@ -18,8 +18,17 @@ export class CommentsService {
   ) {}
 
   async list(slug: string): Promise<CommentDTO[]> {
-    throw new Error('Method not implemented.');
+    const article = await this.articleRepository.findOneOrFail({ slug });
+
+    const comments = await this.commentRepository.find(
+      { article },
+      ['author.followers'],
+      { id: 'DESC' },
+    );
+
+    return comments.map((c) => CommentDTO.map(c, this.userService));
   }
+
   async create(slug: string, dto: NewCommentDTO): Promise<CommentDTO> {
     const article = await this.articleRepository.findOneOrFail({ slug });
 
@@ -31,7 +40,24 @@ export class CommentsService {
 
     return CommentDTO.map(comment, this.userService);
   }
+
   async delete(slug: string, commentId: number) {
-    throw new Error('Method not implemented.');
+    const article = await this.articleRepository.findOneOrFail({ slug });
+
+    const comment = await this.commentRepository.findOneOrFail({
+      id: commentId,
+      article,
+    });
+
+    if (
+      article.author.id !== this.userService.user.id &&
+      comment.author.id !== this.userService.user.id
+    ) {
+      throw new BadRequestException(
+        'You cannot delete comment of different user',
+      );
+    }
+
+    await this.commentRepository.removeAndFlush(comment);
   }
 }
