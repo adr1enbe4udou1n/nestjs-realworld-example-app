@@ -1,18 +1,26 @@
 import { MikroORM } from '@mikro-orm/core';
-import { initializeDbTestBase } from '../db-test-base';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { plainToClass } from 'class-transformer';
+import { Tag } from '../tags/tag.entity';
+import { UserService } from '../user/user.service';
+import { act, actingAs, initializeDbTestBase } from '../db-test-base';
 import { ArticlesService } from './articles.service';
+import { NewArticleDTO } from './dto/article-create.dto';
+import { Article } from './article.entity';
 
 describe('ArticlesService', () => {
   let orm: MikroORM;
   let service: ArticlesService;
+  let userService: UserService;
 
   beforeEach(async () => {
     const module = await initializeDbTestBase({
-      providers: [ArticlesService],
+      providers: [ArticlesService, UserService],
     });
 
     orm = module.get(MikroORM);
     service = module.get(ArticlesService);
+    userService = module.get(UserService);
   });
 
   afterEach(async () => {
@@ -63,13 +71,76 @@ describe('ArticlesService', () => {
    * Article Create
    */
 
-  it('can create article', () => {
-    expect(service).toBeDefined();
+  it('can create article', async () => {
+    await actingAs(orm, userService, {
+      bio: 'My Bio',
+      image: 'https://i.pravatar.cc/300',
+    });
+
+    await orm.em
+      .getRepository(Tag)
+      .persistAndFlush(plainToClass(Tag, { name: 'Existing Tag' }));
+
+    const article = await act(orm, () =>
+      service.create(
+        plainToClass(NewArticleDTO, {
+          title: 'Test Article',
+          description: 'Test Description',
+          body: 'Test Body',
+          tagList: ['Test Tag 1', 'Test Tag 2', 'Existing Tag'],
+        }),
+      ),
+    );
+
+    expect(article).toMatchObject({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      author: {
+        username: 'John Doe',
+        bio: 'My Bio',
+        image: 'https://i.pravatar.cc/300',
+      },
+      tagList: ['Test Tag 1', 'Test Tag 2', 'Existing Tag'],
+    });
+
+    await expect(await orm.em.getRepository(Article).count()).resolves.toBe(1);
+    await expect(await orm.em.getRepository(Tag).count()).resolves.toBe(3);
   });
 
-  it('cannot create article with invalid data', () => {
-    expect(service).toBeDefined();
+  it.each([
+    {
+      title: '',
+      description: 'Test Description',
+      body: 'Test Body',
+    },
+    {
+      title: 'Test Title',
+      description: '',
+      body: 'Test Body',
+    },
+    {
+      title: 'Test Title',
+      description: 'Test Description',
+      body: '',
+    },
+  ])('cannot create article with invalid data', async (data) => {
+    await expect(() =>
+      new ValidationPipe().transform(data, {
+        type: 'body',
+        metatype: NewArticleDTO,
+      }),
+    ).rejects.toThrow(BadRequestException);
   });
+
+  // it('cannot create article with same title', async (data) => {
+  // await expect(() =>
+  //   new ValidationPipe().transform(data, {
+  //     type: 'body',
+  //     metatype: NewArticleDTO,
+  //   }),
+  // ).rejects.toThrow(BadRequestException);
+  // });
 
   /**
    * Article Update

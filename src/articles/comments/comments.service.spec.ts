@@ -1,18 +1,21 @@
 import { MikroORM } from '@mikro-orm/core';
+import { UserService } from '../../user/user.service';
 import { initializeDbTestBase } from '../../db-test-base';
 import { CommentsService } from './comments.service';
 
 describe('CommentsService', () => {
   let orm: MikroORM;
   let service: CommentsService;
+  let userService: UserService;
 
   beforeEach(async () => {
     const module = await initializeDbTestBase({
-      providers: [CommentsService],
+      providers: [CommentsService, UserService],
     });
 
     orm = module.get(MikroORM);
     service = module.get(CommentsService);
+    userService = module.get(UserService);
   });
 
   afterEach(async () => {

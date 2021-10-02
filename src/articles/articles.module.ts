@@ -9,9 +9,10 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { AuthMiddleware } from '../user/auth.middleware';
 import { UserService } from '../user/user.service';
 import { User } from '../users/user.entity';
+import { Tag } from '../tags/tag.entity';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([Article, Comment, User])],
+  imports: [MikroOrmModule.forFeature([Article, Tag, Comment, User])],
   controllers: [ArticlesController, CommentsController],
   providers: [ArticlesService, CommentsService, UserService],
 })

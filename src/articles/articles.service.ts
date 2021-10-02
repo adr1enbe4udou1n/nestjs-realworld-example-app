@@ -1,15 +1,25 @@
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
-import { PagedQuery } from 'src/pagination';
+import { UserService } from '../user/user.service';
+import { PagedQuery } from '../pagination';
 import { Article } from './article.entity';
-import { NewArticleRequest } from './dto/article-create.dto';
-import { UpdateArticleRequest } from './dto/article-update.dto';
+import { NewArticleDTO } from './dto/article-create.dto';
+import { UpdateArticleDTO } from './dto/article-update.dto';
 import { ArticleDTO } from './dto/article.dto';
 import { ArticlesListQuery } from './queries/articles.query';
+import { Tag } from '../tags/tag.entity';
 
 @Injectable()
 export class ArticlesService {
+  constructor(
+    @InjectRepository(Article)
+    private readonly articleRepository: EntityRepository<Article>,
+    @InjectRepository(Tag)
+    private readonly tagRepository: EntityRepository<Tag>,
+    private readonly userService: UserService,
+  ) {}
+
   list(
     query: ArticlesListQuery,
   ): Promise<{ items: ArticleDTO[]; count: number }> {
@@ -21,10 +31,10 @@ export class ArticlesService {
   get(slug: string): Promise<ArticleDTO> {
     throw new Error('Method not implemented.');
   }
-  create(slug: string, command: NewArticleRequest): Promise<ArticleDTO> {
+  create(command: NewArticleDTO): Promise<ArticleDTO> {
     throw new Error('Method not implemented.');
   }
-  update(slug: string, command: UpdateArticleRequest): Promise<ArticleDTO> {
+  update(slug: string, command: UpdateArticleDTO): Promise<ArticleDTO> {
     throw new Error('Method not implemented.');
   }
   delete(slug: string) {
@@ -33,8 +43,4 @@ export class ArticlesService {
   favorite(slug: string, arg1: boolean): Promise<ArticleDTO> {
     throw new Error('Method not implemented.');
   }
-  constructor(
-    @InjectRepository(Article)
-    private readonly tagRepository: EntityRepository<Article>,
-  ) {}
 }

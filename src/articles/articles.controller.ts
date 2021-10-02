@@ -17,7 +17,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { PagedQuery } from 'src/pagination';
+import { PagedQuery } from '../pagination';
 import { AuthGuard } from '../auth.guard';
 import { ArticlesService } from './articles.service';
 import { NewArticleRequest } from './dto/article-create.dto';
@@ -85,10 +85,9 @@ export class ArticlesController {
   @ApiBody({ description: 'Article to create', type: NewArticleRequest })
   @ApiResponse({ type: SingleArticleResponse })
   async create(
-    @Param() slug: string,
     @Body() command: NewArticleRequest,
   ): Promise<SingleArticleResponse> {
-    return { article: await this.articlesService.create(slug, command) };
+    return { article: await this.articlesService.create(command.article) };
   }
 
   @ApiBearerAuth()
@@ -109,7 +108,9 @@ export class ArticlesController {
     @Param() slug: string,
     @Body() command: UpdateArticleRequest,
   ): Promise<SingleArticleResponse> {
-    return { article: await this.articlesService.update(slug, command) };
+    return {
+      article: await this.articlesService.update(slug, command.article),
+    };
   }
 
   @ApiBearerAuth()
