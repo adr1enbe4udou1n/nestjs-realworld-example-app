@@ -22,7 +22,7 @@ export class ProfileDTO {
     dto.image = user.image;
     dto.following = user.followers
       .getItems()
-      .some((u) => u.id === userService.user.id);
+      .some((u) => u.id === userService.user?.id);
     return dto;
   }
 }

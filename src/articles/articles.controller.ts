@@ -70,7 +70,8 @@ export class ArticlesController {
   @Get(':slug')
   @ApiParam({ name: 'slug', description: 'Slug of the article to get' })
   @ApiResponse({ type: SingleArticleResponse })
-  async get(@Param() slug: string): Promise<SingleArticleResponse> {
+  async get(@Param('slug') slug: string): Promise<SingleArticleResponse> {
+    console.log(`WTF ${slug}`);
     return { article: await this.articlesService.get(slug) };
   }
 
@@ -105,7 +106,7 @@ export class ArticlesController {
   })
   @ApiResponse({ type: SingleArticleResponse })
   async update(
-    @Param() slug: string,
+    @Param('slug') slug: string,
     @Body() command: UpdateArticleRequest,
   ): Promise<SingleArticleResponse> {
     return {
@@ -122,7 +123,7 @@ export class ArticlesController {
   })
   @Delete(':slug')
   @ApiParam({ name: 'slug', description: 'Slug of the article to delete' })
-  async delete(@Param() slug: string) {
+  async delete(@Param('slug') slug: string) {
     return { article: await this.articlesService.delete(slug) };
   }
 
@@ -139,7 +140,7 @@ export class ArticlesController {
     description: 'Slug of the article that you want to favorite',
   })
   @ApiResponse({ type: SingleArticleResponse })
-  async favorite(@Param() slug: string): Promise<SingleArticleResponse> {
+  async favorite(@Param('slug') slug: string): Promise<SingleArticleResponse> {
     return { article: await this.articlesService.favorite(slug, true) };
   }
 
@@ -156,7 +157,9 @@ export class ArticlesController {
     description: 'Slug of the article that you want to unfavorite',
   })
   @ApiResponse({ type: SingleArticleResponse })
-  async unfavorite(@Param() slug: string): Promise<SingleArticleResponse> {
+  async unfavorite(
+    @Param('slug') slug: string,
+  ): Promise<SingleArticleResponse> {
     return { article: await this.articlesService.favorite(slug, false) };
   }
 }
