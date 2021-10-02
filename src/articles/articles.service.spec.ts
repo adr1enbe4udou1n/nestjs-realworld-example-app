@@ -11,53 +11,224 @@ import { UpdateArticleDTO } from './dto/article-update.dto';
 import { CommentsService } from './comments/comments.service';
 import { NewCommentDTO } from './comments/dto/comment-create.dto';
 import { Comment } from './comments/comment.entity';
+import { User } from '../users/user.entity';
+import { ArticlesListQuery } from './queries/articles.query';
+import { ProfilesService } from '../profiles/profiles.service';
+import { PagedQuery } from '../pagination';
 
 describe('ArticlesService', () => {
   let orm: MikroORM;
   let service: ArticlesService;
   let commentsService: CommentsService;
   let userService: UserService;
+  let profilesService: ProfilesService;
 
   beforeEach(async () => {
     const module = await initializeDbTestBase({
-      providers: [ArticlesService, CommentsService, UserService],
+      providers: [
+        ArticlesService,
+        CommentsService,
+        UserService,
+        ProfilesService,
+      ],
     });
 
     orm = module.get(MikroORM);
     service = module.get(ArticlesService);
     commentsService = module.get(CommentsService);
     userService = module.get(UserService);
+    profilesService = module.get(ProfilesService);
   });
 
   afterEach(async () => {
     await orm.close(true);
   });
 
+  const createArticlesForAuthor = async (
+    user: Partial<User>,
+    count: number,
+  ) => {
+    await actingAs(orm, userService, user);
+
+    for (let i = 1; i <= count; i++) {
+      await service.create(
+        plainToClass(NewArticleDTO, {
+          title: `${user.name} - Test Article ${i}`,
+          description: 'Test Description',
+          body: 'Test Body',
+          tagList: ['Test Tag 1', 'Test Tag 2', `Tag ${user.name}`],
+        }),
+      );
+    }
+  };
+
+  const createArticles = async () => {
+    await createArticlesForAuthor(
+      {
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+      },
+      30,
+    );
+
+    await createArticlesForAuthor(
+      {
+        name: 'Jane Doe',
+        email: 'jane.doe@example.com',
+      },
+      20,
+    );
+  };
+
   /**
    * Article List
    */
 
-  it('can paginate articles', () => {
-    expect(service).toBeDefined();
+  it('can paginate articles', async () => {
+    await createArticles();
+
+    const [items, count] = await act(orm, () =>
+      service.list(plainToClass(ArticlesListQuery, { limit: 30, offset: 10 })),
+    );
+
+    expect(items.length).toBe(20);
+    expect(count).toBe(50);
+
+    expect(items[0]).toMatchObject({
+      title: 'Jane Doe - Test Article 10',
+      description: 'Test Description',
+      body: 'Test Body',
+      author: {
+        username: 'Jane Doe',
+      },
+      tagList: ['Test Tag 1', 'Test Tag 2', 'Tag Jane Doe'],
+    });
   });
 
-  it('can filter articles by author', () => {
-    expect(service).toBeDefined();
+  it('can filter articles by author', async () => {
+    await createArticles();
+
+    const [items, count] = await act(orm, () =>
+      service.list(
+        plainToClass(ArticlesListQuery, {
+          limit: 10,
+          offset: 0,
+          author: 'John',
+        }),
+      ),
+    );
+
+    expect(items.length).toBe(10);
+    expect(count).toBe(30);
+
+    expect(items[0]).toMatchObject({
+      title: 'John Doe - Test Article 30',
+      description: 'Test Description',
+      body: 'Test Body',
+      author: {
+        username: 'John Doe',
+      },
+      tagList: ['Test Tag 1', 'Test Tag 2', 'Tag John Doe'],
+    });
   });
 
-  it('can filter articles by favorited', () => {
-    expect(service).toBeDefined();
+  it('can filter articles by tag', async () => {
+    await createArticles();
+
+    const [items, count] = await act(orm, () =>
+      service.list(
+        plainToClass(ArticlesListQuery, {
+          limit: 10,
+          offset: 0,
+          tag: 'Tag Jane Doe',
+        }),
+      ),
+    );
+
+    expect(items.length).toBe(10);
+    expect(count).toBe(20);
+
+    expect(items[0]).toMatchObject({
+      title: 'Jane Doe - Test Article 20',
+      description: 'Test Description',
+      body: 'Test Body',
+      author: {
+        username: 'Jane Doe',
+      },
+      tagList: ['Tag Jane Doe'],
+    });
   });
 
-  it('can filter articles by tag', () => {
-    expect(service).toBeDefined();
+  it('can filter articles by favorited', async () => {
+    await createArticles();
+
+    for (const slug of [
+      'john-doe-test-article-1',
+      'john-doe-test-article-2',
+      'john-doe-test-article-4',
+      'john-doe-test-article-8',
+      'john-doe-test-article-16',
+    ]) {
+      await service.favorite(slug, true);
+    }
+
+    const [items, count] = await act(orm, () =>
+      service.list(
+        plainToClass(ArticlesListQuery, {
+          limit: 10,
+          offset: 0,
+          favorited: 'Jane',
+        }),
+      ),
+    );
+
+    expect(items.length).toBe(5);
+    expect(count).toBe(5);
+
+    expect(items[0]).toMatchObject({
+      title: 'John Doe - Test Article 16',
+      description: 'Test Description',
+      body: 'Test Body',
+      author: {
+        username: 'John Doe',
+      },
+      tagList: ['Test Tag 1', 'Test Tag 2', 'Tag John Doe'],
+      favorited: true,
+      favoritesCount: 1,
+    });
   });
 
   /**
    * Article Feed
    */
 
-  it('can paginate articles of followed authors', () => {
+  it('can paginate articles of followed authors', async () => {
+    await createArticles();
+
+    await profilesService.follow('John Doe', true);
+
+    const [items, count] = await act(orm, () =>
+      service.feed(
+        plainToClass(PagedQuery, {
+          limit: 10,
+          offset: 0,
+        }),
+      ),
+    );
+
+    expect(items.length).toBe(10);
+    expect(count).toBe(30);
+
+    expect(items[0]).toMatchObject({
+      title: 'John Doe - Test Article 30',
+      description: 'Test Description',
+      body: 'Test Body',
+      author: {
+        username: 'John Doe',
+      },
+      tagList: ['Test Tag 1', 'Test Tag 2', 'Tag John Doe'],
+    });
+
     expect(service).toBeDefined();
   });
 

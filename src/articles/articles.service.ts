@@ -21,16 +21,40 @@ export class ArticlesService {
     private readonly userService: UserService,
   ) {}
 
-  async list(
-    query: ArticlesListQuery,
-  ): Promise<{ items: ArticleDTO[]; count: number }> {
-    throw new Error('Method not implemented.');
+  async list(query: ArticlesListQuery): Promise<[ArticleDTO[], number]> {
+    const [items, count] = await this.articleRepository.findAndCount(
+      {
+        ...(query.author && {
+          author: { name: { $like: `%${query.author}%` } },
+        }),
+        ...(query.tag && {
+          tags: { name: query.tag },
+        }),
+        ...(query.favorited && {
+          favoredUsers: { name: { $like: `%${query.favorited}%` } },
+        }),
+      },
+      ['author.followers', 'tags', 'favoredUsers'],
+      { id: 'DESC' },
+      query.securedLimit,
+      query.offset,
+    );
+
+    return [items.map((a) => ArticleDTO.map(a, this.userService)), count];
   }
 
-  async feed(
-    query: PagedQuery,
-  ): Promise<{ items: ArticleDTO[]; count: number }> {
-    throw new Error('Method not implemented.');
+  async feed(query: PagedQuery): Promise<[ArticleDTO[], number]> {
+    const [items, count] = await this.articleRepository.findAndCount(
+      {
+        author: { followers: { id: this.userService.user.id } },
+      },
+      ['author.followers', 'tags', 'favoredUsers'],
+      { id: 'DESC' },
+      query.securedLimit,
+      query.offset,
+    );
+
+    return [items.map((a) => ArticleDTO.map(a, this.userService)), count];
   }
 
   async get(slug: string): Promise<ArticleDTO> {

@@ -6,14 +6,19 @@ export class PagedQuery {
     default: 20,
     required: false,
   })
-  limit: number;
+  limit?: number;
+
+  get securedLimit() {
+    const max = 20;
+    return Math.min(this.limit ?? max, max);
+  }
 
   @ApiProperty({
     description: 'Offset/skip number of articles (default is 0)',
     default: 0,
     required: false,
   })
-  offset: number;
+  offset?: number;
 }
 
 export class PagedResponse<T> {

@@ -3,14 +3,14 @@ import { PagedQuery } from '../../pagination';
 
 export class ArticlesListQuery extends PagedQuery {
   @ApiProperty({ description: 'Filter by author (username)', required: false })
-  author: string;
+  author?: string;
 
   @ApiProperty({
     description: 'Filter by favorites of a user (username)',
     required: false,
   })
-  favorited: string;
+  favorited?: string;
 
   @ApiProperty({ description: 'Filter by tag', required: false })
-  tag: string;
+  tag?: string;
 }

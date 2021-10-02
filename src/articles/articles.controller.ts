@@ -43,7 +43,7 @@ export class ArticlesController {
   async list(
     @Query() query: ArticlesListQuery,
   ): Promise<MultipleArticlesResponse> {
-    const { items, count } = await this.articlesService.list(query);
+    const [items, count] = await this.articlesService.list(query);
     return { articles: items, articlesCount: count };
   }
 
@@ -58,7 +58,7 @@ export class ArticlesController {
   @Get('feed')
   @ApiResponse({ type: MultipleArticlesResponse })
   async feed(@Query() query: PagedQuery): Promise<MultipleArticlesResponse> {
-    const { items, count } = await this.articlesService.feed(query);
+    const [items, count] = await this.articlesService.feed(query);
     return { articles: items, articlesCount: count };
   }
 
