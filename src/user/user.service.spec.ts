@@ -1,5 +1,5 @@
 import { MikroORM } from '@mikro-orm/core';
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/user.entity';
 import {
@@ -32,14 +32,6 @@ describe('UsersService', () => {
     await orm.close(true);
   });
 
-  it('guest cannot fetch user infos', async () => {
-    expect(() => service.current()).rejects.toThrow(UnauthorizedException);
-  });
-
-  it('guest cannot update infos', async () => {
-    expect(() => service.current()).rejects.toThrow(UnauthorizedException);
-  });
-
   it('can fetch user infos', async () => {
     await actingAs(orm, service);
 
@@ -53,6 +45,26 @@ describe('UsersService', () => {
     const payload = jwt.decode(user.token);
     expect(payload['name']).toBe('John Doe');
     expect(payload['email']).toBe('john.doe@example.com');
+  });
+
+  it.each([
+    {
+      username: 'John Doe',
+      email: 'john.doe',
+      bio: 'My Bio',
+    },
+    {
+      username: '',
+      email: 'john.doe@example.com',
+      bio: 'My Bio',
+    },
+  ])('cannot update infos with invalid data', async (data) => {
+    await expect(() =>
+      new ValidationPipe().transform(data, {
+        type: 'body',
+        metatype: UpdateUserDTO,
+      }),
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('can update infos', async () => {

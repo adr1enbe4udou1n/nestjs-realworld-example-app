@@ -51,7 +51,7 @@ describe('ProfilesService', () => {
     });
   });
 
-  it('cannot get not existing profile', () => {
+  it('cannot get non existent profile', () => {
     expect(() => act(orm, () => service.get('John Doe'))).rejects.toThrow(
       NotFoundError,
     );
