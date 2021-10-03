@@ -21,6 +21,11 @@ export class ArticlesService {
     private readonly userService: UserService,
   ) {}
 
+  limit(query: PagedQuery) {
+    const max = 20;
+    return Math.min(query.limit ?? max, max);
+  }
+
   async list(query: ArticlesListQuery): Promise<[ArticleDTO[], number]> {
     const [items, count] = await this.articleRepository.findAndCount(
       {
@@ -36,7 +41,7 @@ export class ArticlesService {
       },
       ['author.followers', 'tags', 'favoredUsers'],
       { id: 'DESC' },
-      query.securedLimit,
+      this.limit(query),
       query.offset,
     );
 
@@ -50,7 +55,7 @@ export class ArticlesService {
       },
       ['author.followers', 'tags', 'favoredUsers'],
       { id: 'DESC' },
-      query.securedLimit,
+      this.limit(query),
       query.offset,
     );
 

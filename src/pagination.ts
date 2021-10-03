@@ -6,11 +6,15 @@ export class PagedQuery {
     default: 20,
     required: false,
   })
-  limit?: number;
+  _limit = 20;
 
-  get securedLimit() {
-    const max = 20;
-    return Math.min(this.limit ?? max, max);
+  get limit() {
+    return this._limit;
+  }
+  set limit(limit: number) {
+    if (limit < this._limit) {
+      this._limit = limit;
+    }
   }
 
   @ApiProperty({
@@ -18,7 +22,7 @@ export class PagedQuery {
     default: 0,
     required: false,
   })
-  offset?: number;
+  offset = 0;
 }
 
 export class PagedResponse<T> {
