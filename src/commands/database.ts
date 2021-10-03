@@ -89,7 +89,7 @@ export class DatabaseRefreshService {
         body: lorem.paragraphs(5),
         author: random.arrayElement(users),
         favoredUsers: random.arrayElements(users, datatype.number(5)),
-        created_at: date.recent(90),
+        createdAt: date.recent(90),
       });
 
       for (let i = 1; i <= datatype.number(10); i++) {
@@ -97,7 +97,7 @@ export class DatabaseRefreshService {
           this.em.create(Comment, {
             body: lorem.paragraphs(2),
             author: random.arrayElement(users),
-            created_at: date.recent(7),
+            createdAt: date.recent(7),
           }),
         );
       }

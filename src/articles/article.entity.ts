@@ -51,10 +51,10 @@ export class Article implements HasTimestamps {
   favoredUsers = new Collection<User>(this);
 
   @Property({ columnType: 'timestamp' })
-  created_at: Date;
+  createdAt: Date;
 
   @Property({ columnType: 'timestamp' })
-  updated_at: Date;
+  updatedAt: Date;
 
   @BeforeCreate()
   async beforeCreate() {

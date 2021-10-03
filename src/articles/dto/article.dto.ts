@@ -17,10 +17,10 @@ export class ArticleDTO {
   body: string;
 
   @ApiProperty()
-  created_at: Date;
+  createdAt: Date;
 
   @ApiProperty()
-  updated_at: Date;
+  updatedAt: Date;
 
   @ApiProperty()
   tagList: string[] = [];
@@ -46,8 +46,8 @@ export class ArticleDTO {
       .getItems()
       .some((u) => u.id === userService.user?.id);
     dto.favoritesCount = article.favoredUsers.count();
-    dto.created_at = article.created_at;
-    dto.updated_at = article.updated_at;
+    dto.createdAt = article.createdAt;
+    dto.updatedAt = article.updatedAt;
     return dto;
   }
 }

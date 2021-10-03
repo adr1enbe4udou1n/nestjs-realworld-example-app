@@ -4,16 +4,16 @@ import { HasTimestamps } from './has-timestamps';
 
 export class TimestampsSubscriber implements EventSubscriber {
   async beforeCreate(args: EventArgs<HasTimestamps>): Promise<void> {
-    if (!args.entity.created_at) {
-      args.entity.created_at = new Date();
+    if (!args.entity.createdAt) {
+      args.entity.createdAt = new Date();
     }
 
-    args.entity.updated_at = args.entity.created_at;
+    args.entity.updatedAt = args.entity.createdAt;
   }
 
   async beforeUpdate(args: EventArgs<Article>): Promise<void> {
-    if (!args.entity.updated_at) {
-      args.entity.updated_at = new Date();
+    if (!args.entity.updatedAt) {
+      args.entity.updatedAt = new Date();
     }
   }
 }

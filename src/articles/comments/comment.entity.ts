@@ -18,8 +18,8 @@ export class Comment implements HasTimestamps {
   body: string;
 
   @Property({ columnType: 'timestamp' })
-  created_at: Date;
+  createdAt: Date;
 
   @Property({ columnType: 'timestamp' })
-  updated_at: Date;
+  updatedAt: Date;
 }

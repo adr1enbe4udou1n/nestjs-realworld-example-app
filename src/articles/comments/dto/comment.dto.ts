@@ -11,10 +11,10 @@ export class CommentDTO {
   body: string;
 
   @ApiProperty()
-  created_at: Date;
+  createdAt: Date;
 
   @ApiProperty()
-  updated_at: Date;
+  updatedAt: Date;
 
   @ApiProperty()
   author: ProfileDTO;
@@ -24,8 +24,8 @@ export class CommentDTO {
     dto.id = comment.id;
     dto.body = comment.body;
     dto.author = ProfileDTO.map(comment.author, userService);
-    dto.created_at = comment.created_at;
-    dto.updated_at = comment.updated_at;
+    dto.createdAt = comment.createdAt;
+    dto.updatedAt = comment.updatedAt;
     return dto;
   }
 }
