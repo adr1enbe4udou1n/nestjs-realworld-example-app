@@ -71,7 +71,6 @@ export class ArticlesController {
   @ApiParam({ name: 'slug', description: 'Slug of the article to get' })
   @ApiResponse({ type: SingleArticleResponse })
   async get(@Param('slug') slug: string): Promise<SingleArticleResponse> {
-    console.log(`WTF ${slug}`);
     return { article: await this.articlesService.get(slug) };
   }
 
