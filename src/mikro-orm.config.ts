@@ -16,6 +16,7 @@ const config: Options = {
   debug: true,
   highlighter: new SqlHighlighter(),
   metadataProvider: TsMorphMetadataProvider,
+  migrations: { path: 'src/migrations' },
 };
 
 export default config;

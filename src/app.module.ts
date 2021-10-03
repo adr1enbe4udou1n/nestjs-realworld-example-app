@@ -5,6 +5,7 @@ import { TagsModule } from './tags/tags.module';
 import { ArticlesModule } from './articles/articles.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { UserModule } from './user/user.module';
+import { MigrateService } from './migrate.service';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { UserModule } from './user/user.module';
     ProfilesModule,
     UserModule,
   ],
-  providers: [],
+  providers: [MigrateService],
 })
 export class AppModule {}
