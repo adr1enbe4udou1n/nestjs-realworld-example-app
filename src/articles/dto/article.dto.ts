@@ -41,9 +41,9 @@ export class ArticleDTO {
     dto.description = article.description;
     dto.body = article.body;
     dto.author = ProfileDTO.map(article.author, userService);
-    dto.tagList = article.tags.getItems().map((t) => t.name);
+    dto.tagList = article.tags.toArray().map((t) => t.name);
     dto.favorited = article.favoredUsers
-      .getItems()
+      .toArray()
       .some((u) => u.id === userService.user?.id);
     dto.favoritesCount = article.favoredUsers.count();
     dto.createdAt = article.createdAt;

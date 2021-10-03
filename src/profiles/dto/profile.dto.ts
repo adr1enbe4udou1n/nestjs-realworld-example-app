@@ -21,7 +21,7 @@ export class ProfileDTO {
     dto.bio = user.bio;
     dto.image = user.image;
     dto.following = user.followers
-      .getItems()
+      .toArray()
       .some((u) => u.id === userService.user?.id);
     return dto;
   }

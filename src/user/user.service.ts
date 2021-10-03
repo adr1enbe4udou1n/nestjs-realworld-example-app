@@ -1,12 +1,12 @@
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { BadRequestException, Injectable, Scope } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from '../users/user.entity';
 import { UserDTO } from './dto/current-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateUserDTO } from './dto/update-user.dto';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class UserService {
   private _user: User = null;
 
