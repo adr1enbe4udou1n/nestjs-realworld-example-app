@@ -8,6 +8,7 @@ export class MigrateService implements OnModuleInit {
   async onModuleInit() {
     if (process.env.NODE_ENV === 'production') {
       await this.orm.getMigrator().up();
+      await this.orm.close(true);
     }
   }
 }

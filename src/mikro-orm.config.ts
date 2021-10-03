@@ -16,7 +16,10 @@ const config: Options = {
   debug: true,
   highlighter: new SqlHighlighter(),
   metadataProvider: TsMorphMetadataProvider,
-  migrations: { path: 'src/migrations' },
+  migrations:
+    process.env.NODE_ENV === 'production'
+      ? { path: 'dist/migrations', pattern: /^[\w-]+\d+\.js$/ }
+      : { path: 'src/migrations', pattern: /^[\w-]+\d+\.ts$/ },
 };
 
 export default config;
