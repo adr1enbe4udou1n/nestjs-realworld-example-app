@@ -5,14 +5,13 @@ import {
   NestMiddleware,
 } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-import { User } from '../users/user.entity';
 import { UserService } from './user.service';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
   constructor(private readonly userService: UserService) {}
 
-  async use(req: Request & { user?: User }, res: Response, next: NextFunction) {
+  async use(req: Request, res: Response, next: NextFunction) {
     const authHeaders = req.headers.authorization;
 
     if (authHeaders && (authHeaders as string).split(' ')[1]) {
@@ -26,8 +25,6 @@ export class AuthMiddleware implements NestMiddleware {
           HttpStatus.UNAUTHORIZED,
         );
       }
-
-      req.user = this.userService.user;
     }
 
     next();
