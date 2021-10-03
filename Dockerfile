@@ -1,7 +1,7 @@
-FROM node:14-buster
-RUN apt-get install -y tzdata
+FROM node:14-alpine
 
-COPY /dist /package.json /pnpm-lock.yaml /app/
+COPY /package.json /pnpm-lock.yaml /app/
+COPY /dist /app/dist
 WORKDIR /app
 
 RUN curl -f https://get.pnpm.io/v6.7.js | node - add --global pnpm@6
