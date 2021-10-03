@@ -18,7 +18,11 @@ const config: Options = {
   metadataProvider: TsMorphMetadataProvider,
   migrations:
     process.env.NODE_ENV === 'production'
-      ? { path: 'dist/migrations', pattern: /^[\w-]+\d+\.js$/ }
+      ? {
+          path: 'dist/migrations',
+          pattern: /^[\w-]+\d+\.js$/,
+          disableForeignKeys: false,
+        }
       : { path: 'src/migrations', pattern: /^[\w-]+\d+\.ts$/ },
 };
 
