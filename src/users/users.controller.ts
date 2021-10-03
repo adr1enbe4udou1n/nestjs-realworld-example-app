@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserResponse } from '../user/dto/current-user.dto';
 import { LoginUserRequest } from './dto/login.dto';
@@ -15,6 +15,7 @@ export class UsersController {
     description: 'Register a new user',
   })
   @Post()
+  @HttpCode(200)
   @ApiBody({
     description: 'Details of the new user to register',
     type: NewUserRequest,
@@ -29,6 +30,7 @@ export class UsersController {
     description: 'Login for existing user',
   })
   @Post('login')
+  @HttpCode(200)
   @ApiBody({
     description: 'Credentials to use',
     type: LoginUserRequest,

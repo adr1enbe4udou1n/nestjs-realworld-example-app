@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   UseGuards,
@@ -49,6 +50,7 @@ export class CommentsController {
     description: 'Create a comment for an article. Auth is required',
   })
   @Post()
+  @HttpCode(200)
   @ApiParam({
     name: 'slug',
     description: 'Slug of the article that you want to create a comment for',

@@ -23,7 +23,7 @@ describe('UsersService', () => {
       providers: [UserService],
     });
 
-    service = module.get(UserService);
+    service = await module.resolve(UserService);
     orm = module.get(MikroORM);
     jwt = module.get(JwtService);
   });

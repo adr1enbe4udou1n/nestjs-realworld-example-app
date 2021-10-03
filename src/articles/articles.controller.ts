@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Put,
@@ -82,6 +83,7 @@ export class ArticlesController {
     description: 'Create an article. Auth is required',
   })
   @Post()
+  @HttpCode(200)
   @ApiBody({ description: 'Article to create', type: NewArticleRequest })
   @ApiResponse({ type: SingleArticleResponse })
   async create(
@@ -134,6 +136,7 @@ export class ArticlesController {
     description: 'Favorite an article. Auth is required',
   })
   @Post(':slug/favorite')
+  @HttpCode(200)
   @ApiParam({
     name: 'slug',
     description: 'Slug of the article that you want to favorite',

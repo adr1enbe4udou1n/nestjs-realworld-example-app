@@ -1,11 +1,11 @@
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Scope } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { User } from '../users/user.entity';
 import { ProfileDTO } from './dto/profile.dto';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class ProfilesService {
   constructor(
     @InjectRepository(User)

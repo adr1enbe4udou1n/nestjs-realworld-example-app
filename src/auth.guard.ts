@@ -1,8 +1,8 @@
-import { Injectable, CanActivate } from '@nestjs/common';
+import { Injectable, CanActivate, Scope } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UserService } from './user/user.service';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class AuthGuard implements CanActivate {
   constructor(private readonly userService: UserService) {}
 

@@ -3,11 +3,12 @@ import {
   HttpStatus,
   Injectable,
   NestMiddleware,
+  Scope,
 } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 import { UserService } from './user.service';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class AuthMiddleware implements NestMiddleware {
   constructor(private readonly userService: UserService) {}
 

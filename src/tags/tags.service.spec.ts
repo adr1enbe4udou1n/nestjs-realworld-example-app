@@ -14,7 +14,7 @@ describe('TagsService', () => {
     });
 
     orm = module.get(MikroORM);
-    service = module.get(TagsService);
+    service = await module.resolve(TagsService);
   });
 
   afterEach(async () => {

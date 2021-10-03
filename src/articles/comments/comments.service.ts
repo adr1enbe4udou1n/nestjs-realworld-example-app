@@ -1,13 +1,13 @@
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Scope } from '@nestjs/common';
 import { UserService } from '../../user/user.service';
 import { Article } from '../article.entity';
 import { Comment } from './comment.entity';
 import { NewCommentDTO } from './dto/comment-create.dto';
 import { CommentDTO } from './dto/comment.dto';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class CommentsService {
   constructor(
     @InjectRepository(Article)

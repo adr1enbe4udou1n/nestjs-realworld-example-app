@@ -15,6 +15,7 @@ import { User } from '../users/user.entity';
 import { ArticlesListQuery } from './queries/articles.query';
 import { ProfilesService } from '../profiles/profiles.service';
 import { PagedQuery } from '../pagination';
+import { ContextIdFactory } from '@nestjs/core';
 
 describe('ArticlesService', () => {
   let orm: MikroORM;
@@ -34,10 +35,12 @@ describe('ArticlesService', () => {
     });
 
     orm = module.get(MikroORM);
-    service = module.get(ArticlesService);
-    commentsService = module.get(CommentsService);
-    userService = module.get(UserService);
-    profilesService = module.get(ProfilesService);
+
+    const contextId = ContextIdFactory.create();
+    commentsService = await module.resolve(CommentsService, contextId);
+    userService = await module.resolve(UserService, contextId);
+    profilesService = await module.resolve(ProfilesService, contextId);
+    service = await module.resolve(ArticlesService, contextId);
   });
 
   afterEach(async () => {

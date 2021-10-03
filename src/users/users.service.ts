@@ -1,6 +1,6 @@
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Scope } from '@nestjs/common';
 import { NewUserDTO } from './dto/register.dto';
 import { User } from './user.entity';
 import { UserDTO } from '../user/dto/current-user.dto';
@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginUserDTO } from './dto/login.dto';
 import { verify } from 'argon2';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class UsersService {
   constructor(
     @InjectRepository(User)

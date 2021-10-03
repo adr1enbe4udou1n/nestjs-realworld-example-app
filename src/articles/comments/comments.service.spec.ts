@@ -8,6 +8,7 @@ import { plainToClass } from 'class-transformer';
 import { Comment } from './comment.entity';
 import { ArticlesService } from '../articles.service';
 import { NewArticleDTO } from '../dto/article-create.dto';
+import { ContextIdFactory } from '@nestjs/core';
 
 describe('CommentsService', () => {
   let orm: MikroORM;
@@ -21,9 +22,11 @@ describe('CommentsService', () => {
     });
 
     orm = module.get(MikroORM);
-    service = module.get(CommentsService);
-    articlesService = module.get(ArticlesService);
-    userService = module.get(UserService);
+
+    const contextId = ContextIdFactory.create();
+    service = await module.resolve(CommentsService, contextId);
+    articlesService = await module.resolve(ArticlesService, contextId);
+    userService = await module.resolve(UserService, contextId);
   });
 
   afterEach(async () => {

@@ -2,6 +2,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   UseGuards,
@@ -43,6 +44,7 @@ export class ProfilesController {
     description: 'Follow a user by username',
   })
   @Post('celeb_:username/follow')
+  @HttpCode(200)
   @ApiParam({
     name: 'username',
     description: 'Username of the profile you want to follow',
