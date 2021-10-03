@@ -28,7 +28,7 @@ export const initializeDbTestBase = async (metadata: ModuleMetadata) => {
 
   const orm = module.get<MikroORM>(MikroORM);
 
-  await orm.getSchemaGenerator().updateSchema();
+  await orm.getMigrator().up();
 
   await orm.em.nativeDelete(Tag, {});
   await orm.em.nativeDelete(Comment, {});
