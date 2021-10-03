@@ -47,7 +47,8 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.3.0",
     "slugify": "^1.6.0",
-    "swagger-ui-express": "^4.1.6"
+    "swagger-ui-express": "^4.1.6",
+    "ts-node": "^10.2.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.1.2",
@@ -70,7 +71,6 @@
     "supertest": "^6.1.6",
     "ts-jest": "^27.0.5",
     "ts-loader": "^9.2.6",
-    "ts-node": "^10.2.1",
     "tsconfig-paths": "^3.11.0",
     "typescript": "^4.4.3",
     "webpack": "^5.56.0"

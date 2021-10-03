@@ -1,7 +1,7 @@
 FROM node:14-alpine
 RUN apk --no-cache add curl
 
-COPY /package.json /pnpm-lock.yaml /app/
+COPY /package.json /pnpm-lock.yaml /tsconfig.json /app/
 COPY /dist/src /app/dist
 COPY /dist/migrations /app/migrations
 WORKDIR /app
