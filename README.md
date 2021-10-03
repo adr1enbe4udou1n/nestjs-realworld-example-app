@@ -20,6 +20,7 @@ Two databases will spin up, one for normal development and one dedicated for int
 
 ```sh
 pnpm i
+pnpm mikro-orm migration:up # migrate database schema
 pnpm console:dev db seed # migrate and fill db with fake data
 pnpm start:dev
 ```
