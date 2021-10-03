@@ -6,16 +6,7 @@ export class PagedQuery {
     default: 20,
     required: false,
   })
-  _limit = 20;
-
-  get limit() {
-    return this._limit;
-  }
-  set limit(limit: number) {
-    if (limit < this._limit) {
-      this._limit = limit;
-    }
-  }
+  limit = 20;
 
   @ApiProperty({
     description: 'Offset/skip number of articles (default is 0)',
