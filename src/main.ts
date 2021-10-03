@@ -2,10 +2,15 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { EntityNotFoundFilter } from './filters/entity-not-found.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe()).setGlobalPrefix('api');
+
+  app
+    .useGlobalPipes(new ValidationPipe())
+    .setGlobalPrefix('api')
+    .useGlobalFilters(new EntityNotFoundFilter());
 
   const config = new DocumentBuilder()
     .setTitle('Conduit API')
