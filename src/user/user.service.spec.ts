@@ -10,7 +10,6 @@ import {
 } from '../db-test-base';
 import { UserService } from './user.service';
 import { UserDTO } from './dto/current-user.dto';
-import { plainToClass } from 'class-transformer';
 import { UpdateUserDTO } from './dto/update-user.dto';
 
 describe('UsersService', () => {
@@ -71,12 +70,10 @@ describe('UsersService', () => {
     await actingAs(orm, service);
 
     const user = await act(orm, () =>
-      service.update(
-        plainToClass(UpdateUserDTO, {
-          email: 'jane.doe@example.com',
-          bio: 'My Bio',
-        }),
-      ),
+      service.update({
+        email: 'jane.doe@example.com',
+        bio: 'My Bio',
+      }),
     );
 
     expect(user).toMatchObject({
@@ -101,11 +98,9 @@ describe('UsersService', () => {
 
     await expect(() =>
       act(orm, () =>
-        service.update(
-          plainToClass(UpdateUserDTO, {
-            email: 'jane.doe@example.com',
-          }),
-        ),
+        service.update({
+          email: 'jane.doe@example.com',
+        }),
       ),
     ).rejects.toThrow(BadRequestException);
   });

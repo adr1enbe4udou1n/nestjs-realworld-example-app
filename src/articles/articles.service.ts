@@ -90,13 +90,11 @@ export class ArticlesService {
 
     article.tags.add(
       ...dto.tagList.map((name) => {
-        let tag = existingTags.find((t) => t.name === name);
+        const tag = existingTags.find((t) => t.name === name);
 
         if (tag) return tag;
 
-        tag = new Tag();
-        tag.name = name;
-        return tag;
+        return new Tag({ name });
       }),
     );
 

@@ -1,5 +1,4 @@
 import { MikroORM } from '@mikro-orm/core';
-import { plainToClass } from 'class-transformer';
 import { act, initializeDbTestBase } from '../db-test-base';
 import { Tag } from './tag.entity';
 import { TagsService } from './tags.service';
@@ -25,9 +24,9 @@ describe('TagsService', () => {
     await orm.em
       .getRepository(Tag)
       .persistAndFlush([
-        plainToClass(Tag, { name: 'Tag3' }),
-        plainToClass(Tag, { name: 'Tag2' }),
-        plainToClass(Tag, { name: 'Tag1' }),
+        new Tag({ name: 'Tag3' }),
+        new Tag({ name: 'Tag2' }),
+        new Tag({ name: 'Tag1' }),
       ]);
 
     expect(await act(orm, () => service.list())).toEqual([

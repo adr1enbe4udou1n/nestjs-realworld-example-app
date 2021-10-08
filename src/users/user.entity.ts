@@ -61,4 +61,8 @@ export class User implements HasTimestamps {
 
   @Property({ columnType: 'timestamp' })
   updatedAt: Date;
+
+  constructor(user: Partial<User> = {}) {
+    Object.assign(this, user);
+  }
 }

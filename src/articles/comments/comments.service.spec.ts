@@ -4,10 +4,8 @@ import { act, actingAs, initializeDbTestBase } from '../../db-test-base';
 import { CommentsService } from './comments.service';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NewCommentDTO } from './dto/comment-create.dto';
-import { plainToClass } from 'class-transformer';
 import { Comment } from './comment.entity';
 import { ArticlesService } from '../articles.service';
-import { NewArticleDTO } from '../dto/article-create.dto';
 import { ContextIdFactory } from '@nestjs/core';
 
 describe('CommentsService', () => {
@@ -43,22 +41,18 @@ describe('CommentsService', () => {
       image: 'https://i.pravatar.cc/300',
     });
 
-    await articlesService.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await articlesService.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
     for (let i = 1; i <= 5; i++) {
       await act(orm, () =>
-        service.create(
-          'test-article',
-          plainToClass(NewCommentDTO, {
-            body: `New John Comment ${i}`,
-          }),
-        ),
+        service.create('test-article', {
+          body: `New John Comment ${i}`,
+        }),
       );
     }
 
@@ -71,12 +65,9 @@ describe('CommentsService', () => {
 
     for (let i = 1; i <= 5; i++) {
       await act(orm, () =>
-        service.create(
-          'test-article',
-          plainToClass(NewCommentDTO, {
-            body: `New Jane Comment ${i}`,
-          }),
-        ),
+        service.create('test-article', {
+          body: `New Jane Comment ${i}`,
+        }),
       );
     }
 
@@ -106,21 +97,17 @@ describe('CommentsService', () => {
   it('can create comment', async () => {
     await actingAs(orm, userService);
 
-    await articlesService.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await articlesService.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
     const comment = await act(orm, () =>
-      service.create(
-        'test-article',
-        plainToClass(NewCommentDTO, {
-          body: 'New Comment',
-        }),
-      ),
+      service.create('test-article', {
+        body: 'New Comment',
+      }),
     );
 
     expect(comment).toMatchObject({
@@ -151,12 +138,9 @@ describe('CommentsService', () => {
   it('cannot create comment to non existent article', async () => {
     await expect(() =>
       act(orm, () =>
-        service.create(
-          'test-article',
-          plainToClass(NewCommentDTO, {
-            body: 'New Comment',
-          }),
-        ),
+        service.create('test-article', {
+          body: 'New Comment',
+        }),
       ),
     ).rejects.toThrow(NotFoundError);
   });
@@ -168,20 +152,16 @@ describe('CommentsService', () => {
   it('can delete own comment', async () => {
     await actingAs(orm, userService);
 
-    await articlesService.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await articlesService.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
-    const comment = await service.create(
-      'test-article',
-      plainToClass(NewCommentDTO, {
-        body: 'New Comment 1',
-      }),
-    );
+    const comment = await service.create('test-article', {
+      body: 'New Comment 1',
+    });
 
     await act(orm, () => service.delete('test-article', comment.id));
 
@@ -191,32 +171,25 @@ describe('CommentsService', () => {
   it('can delete all comments of own article', async () => {
     const user = await actingAs(orm, userService);
 
-    await articlesService.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await articlesService.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
-    await service.create(
-      'test-article',
-      plainToClass(NewCommentDTO, {
-        body: 'New Comment 1',
-      }),
-    );
+    await service.create('test-article', {
+      body: 'New Comment 1',
+    });
 
     await actingAs(orm, userService, {
       name: 'Jane Doe',
       email: 'jane.doe@example.com',
     });
 
-    const comment = await service.create(
-      'test-article',
-      plainToClass(NewCommentDTO, {
-        body: 'New Comment 2',
-      }),
-    );
+    const comment = await service.create('test-article', {
+      body: 'New Comment 2',
+    });
 
     userService.user = user;
 
@@ -228,20 +201,16 @@ describe('CommentsService', () => {
   it('cannot delete comment of other author', async () => {
     await actingAs(orm, userService);
 
-    await articlesService.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await articlesService.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
-    const comment = await service.create(
-      'test-article',
-      plainToClass(NewCommentDTO, {
-        body: 'New Comment 1',
-      }),
-    );
+    const comment = await service.create('test-article', {
+      body: 'New Comment 1',
+    });
 
     await actingAs(orm, userService, {
       name: 'Jane Doe',
@@ -256,28 +225,23 @@ describe('CommentsService', () => {
   it('cannot delete comment with bad article', async () => {
     await actingAs(orm, userService);
 
-    await articlesService.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await articlesService.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
-    await articlesService.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Bad Article',
-        description: 'Bad Description',
-        body: 'Bad Body',
-      }),
-    );
+    await articlesService.create({
+      title: 'Bad Article',
+      description: 'Bad Description',
+      body: 'Bad Body',
+      tagList: [],
+    });
 
-    const comment = await service.create(
-      'test-article',
-      plainToClass(NewCommentDTO, {
-        body: 'New Comment 1',
-      }),
-    );
+    const comment = await service.create('test-article', {
+      body: 'New Comment 1',
+    });
 
     await expect(() =>
       act(orm, () => service.delete('bad-article', comment.id)),
@@ -293,13 +257,12 @@ describe('CommentsService', () => {
   it('cannot delete non existent comment', async () => {
     await actingAs(orm, userService);
 
-    await articlesService.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await articlesService.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
     await expect(() =>
       act(orm, () => service.delete('test-article', 1)),

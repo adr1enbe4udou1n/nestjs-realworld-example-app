@@ -62,4 +62,8 @@ export class Article implements HasTimestamps {
       this.slug = slugify(this.title, { lower: true });
     }
   }
+
+  constructor(article: Partial<Article> = {}) {
+    Object.assign(this, article);
+  }
 }

@@ -5,7 +5,6 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { hash } from 'argon2';
-import { plainToClass } from 'class-transformer';
 import { Article } from './articles/article.entity';
 import { Comment } from './articles/comments/comment.entity';
 import { Tag } from './tags/tag.entity';
@@ -39,7 +38,7 @@ export const initializeDbTestBase = async (metadata: ModuleMetadata) => {
 };
 
 export const createUser = async (orm: MikroORM, data: Partial<User> = {}) => {
-  const user = plainToClass(User, {
+  const user = new User({
     email: 'john.doe@example.com',
     name: 'John Doe',
     password: await hash('password'),

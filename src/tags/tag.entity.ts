@@ -24,4 +24,8 @@ export class Tag implements HasTimestamps {
 
   @Property({ columnType: 'timestamp' })
   updatedAt: Date;
+
+  constructor(tag: Partial<Tag> = {}) {
+    Object.assign(this, tag);
+  }
 }

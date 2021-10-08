@@ -1,4 +1,4 @@
-import { EntityManager } from '@mikro-orm/core';
+import { EntityManager, MikroORM } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { ConsoleService } from 'nestjs-console';
 import { Article } from '../articles/article.entity';
@@ -13,6 +13,7 @@ import { name, internet, lorem, random, datatype, unique, date } from 'faker';
 export class DatabaseRefreshService {
   constructor(
     private readonly consoleService: ConsoleService,
+    private readonly orm: MikroORM,
     private readonly em: EntityManager,
   ) {
     const cli = this.consoleService.getCli();
@@ -46,6 +47,8 @@ export class DatabaseRefreshService {
   }
 
   fresh = async () => {
+    await this.orm.getMigrator().up();
+
     await this.em.nativeDelete(Tag, {});
     await this.em.nativeDelete(Comment, {});
     await this.em.nativeDelete(Article, {});

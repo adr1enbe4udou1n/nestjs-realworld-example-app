@@ -22,4 +22,8 @@ export class Comment implements HasTimestamps {
 
   @Property({ columnType: 'timestamp' })
   updatedAt: Date;
+
+  constructor(comment: Partial<Comment> = {}) {
+    Object.assign(this, comment);
+  }
 }

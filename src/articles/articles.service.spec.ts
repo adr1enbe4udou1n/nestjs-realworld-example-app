@@ -1,6 +1,5 @@
 import { MikroORM, NotFoundError } from '@mikro-orm/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { plainToClass } from 'class-transformer';
 import { Tag } from '../tags/tag.entity';
 import { UserService } from '../user/user.service';
 import { act, actingAs, initializeDbTestBase } from '../db-test-base';
@@ -9,12 +8,9 @@ import { NewArticleDTO } from './dto/article-create.dto';
 import { Article } from './article.entity';
 import { UpdateArticleDTO } from './dto/article-update.dto';
 import { CommentsService } from './comments/comments.service';
-import { NewCommentDTO } from './comments/dto/comment-create.dto';
 import { Comment } from './comments/comment.entity';
 import { User } from '../users/user.entity';
-import { ArticlesListQuery } from './queries/articles.query';
 import { ProfilesService } from '../profiles/profiles.service';
-import { PagedQuery } from '../pagination';
 import { ContextIdFactory } from '@nestjs/core';
 
 describe('ArticlesService', () => {
@@ -54,14 +50,12 @@ describe('ArticlesService', () => {
     await actingAs(orm, userService, user);
 
     for (let i = 1; i <= count; i++) {
-      await service.create(
-        plainToClass(NewArticleDTO, {
-          title: `${user.name} - Test Article ${i}`,
-          description: 'Test Description',
-          body: 'Test Body',
-          tagList: ['Test Tag 1', 'Test Tag 2', `Tag ${user.name}`],
-        }),
-      );
+      await service.create({
+        title: `${user.name} - Test Article ${i}`,
+        description: 'Test Description',
+        body: 'Test Body',
+        tagList: ['Test Tag 1', 'Test Tag 2', `Tag ${user.name}`],
+      });
     }
   };
 
@@ -91,7 +85,7 @@ describe('ArticlesService', () => {
     await createArticles();
 
     const [items, count] = await act(orm, () =>
-      service.list(plainToClass(ArticlesListQuery, { limit: 30, offset: 10 })),
+      service.list({ limit: 30, offset: 10 }),
     );
 
     expect(items.length).toBe(20);
@@ -112,13 +106,11 @@ describe('ArticlesService', () => {
     await createArticles();
 
     const [items, count] = await act(orm, () =>
-      service.list(
-        plainToClass(ArticlesListQuery, {
-          limit: 10,
-          offset: 0,
-          author: 'John',
-        }),
-      ),
+      service.list({
+        limit: 10,
+        offset: 0,
+        author: 'John',
+      }),
     );
 
     expect(items.length).toBe(10);
@@ -139,13 +131,11 @@ describe('ArticlesService', () => {
     await createArticles();
 
     const [items, count] = await act(orm, () =>
-      service.list(
-        plainToClass(ArticlesListQuery, {
-          limit: 10,
-          offset: 0,
-          tag: 'Tag Jane Doe',
-        }),
-      ),
+      service.list({
+        limit: 10,
+        offset: 0,
+        tag: 'Tag Jane Doe',
+      }),
     );
 
     expect(items.length).toBe(10);
@@ -176,13 +166,11 @@ describe('ArticlesService', () => {
     }
 
     const [items, count] = await act(orm, () =>
-      service.list(
-        plainToClass(ArticlesListQuery, {
-          limit: 10,
-          offset: 0,
-          favorited: 'Jane',
-        }),
-      ),
+      service.list({
+        limit: 10,
+        offset: 0,
+        favorited: 'Jane',
+      }),
     );
 
     expect(items.length).toBe(5);
@@ -211,12 +199,10 @@ describe('ArticlesService', () => {
     await profilesService.follow('John Doe', true);
 
     const [items, count] = await act(orm, () =>
-      service.feed(
-        plainToClass(PagedQuery, {
-          limit: 10,
-          offset: 0,
-        }),
-      ),
+      service.feed({
+        limit: 10,
+        offset: 0,
+      }),
     );
 
     expect(items.length).toBe(10);
@@ -245,14 +231,12 @@ describe('ArticlesService', () => {
       image: 'https://i.pravatar.cc/300',
     });
 
-    await service.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-        tagList: ['Test Tag 1', 'Test Tag 2'],
-      }),
-    );
+    await service.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: ['Test Tag 1', 'Test Tag 2'],
+    });
 
     const article = await act(orm, () => service.get('test-article'));
 
@@ -288,17 +272,15 @@ describe('ArticlesService', () => {
 
     await orm.em
       .getRepository(Tag)
-      .persistAndFlush(plainToClass(Tag, { name: 'Existing Tag' }));
+      .persistAndFlush(new Tag({ name: 'Existing Tag' }));
 
     const article = await act(orm, () =>
-      service.create(
-        plainToClass(NewArticleDTO, {
-          title: 'Test Article',
-          description: 'Test Description',
-          body: 'Test Body',
-          tagList: ['Test Tag 1', 'Test Tag 2', 'Existing Tag'],
-        }),
-      ),
+      service.create({
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+        tagList: ['Test Tag 1', 'Test Tag 2', 'Existing Tag'],
+      }),
     );
 
     expect(article).toMatchObject({
@@ -349,23 +331,21 @@ describe('ArticlesService', () => {
       image: 'https://i.pravatar.cc/300',
     });
 
-    await service.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await service.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
     await expect(() =>
       act(orm, () =>
-        service.create(
-          plainToClass(NewArticleDTO, {
-            title: 'Test Article',
-            description: 'Test Description',
-            body: 'Test Body',
-          }),
-        ),
+        service.create({
+          title: 'Test Article',
+          description: 'Test Description',
+          body: 'Test Body',
+          tagList: [],
+        }),
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -377,23 +357,19 @@ describe('ArticlesService', () => {
   it('can update own article', async () => {
     await actingAs(orm, userService);
 
-    await service.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await service.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
     const article = await act(orm, () =>
-      service.update(
-        'test-article',
-        plainToClass(UpdateArticleDTO, {
-          title: 'New Title',
-          description: 'New Description',
-          body: 'New Body',
-        }),
-      ),
+      service.update('test-article', {
+        title: 'New Title',
+        description: 'New Description',
+        body: 'New Body',
+      }),
     );
 
     expect(article).toMatchObject({
@@ -430,14 +406,11 @@ describe('ArticlesService', () => {
   it('cannot update non existent article', async () => {
     await expect(() =>
       act(orm, () =>
-        service.update(
-          'test-article',
-          plainToClass(UpdateArticleDTO, {
-            title: 'New Title',
-            description: 'New Description',
-            body: 'New Body',
-          }),
-        ),
+        service.update('test-article', {
+          title: 'New Title',
+          description: 'New Description',
+          body: 'New Body',
+        }),
       ),
     ).rejects.toThrow(NotFoundError);
   });
@@ -445,13 +418,12 @@ describe('ArticlesService', () => {
   it('cannot update article of other author', async () => {
     await actingAs(orm, userService);
 
-    await service.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await service.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
     await actingAs(orm, userService, {
       name: 'Jane Doe',
@@ -460,14 +432,11 @@ describe('ArticlesService', () => {
 
     await expect(() =>
       act(orm, () =>
-        service.update(
-          'test-article',
-          plainToClass(UpdateArticleDTO, {
-            title: 'New Title',
-            description: 'New Description',
-            body: 'New Body',
-          }),
-        ),
+        service.update('test-article', {
+          title: 'New Title',
+          description: 'New Description',
+          body: 'New Body',
+        }),
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -479,27 +448,20 @@ describe('ArticlesService', () => {
   it('can delete own article with all comments', async () => {
     await actingAs(orm, userService);
 
-    await service.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await service.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
-    await commentsService.create(
-      'test-article',
-      plainToClass(NewCommentDTO, {
-        body: 'New Comment 1',
-      }),
-    );
+    await commentsService.create('test-article', {
+      body: 'New Comment 1',
+    });
 
-    await commentsService.create(
-      'test-article',
-      plainToClass(NewCommentDTO, {
-        body: 'New Comment 2',
-      }),
-    );
+    await commentsService.create('test-article', {
+      body: 'New Comment 2',
+    });
 
     await act(orm, () => service.delete('test-article'));
 
@@ -510,13 +472,12 @@ describe('ArticlesService', () => {
   it('cannot delete article of other author', async () => {
     await actingAs(orm, userService);
 
-    await service.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await service.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
     await actingAs(orm, userService, {
       name: 'Jane Doe',
@@ -541,13 +502,12 @@ describe('ArticlesService', () => {
   it('can favorite article', async () => {
     await actingAs(orm, userService);
 
-    await service.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await service.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
     const article = await act(orm, () =>
       service.favorite('test-article', true),
@@ -562,13 +522,12 @@ describe('ArticlesService', () => {
   it('can unfavorite article', async () => {
     await actingAs(orm, userService);
 
-    await service.create(
-      plainToClass(NewArticleDTO, {
-        title: 'Test Article',
-        description: 'Test Description',
-        body: 'Test Body',
-      }),
-    );
+    await service.create({
+      title: 'Test Article',
+      description: 'Test Description',
+      body: 'Test Body',
+      tagList: [],
+    });
 
     await service.favorite('test-article', true);
 

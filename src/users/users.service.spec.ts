@@ -2,7 +2,6 @@ import { MikroORM } from '@mikro-orm/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { hash } from 'argon2';
-import { plainToClass } from 'class-transformer';
 import { UserDTO } from '../user/dto/current-user.dto';
 import { act, initializeDbTestBase } from '../db-test-base';
 import { NewUserDTO } from './dto/register.dto';
@@ -53,13 +52,11 @@ describe('UsersService', () => {
 
   it('can register new users', async () => {
     const user = await act<UserDTO>(orm, () =>
-      service.register(
-        plainToClass(NewUserDTO, {
-          email: 'john.doe@example.com',
-          username: 'John Doe',
-          password: 'password',
-        }),
-      ),
+      service.register({
+        email: 'john.doe@example.com',
+        username: 'John Doe',
+        password: 'password',
+      }),
     );
 
     expect(user).toMatchObject({
@@ -83,7 +80,7 @@ describe('UsersService', () => {
 
   it('cannot register twice', async () => {
     await orm.em.getRepository(User).persistAndFlush(
-      plainToClass(User, {
+      new User({
         email: 'john.doe@example.com',
         name: 'John Doe',
         password: 'password',
@@ -92,13 +89,11 @@ describe('UsersService', () => {
 
     await expect(() =>
       act(orm, () =>
-        service.register(
-          plainToClass(NewUserDTO, {
-            email: 'john.doe@example.com',
-            username: 'John Doe',
-            password: 'password',
-          }),
-        ),
+        service.register({
+          email: 'john.doe@example.com',
+          username: 'John Doe',
+          password: 'password',
+        }),
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -114,7 +109,7 @@ describe('UsersService', () => {
     },
   ])('cannot login with invalid data', async (data) => {
     await orm.em.getRepository(User).persistAndFlush(
-      plainToClass(User, {
+      new User({
         email: 'john.doe@example.com',
         name: 'John Doe',
         password: await hash('password'),
@@ -128,7 +123,7 @@ describe('UsersService', () => {
 
   it('can login', async () => {
     await orm.em.getRepository(User).persistAndFlush(
-      plainToClass(User, {
+      new User({
         email: 'john.doe@example.com',
         name: 'John Doe',
         password: await hash('password'),

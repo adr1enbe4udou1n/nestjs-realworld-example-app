@@ -1,5 +1,4 @@
 import { MikroORM, NotFoundError } from '@mikro-orm/core';
-import { plainToClass } from 'class-transformer';
 import { User } from '../users/user.entity';
 import {
   act,
@@ -34,7 +33,7 @@ describe('ProfilesService', () => {
 
   it('can get profile', async () => {
     await orm.em.getRepository(User).persistAndFlush(
-      plainToClass(User, {
+      new User({
         name: 'John Doe',
         email: 'john.doe@example.com',
         password: await hash('password'),
@@ -68,7 +67,7 @@ describe('ProfilesService', () => {
     });
 
     user.following.add(
-      plainToClass(User, {
+      new User({
         name: 'Jane Doe',
         email: 'jane.doe@example.com',
         password: await hash('password'),
@@ -127,12 +126,12 @@ describe('ProfilesService', () => {
     });
 
     user.following.add(
-      plainToClass(User, {
+      new User({
         name: 'Jane Doe',
         email: 'jane.doe@example.com',
         password: await hash('password'),
       }),
-      plainToClass(User, {
+      new User({
         name: 'Alice',
         email: 'alice@example.com',
         password: await hash('password'),
