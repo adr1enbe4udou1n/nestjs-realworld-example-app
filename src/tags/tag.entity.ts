@@ -6,10 +6,9 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { Article } from '../articles/article.entity';
-import { HasTimestamps } from '../has-timestamps';
 
 @Entity({ collection: 'tags' })
-export class Tag implements HasTimestamps {
+export class Tag {
   @PrimaryKey()
   id: number;
 
@@ -18,12 +17,6 @@ export class Tag implements HasTimestamps {
 
   @ManyToMany(() => Article, (a) => a.tags)
   articles = new Collection<Article>(this);
-
-  @Property({ columnType: 'timestamp' })
-  createdAt: Date;
-
-  @Property({ columnType: 'timestamp' })
-  updatedAt: Date;
 
   constructor(tag: Partial<Tag> = {}) {
     Object.assign(this, tag);
