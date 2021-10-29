@@ -62,8 +62,6 @@ export const actingAs = async (
 
 export const act = async <T>(orm: MikroORM, action: () => Promise<T>) => {
   orm.em.clear();
-  const result = await action();
-  orm.em.clear();
 
-  return result;
+  return await action();
 };
