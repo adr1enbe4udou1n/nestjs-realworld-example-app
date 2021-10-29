@@ -27,17 +27,21 @@ export class ArticlesService {
   }
 
   async list(query: ArticlesListQuery): Promise<[ArticleDTO[], number]> {
+    const articles = await this.articleRepository.find({
+      ...(query.author && {
+        author: { name: { $like: `%${query.author}%` } },
+      }),
+      ...(query.tag && {
+        tags: { name: query.tag },
+      }),
+      ...(query.favorited && {
+        favoredUsers: { name: { $like: `%${query.favorited}%` } },
+      }),
+    });
+
     const [items, count] = await this.articleRepository.findAndCount(
       {
-        ...(query.author && {
-          author: { name: { $like: `%${query.author}%` } },
-        }),
-        ...(query.tag && {
-          tags: { name: query.tag },
-        }),
-        ...(query.favorited && {
-          favoredUsers: { name: { $like: `%${query.favorited}%` } },
-        }),
+        id: { $in: articles.map((a) => a.id) },
       },
       ['author.followers', 'tags', 'favoredUsers'],
       { id: 'DESC' },

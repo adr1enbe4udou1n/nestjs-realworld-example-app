@@ -98,7 +98,7 @@ describe('ArticlesService', () => {
       author: {
         username: 'Jane Doe',
       },
-      tagList: ['Test Tag 1', 'Test Tag 2', 'Tag Jane Doe'],
+      tagList: ['Tag Jane Doe', 'Test Tag 1', 'Test Tag 2'],
     });
   });
 
@@ -123,7 +123,7 @@ describe('ArticlesService', () => {
       author: {
         username: 'John Doe',
       },
-      tagList: ['Test Tag 1', 'Test Tag 2', 'Tag John Doe'],
+      tagList: ['Tag John Doe', 'Test Tag 1', 'Test Tag 2'],
     });
   });
 
@@ -148,7 +148,7 @@ describe('ArticlesService', () => {
       author: {
         username: 'Jane Doe',
       },
-      tagList: ['Tag Jane Doe'],
+      tagList: ['Tag Jane Doe', 'Test Tag 1', 'Test Tag 2'],
     });
   });
 
@@ -183,7 +183,7 @@ describe('ArticlesService', () => {
       author: {
         username: 'John Doe',
       },
-      tagList: ['Test Tag 1', 'Test Tag 2', 'Tag John Doe'],
+      tagList: ['Tag John Doe', 'Test Tag 1', 'Test Tag 2'],
       favorited: true,
       favoritesCount: 1,
     });
@@ -215,7 +215,7 @@ describe('ArticlesService', () => {
       author: {
         username: 'John Doe',
       },
-      tagList: ['Test Tag 1', 'Test Tag 2', 'Tag John Doe'],
+      tagList: ['Tag John Doe', 'Test Tag 1', 'Test Tag 2'],
     });
 
     expect(service).toBeDefined();
@@ -279,7 +279,7 @@ describe('ArticlesService', () => {
         title: 'Test Article',
         description: 'Test Description',
         body: 'Test Body',
-        tagList: ['Test Tag 1', 'Test Tag 2', 'Existing Tag'],
+        tagList: ['Existing Tag', 'Test Tag 1', 'Test Tag 2'],
       }),
     );
 
@@ -293,7 +293,7 @@ describe('ArticlesService', () => {
         bio: 'My Bio',
         image: 'https://i.pravatar.cc/300',
       },
-      tagList: ['Test Tag 1', 'Test Tag 2', 'Existing Tag'],
+      tagList: ['Existing Tag', 'Test Tag 1', 'Test Tag 2'],
     });
 
     expect(await orm.em.getRepository(Article).count()).toBe(1);
