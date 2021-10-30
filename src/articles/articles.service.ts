@@ -1,4 +1,4 @@
-import { EntityRepository } from '@mikro-orm/core';
+import { EntityRepository } from '@mikro-orm/postgresql';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { BadRequestException, Injectable, Scope } from '@nestjs/common';
 import { UserService } from '../user/user.service';
@@ -27,29 +27,45 @@ export class ArticlesService {
   }
 
   async list(query: ArticlesListQuery): Promise<[ArticleDTO[], number]> {
-    const articles = await this.articleRepository.find({
-      ...(query.author && {
-        author: { name: { $like: `%${query.author}%` } },
-      }),
-      ...(query.tag && {
-        tags: { name: query.tag },
-      }),
-      ...(query.favorited && {
-        favoredUsers: { name: { $like: `%${query.favorited}%` } },
-      }),
+    const subQb = this.articleRepository
+      .createQueryBuilder('a')
+      .select('a.id')
+      .where({
+        ...(query.author && {
+          author: { name: { $like: `%${query.author}%` } },
+        }),
+        ...(query.tag && {
+          tags: { name: query.tag },
+        }),
+        ...(query.favorited && {
+          favoredUsers: { name: { $like: `%${query.favorited}%` } },
+        }),
+      });
+
+    const qb = this.articleRepository.createQueryBuilder('a').where({
+      id: { $in: subQb.getKnexQuery() },
     });
 
-    const [items, count] = await this.articleRepository.findAndCount(
-      {
-        id: { $in: articles.map((a) => a.id) },
-      },
-      ['author.followers', 'tags', 'favoredUsers'],
-      { id: 'DESC' },
-      this.limit(query),
-      query.offset,
-    );
+    const [{ count }, items] = await Promise.all([
+      qb.count('a.id', true).execute('get'),
+      qb
+        .select('*')
+        .orderBy({ id: 'DESC' })
+        .limit(this.limit(query))
+        .offset(query.offset)
+        .getResult(),
+    ]);
 
-    return [items.map((a) => ArticleDTO.map(a, this.userService)), count];
+    await this.articleRepository.populate(items, [
+      'author.followers',
+      'tags',
+      'favoredUsers',
+    ]);
+
+    return [
+      items.map((a) => ArticleDTO.map(a, this.userService)),
+      parseInt(count, 10),
+    ];
   }
 
   async feed(query: PagedQuery): Promise<[ArticleDTO[], number]> {
