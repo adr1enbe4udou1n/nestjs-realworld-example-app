@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:16-alpine
 RUN apk --no-cache add curl
 
 COPY /package.json /pnpm-lock.yaml /app/

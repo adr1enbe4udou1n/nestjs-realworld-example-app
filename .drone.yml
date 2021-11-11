@@ -14,7 +14,7 @@ steps:
     - ./.pnpm-store
 
 - name: build
-  image: node:14-buster
+  image: node:16-buster
   environment:
     DB_HOST: db
     DB_PORT: 5432
@@ -64,7 +64,7 @@ steps:
 
 services:
 - name: db
-  image: postgres:13
+  image: postgres:14
   environment:
     POSTGRES_USER: main
     POSTGRES_PASSWORD: main
