@@ -8,7 +8,6 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -16,6 +15,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtGuestAuthGuard } from '../auth/jwt-guest-auth.guard';
 import { ProfileResponse } from './dto/profile.dto';
 import { ProfilesService } from './profiles.service';
 
@@ -24,7 +25,7 @@ import { ProfilesService } from './profiles.service';
 export class ProfilesController {
   constructor(private profilesService: ProfilesService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtGuestAuthGuard)
   @ApiOperation({
     summary: 'Get a profile',
     description: 'Get a profile of a user of the system. Auth is optional',
@@ -42,7 +43,7 @@ export class ProfilesController {
     return { profile: await this.profilesService.get(username, req.user) };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Follow a user',
@@ -64,7 +65,7 @@ export class ProfilesController {
     };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Unfollow a user',

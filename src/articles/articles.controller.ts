@@ -11,7 +11,6 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -20,6 +19,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtGuestAuthGuard } from '../auth/jwt-guest-auth.guard';
 import { PagedQuery } from '../pagination';
 import { ArticlesService } from './articles.service';
 import { NewArticleRequest } from './dto/article-create.dto';
@@ -34,7 +35,7 @@ import { ArticlesListQuery } from './queries/articles.query';
 export class ArticlesController {
   constructor(private articlesService: ArticlesService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtGuestAuthGuard)
   @ApiTags('Articles')
   @ApiOperation({
     summary: 'Get recent articles globally',
@@ -51,7 +52,7 @@ export class ArticlesController {
     return { articles: items, articlesCount: count };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiTags('Articles')
   @ApiOperation({
@@ -69,7 +70,7 @@ export class ArticlesController {
     return { articles: items, articlesCount: count };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtGuestAuthGuard)
   @ApiTags('Articles')
   @ApiOperation({
     summary: 'Get an article',
@@ -85,7 +86,7 @@ export class ArticlesController {
     return { article: await this.articlesService.get(slug, req.user) };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiTags('Articles')
   @ApiOperation({
@@ -105,7 +106,7 @@ export class ArticlesController {
     };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiTags('Articles')
   @ApiOperation({
@@ -133,7 +134,7 @@ export class ArticlesController {
     };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiTags('Articles')
   @ApiOperation({
@@ -146,7 +147,7 @@ export class ArticlesController {
     return { article: await this.articlesService.delete(slug, req.user) };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiTags('Favorites')
   @ApiOperation({
@@ -169,7 +170,7 @@ export class ArticlesController {
     };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiTags('Favorites')
   @ApiOperation({

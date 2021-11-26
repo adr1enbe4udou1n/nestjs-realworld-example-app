@@ -6,9 +6,9 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from '../auth/auth.service';
+import { LocalAuthGuard } from '../auth/local-auth.guard';
 import { UserResponse } from '../user/dto/current-user.dto';
 import { LoginUserRequest } from './dto/login.dto';
 import { NewUserRequest } from './dto/register.dto';
@@ -52,7 +52,7 @@ export class UsersController {
     type: LoginUserRequest,
   })
   @ApiResponse({ type: UserResponse })
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(LocalAuthGuard)
   async login(
     @Body() command: LoginUserRequest,
     @Request() req,

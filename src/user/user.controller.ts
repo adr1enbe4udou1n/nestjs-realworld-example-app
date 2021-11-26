@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Put, Request, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -8,12 +7,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthService } from '../auth/auth.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UserResponse } from './dto/current-user.dto';
 import { UpdateUserRequest } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 @ApiTags('User and Authentication')
 @Controller('user')
 export class UserController {
@@ -44,7 +44,7 @@ export class UserController {
     type: UpdateUserRequest,
   })
   @ApiResponse({ type: UserResponse })
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   async update(
     @Body() command: UpdateUserRequest,
     @Request() req,

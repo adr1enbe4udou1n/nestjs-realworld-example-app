@@ -9,7 +9,6 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -18,6 +17,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { JwtGuestAuthGuard } from '../../auth/jwt-guest-auth.guard';
 import { CommentsService } from './comments.service';
 import { NewCommentRequest } from './dto/comment-create.dto';
 import {
@@ -30,7 +31,7 @@ import {
 export class CommentsController {
   constructor(private commentsService: CommentsService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtGuestAuthGuard)
   @ApiOperation({
     summary: 'Get comments for an article',
     description: 'Get the comments for an article. Auth is optional',
@@ -48,7 +49,7 @@ export class CommentsController {
     return { comments: await this.commentsService.list(slug, req.user) };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create a comment for an article',
@@ -79,7 +80,7 @@ export class CommentsController {
     };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Delete a comment for an article',
