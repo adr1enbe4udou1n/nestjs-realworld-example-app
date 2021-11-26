@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { UserService } from '../../user/user.service';
 import { User } from '../../users/user.entity';
 
 export class ProfileDTO {
@@ -15,14 +14,14 @@ export class ProfileDTO {
   @ApiProperty()
   following: boolean;
 
-  static map(user: User, userService: UserService): ProfileDTO {
+  static map(user: User, currentUser: User | null): ProfileDTO {
     const dto = new ProfileDTO();
     dto.username = user.name;
     dto.bio = user.bio;
     dto.image = user.image;
     dto.following = user.followers
       .toArray()
-      .some((u) => u.id === userService.user?.id);
+      .some((u) => u.id === currentUser?.id);
     return dto;
   }
 }

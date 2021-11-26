@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ProfileDTO } from '../../profiles/dto/profile.dto';
 import { Article } from '../article.entity';
-import { UserService } from '../../user/user.service';
+import { User } from '../../users/user.entity';
 
 export class ArticleDTO {
   @ApiProperty()
@@ -34,20 +34,20 @@ export class ArticleDTO {
   @ApiProperty()
   favoritesCount: number;
 
-  static map(article: Article, userService: UserService): ArticleDTO {
+  static map(article: Article, currentUser: User | null): ArticleDTO {
     const dto = new ArticleDTO();
     dto.title = article.title;
     dto.slug = article.slug;
     dto.description = article.description;
     dto.body = article.body;
-    dto.author = ProfileDTO.map(article.author, userService);
+    dto.author = ProfileDTO.map(article.author, currentUser);
     dto.tagList = article.tags
       .toArray()
       .map((t) => t.name)
       .sort();
     dto.favorited = article.favoredUsers
       .toArray()
-      .some((u) => u.id === userService.user?.id);
+      .some((u) => u.id === currentUser?.id);
     dto.favoritesCount = article.favoredUsers.count();
     dto.createdAt = article.createdAt;
     dto.updatedAt = article.updatedAt;

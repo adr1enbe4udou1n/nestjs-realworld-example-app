@@ -1,7 +1,6 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { User } from '../users/user.entity';
-import { AuthMiddleware } from './auth.middleware';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 
@@ -10,8 +9,4 @@ import { UserService } from './user.service';
   controllers: [UserController],
   providers: [UserService],
 })
-export class UserModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes(UserController);
-  }
-}
+export class UserModule {}

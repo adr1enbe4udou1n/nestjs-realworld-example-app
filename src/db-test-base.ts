@@ -8,7 +8,6 @@ import { hash } from 'argon2';
 import { Article } from './articles/article.entity';
 import { Comment } from './articles/comments/comment.entity';
 import { Tag } from './tags/tag.entity';
-import { UserService } from './user/user.service';
 import { User } from './users/user.entity';
 
 export const initializeDbTestBase = async (metadata: ModuleMetadata) => {
@@ -50,14 +49,8 @@ export const createUser = async (orm: MikroORM, data: Partial<User> = {}) => {
   return user;
 };
 
-export const actingAs = async (
-  orm: MikroORM,
-  service: UserService,
-  data: Partial<User> = {},
-) => {
-  const user = await createUser(orm, data);
-  service.user = user;
-  return user;
+export const actingAs = async (orm: MikroORM, data: Partial<User> = {}) => {
+  return await createUser(orm, data);
 };
 
 export const act = async <T>(orm: MikroORM, action: () => Promise<T>) => {

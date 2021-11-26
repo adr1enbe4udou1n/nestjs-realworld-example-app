@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Put, Request, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -6,17 +7,20 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from '../auth.guard';
+import { AuthService } from '../auth/auth.service';
 import { UserResponse } from './dto/current-user.dto';
 import { UpdateUserRequest } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('User and Authentication')
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private authService: AuthService,
+  ) {}
 
   @ApiOperation({
     summary: 'Get current user',
@@ -24,8 +28,10 @@ export class UserController {
   })
   @Get()
   @ApiResponse({ type: UserResponse })
-  async current(): Promise<UserResponse> {
-    return { user: await this.userService.current() };
+  async current(@Request() req): Promise<UserResponse> {
+    return {
+      user: await this.authService.getUserWithToken(req.user),
+    };
   }
 
   @ApiOperation({
@@ -38,7 +44,15 @@ export class UserController {
     type: UpdateUserRequest,
   })
   @ApiResponse({ type: UserResponse })
-  async update(@Body() command: UpdateUserRequest): Promise<UserResponse> {
-    return { user: await this.userService.update(command.user) };
+  @UseGuards(AuthGuard('jwt'))
+  async update(
+    @Body() command: UpdateUserRequest,
+    @Request() req,
+  ): Promise<UserResponse> {
+    return {
+      user: await this.authService.getUserWithToken(
+        await this.userService.update(command.user, req.user),
+      ),
+    };
   }
 }

@@ -1,5 +1,4 @@
 import { MikroORM, NotFoundError } from '@mikro-orm/core';
-import { UserService } from '../../user/user.service';
 import { act, actingAs, initializeDbTestBase } from '../../db-test-base';
 import { CommentsService } from './comments.service';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
@@ -12,11 +11,10 @@ describe('CommentsService', () => {
   let orm: MikroORM;
   let service: CommentsService;
   let articlesService: ArticlesService;
-  let userService: UserService;
 
   beforeEach(async () => {
     const module = await initializeDbTestBase({
-      providers: [CommentsService, ArticlesService, UserService],
+      providers: [CommentsService, ArticlesService],
     });
 
     orm = module.get(MikroORM);
@@ -24,7 +22,6 @@ describe('CommentsService', () => {
     const contextId = ContextIdFactory.create();
     service = await module.resolve(CommentsService, contextId);
     articlesService = await module.resolve(ArticlesService, contextId);
-    userService = await module.resolve(UserService, contextId);
   });
 
   afterEach(async () => {
@@ -36,27 +33,34 @@ describe('CommentsService', () => {
    */
 
   it('can list all comments of article', async () => {
-    await actingAs(orm, userService, {
+    let user = await actingAs(orm, {
       bio: 'My Bio',
       image: 'https://i.pravatar.cc/300',
     });
 
-    await articlesService.create({
-      title: 'Test Article',
-      description: 'Test Description',
-      body: 'Test Body',
-      tagList: [],
-    });
+    await articlesService.create(
+      {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+        tagList: [],
+      },
+      user,
+    );
 
     for (let i = 1; i <= 5; i++) {
       await act(orm, () =>
-        service.create('test-article', {
-          body: `New John Comment ${i}`,
-        }),
+        service.create(
+          'test-article',
+          {
+            body: `New John Comment ${i}`,
+          },
+          user,
+        ),
       );
     }
 
-    await actingAs(orm, userService, {
+    user = await actingAs(orm, {
       name: 'Jane Doe',
       email: 'jane.doe@example.com',
       bio: 'My Bio',
@@ -65,9 +69,13 @@ describe('CommentsService', () => {
 
     for (let i = 1; i <= 5; i++) {
       await act(orm, () =>
-        service.create('test-article', {
-          body: `New Jane Comment ${i}`,
-        }),
+        service.create(
+          'test-article',
+          {
+            body: `New Jane Comment ${i}`,
+          },
+          user,
+        ),
       );
     }
 
@@ -95,19 +103,26 @@ describe('CommentsService', () => {
    */
 
   it('can create comment', async () => {
-    await actingAs(orm, userService);
+    const user = await actingAs(orm);
 
-    await articlesService.create({
-      title: 'Test Article',
-      description: 'Test Description',
-      body: 'Test Body',
-      tagList: [],
-    });
+    await articlesService.create(
+      {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+        tagList: [],
+      },
+      user,
+    );
 
     const comment = await act(orm, () =>
-      service.create('test-article', {
-        body: 'New Comment',
-      }),
+      service.create(
+        'test-article',
+        {
+          body: 'New Comment',
+        },
+        user,
+      ),
     );
 
     expect(comment).toMatchObject({
@@ -136,11 +151,17 @@ describe('CommentsService', () => {
   });
 
   it('cannot create comment to non existent article', async () => {
+    const user = await actingAs(orm);
+
     await expect(() =>
       act(orm, () =>
-        service.create('test-article', {
-          body: 'New Comment',
-        }),
+        service.create(
+          'test-article',
+          {
+            body: 'New Comment',
+          },
+          user,
+        ),
       ),
     ).rejects.toThrow(NotFoundError);
   });
@@ -150,122 +171,160 @@ describe('CommentsService', () => {
    */
 
   it('can delete own comment', async () => {
-    await actingAs(orm, userService);
+    const user = await actingAs(orm);
 
-    await articlesService.create({
-      title: 'Test Article',
-      description: 'Test Description',
-      body: 'Test Body',
-      tagList: [],
-    });
+    await articlesService.create(
+      {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+        tagList: [],
+      },
+      user,
+    );
 
-    const comment = await service.create('test-article', {
-      body: 'New Comment 1',
-    });
+    const comment = await service.create(
+      'test-article',
+      {
+        body: 'New Comment 1',
+      },
+      user,
+    );
 
-    await act(orm, () => service.delete('test-article', comment.id));
+    await act(orm, () => service.delete('test-article', comment.id, user));
 
     expect(await orm.em.getRepository(Comment).count()).toBe(0);
   });
 
   it('can delete all comments of own article', async () => {
-    const user = await actingAs(orm, userService);
+    let user = await actingAs(orm);
 
-    await articlesService.create({
-      title: 'Test Article',
-      description: 'Test Description',
-      body: 'Test Body',
-      tagList: [],
-    });
+    await articlesService.create(
+      {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+        tagList: [],
+      },
+      user,
+    );
 
-    await service.create('test-article', {
-      body: 'New Comment 1',
-    });
+    await service.create(
+      'test-article',
+      {
+        body: 'New Comment 1',
+      },
+      user,
+    );
 
-    await actingAs(orm, userService, {
+    user = await actingAs(orm, {
       name: 'Jane Doe',
       email: 'jane.doe@example.com',
     });
 
-    const comment = await service.create('test-article', {
-      body: 'New Comment 2',
-    });
+    const comment = await service.create(
+      'test-article',
+      {
+        body: 'New Comment 2',
+      },
+      user,
+    );
 
-    userService.user = user;
-
-    await act(orm, () => service.delete('test-article', comment.id));
+    await act(orm, () => service.delete('test-article', comment.id, user));
 
     expect(await orm.em.getRepository(Comment).count()).toBe(1);
   });
 
   it('cannot delete comment of other author', async () => {
-    await actingAs(orm, userService);
+    let user = await actingAs(orm);
 
-    await articlesService.create({
-      title: 'Test Article',
-      description: 'Test Description',
-      body: 'Test Body',
-      tagList: [],
-    });
+    await articlesService.create(
+      {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+        tagList: [],
+      },
+      user,
+    );
 
-    const comment = await service.create('test-article', {
-      body: 'New Comment 1',
-    });
+    const comment = await service.create(
+      'test-article',
+      {
+        body: 'New Comment 1',
+      },
+      user,
+    );
 
-    await actingAs(orm, userService, {
+    user = await actingAs(orm, {
       name: 'Jane Doe',
       email: 'jane.doe@example.com',
     });
 
     await expect(() =>
-      act(orm, () => service.delete('test-article', comment.id)),
+      act(orm, () => service.delete('test-article', comment.id, user)),
     ).rejects.toThrow(BadRequestException);
   });
 
   it('cannot delete comment with bad article', async () => {
-    await actingAs(orm, userService);
+    const user = await actingAs(orm);
 
-    await articlesService.create({
-      title: 'Test Article',
-      description: 'Test Description',
-      body: 'Test Body',
-      tagList: [],
-    });
+    await articlesService.create(
+      {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+        tagList: [],
+      },
+      user,
+    );
 
-    await articlesService.create({
-      title: 'Bad Article',
-      description: 'Bad Description',
-      body: 'Bad Body',
-      tagList: [],
-    });
+    await articlesService.create(
+      {
+        title: 'Bad Article',
+        description: 'Bad Description',
+        body: 'Bad Body',
+        tagList: [],
+      },
+      user,
+    );
 
-    const comment = await service.create('test-article', {
-      body: 'New Comment 1',
-    });
+    const comment = await service.create(
+      'test-article',
+      {
+        body: 'New Comment 1',
+      },
+      user,
+    );
 
     await expect(() =>
-      act(orm, () => service.delete('bad-article', comment.id)),
+      act(orm, () => service.delete('bad-article', comment.id, user)),
     ).rejects.toThrow(NotFoundError);
   });
 
   it('cannot delete comment with inexisting article', async () => {
+    const user = await actingAs(orm);
+
     await expect(() =>
-      act(orm, () => service.delete('test-article', 1)),
+      act(orm, () => service.delete('test-article', 1, user)),
     ).rejects.toThrow(NotFoundError);
   });
 
   it('cannot delete non existent comment', async () => {
-    await actingAs(orm, userService);
+    const user = await actingAs(orm);
 
-    await articlesService.create({
-      title: 'Test Article',
-      description: 'Test Description',
-      body: 'Test Body',
-      tagList: [],
-    });
+    await articlesService.create(
+      {
+        title: 'Test Article',
+        description: 'Test Description',
+        body: 'Test Body',
+        tagList: [],
+      },
+      user,
+    );
 
     await expect(() =>
-      act(orm, () => service.delete('test-article', 1)),
+      act(orm, () => service.delete('test-article', 1, user)),
     ).rejects.toThrow(NotFoundError);
   });
 });

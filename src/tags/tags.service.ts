@@ -1,9 +1,7 @@
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Injectable, Scope } from '@nestjs/common';
 import { Tag } from './tag.entity';
 
-@Injectable({ scope: Scope.REQUEST })
 export class TagsService {
   constructor(
     @InjectRepository(Tag)

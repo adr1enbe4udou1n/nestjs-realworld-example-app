@@ -6,8 +6,10 @@ import {
   HttpCode,
   Param,
   Post,
+  Request,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -16,7 +18,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from '../../auth.guard';
 import { CommentsService } from './comments.service';
 import { NewCommentRequest } from './dto/comment-create.dto';
 import {
@@ -29,6 +30,7 @@ import {
 export class CommentsController {
   constructor(private commentsService: CommentsService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: 'Get comments for an article',
     description: 'Get the comments for an article. Auth is optional',
@@ -39,12 +41,15 @@ export class CommentsController {
     description: 'Slug of the article that you want to get comments for',
   })
   @ApiResponse({ type: MultipleCommentsResponse })
-  async get(@Param('slug') slug: string): Promise<MultipleCommentsResponse> {
-    return { comments: await this.commentsService.list(slug) };
+  async get(
+    @Param('slug') slug: string,
+    @Request() req,
+  ): Promise<MultipleCommentsResponse> {
+    return { comments: await this.commentsService.list(slug, req.user) };
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @ApiOperation({
     summary: 'Create a comment for an article',
     description: 'Create a comment for an article. Auth is required',
@@ -63,14 +68,19 @@ export class CommentsController {
   async create(
     @Param('slug') slug: string,
     @Body() command: NewCommentRequest,
+    @Request() req,
   ): Promise<SingleCommentResponse> {
     return {
-      comment: await this.commentsService.create(slug, command.comment),
+      comment: await this.commentsService.create(
+        slug,
+        command.comment,
+        req.user,
+      ),
     };
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @ApiOperation({
     summary: 'Delete a comment for an article',
     description: 'Delete a comment for an article. Auth is required',
@@ -87,7 +97,10 @@ export class CommentsController {
   async delete(
     @Param('slug') slug: string,
     @Param('commentId') commentId: number,
+    @Request() req,
   ) {
-    return { comment: await this.commentsService.delete(slug, commentId) };
+    return {
+      comment: await this.commentsService.delete(slug, commentId, req.user),
+    };
   }
 }

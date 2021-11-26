@@ -1,7 +1,6 @@
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { BadRequestException, Injectable, Scope } from '@nestjs/common';
-import { UserService } from '../user/user.service';
+import { BadRequestException } from '@nestjs/common';
 import { PagedQuery } from '../pagination';
 import { Article } from './article.entity';
 import { NewArticleDTO } from './dto/article-create.dto';
@@ -10,15 +9,14 @@ import { ArticleDTO } from './dto/article.dto';
 import { ArticlesListQuery } from './queries/articles.query';
 import { Tag } from '../tags/tag.entity';
 import slugify from 'slugify';
+import { User } from '../users/user.entity';
 
-@Injectable({ scope: Scope.REQUEST })
 export class ArticlesService {
   constructor(
     @InjectRepository(Article)
     private readonly articleRepository: EntityRepository<Article>,
     @InjectRepository(Tag)
     private readonly tagRepository: EntityRepository<Tag>,
-    private readonly userService: UserService,
   ) {}
 
   limit(query: PagedQuery) {
@@ -26,7 +24,10 @@ export class ArticlesService {
     return Math.min(query.limit ?? max, max);
   }
 
-  async list(query: ArticlesListQuery): Promise<[ArticleDTO[], number]> {
+  async list(
+    query: ArticlesListQuery,
+    currentUser: User | null = null,
+  ): Promise<[ArticleDTO[], number]> {
     const subQb = this.articleRepository
       .createQueryBuilder('a')
       .select('a.id')
@@ -63,15 +64,18 @@ export class ArticlesService {
     ]);
 
     return [
-      items.map((a) => ArticleDTO.map(a, this.userService)),
+      items.map((a) => ArticleDTO.map(a, currentUser)),
       parseInt(count, 10),
     ];
   }
 
-  async feed(query: PagedQuery): Promise<[ArticleDTO[], number]> {
+  async feed(
+    query: PagedQuery,
+    currentUser: User,
+  ): Promise<[ArticleDTO[], number]> {
     const [items, count] = await this.articleRepository.findAndCount(
       {
-        author: { followers: { id: this.userService.user.id } },
+        author: { followers: { id: currentUser.id } },
       },
       ['author.followers', 'tags', 'favoredUsers'],
       { id: 'DESC' },
@@ -79,20 +83,23 @@ export class ArticlesService {
       query.offset,
     );
 
-    return [items.map((a) => ArticleDTO.map(a, this.userService)), count];
+    return [items.map((a) => ArticleDTO.map(a, currentUser)), count];
   }
 
-  async get(slug: string): Promise<ArticleDTO> {
+  async get(
+    slug: string,
+    currentUser: User | null = null,
+  ): Promise<ArticleDTO> {
     const article = await this.articleRepository.findOneOrFail({ slug }, [
       'author.followers',
       'tags',
       'favoredUsers',
     ]);
 
-    return ArticleDTO.map(article, this.userService);
+    return ArticleDTO.map(article, currentUser);
   }
 
-  async create(dto: NewArticleDTO): Promise<ArticleDTO> {
+  async create(dto: NewArticleDTO, currentUser: User): Promise<ArticleDTO> {
     if (
       (await this.articleRepository.count({
         slug: slugify(dto.title, { lower: true }),
@@ -102,7 +109,7 @@ export class ArticlesService {
     }
 
     const article = NewArticleDTO.map(dto);
-    article.author = this.userService.user;
+    article.author = currentUser;
 
     const existingTags = await this.tagRepository.find({
       name: { $in: dto.tagList },
@@ -120,17 +127,21 @@ export class ArticlesService {
 
     await this.articleRepository.persistAndFlush(article);
 
-    return ArticleDTO.map(article, this.userService);
+    return ArticleDTO.map(article, currentUser);
   }
 
-  async update(slug: string, dto: UpdateArticleDTO): Promise<ArticleDTO> {
+  async update(
+    slug: string,
+    dto: UpdateArticleDTO,
+    currentUser: User,
+  ): Promise<ArticleDTO> {
     const article = await this.articleRepository.findOneOrFail({ slug }, [
       'author.followers',
       'tags',
       'favoredUsers',
     ]);
 
-    if (article.author.id !== this.userService.user.id) {
+    if (article.author.id !== currentUser.id) {
       throw new BadRequestException(
         'You cannot edit article from other authors',
       );
@@ -140,15 +151,15 @@ export class ArticlesService {
       UpdateArticleDTO.map(dto, article),
     );
 
-    return ArticleDTO.map(article, this.userService);
+    return ArticleDTO.map(article, currentUser);
   }
 
-  async delete(slug: string) {
+  async delete(slug: string, currentUser: User) {
     const article = await this.articleRepository.findOneOrFail({ slug }, [
       'comments',
     ]);
 
-    if (article.author.id !== this.userService.user.id) {
+    if (article.author.id !== currentUser.id) {
       throw new BadRequestException(
         'You cannot edit article from other authors',
       );
@@ -157,7 +168,11 @@ export class ArticlesService {
     await this.articleRepository.removeAndFlush(article);
   }
 
-  async favorite(slug: string, favorite: boolean): Promise<ArticleDTO> {
+  async favorite(
+    slug: string,
+    favorite: boolean,
+    currentUser: User,
+  ): Promise<ArticleDTO> {
     const article = await this.articleRepository.findOneOrFail({ slug }, [
       'tags',
       'favoredUsers',
@@ -166,11 +181,11 @@ export class ArticlesService {
 
     const favoredUser = article.favoredUsers
       .getItems()
-      .find((u) => u.id === this.userService.user.id);
+      .find((u) => u.id === currentUser.id);
 
     if (favorite) {
       if (!favoredUser) {
-        article.favoredUsers.add(this.userService.user);
+        article.favoredUsers.add(currentUser);
       }
     } else {
       if (favoredUser) {
@@ -180,6 +195,6 @@ export class ArticlesService {
 
     await this.articleRepository.flush();
 
-    return ArticleDTO.map(article, this.userService);
+    return ArticleDTO.map(article, currentUser);
   }
 }

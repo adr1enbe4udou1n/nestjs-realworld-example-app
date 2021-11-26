@@ -32,9 +32,9 @@ describe('UsersService', () => {
   });
 
   it('can fetch user infos', async () => {
-    await actingAs(orm, service);
+    const currentUser = await actingAs(orm);
 
-    const user = await act<UserDTO>(orm, () => service.current());
+    const user = await act<UserDTO>(orm, () => service.current(currentUser));
 
     expect(user).toMatchObject({
       email: 'john.doe@example.com',
@@ -67,13 +67,16 @@ describe('UsersService', () => {
   });
 
   it('can update infos', async () => {
-    await actingAs(orm, service);
+    const currentUser = await actingAs(orm);
 
     const user = await act(orm, () =>
-      service.update({
-        email: 'jane.doe@example.com',
-        bio: 'My Bio',
-      }),
+      service.update(
+        {
+          email: 'jane.doe@example.com',
+          bio: 'My Bio',
+        },
+        currentUser,
+      ),
     );
 
     expect(user).toMatchObject({
@@ -94,13 +97,16 @@ describe('UsersService', () => {
       name: 'Jane Doe',
       email: 'jane.doe@example.com',
     });
-    await actingAs(orm, service);
+    const currentUser = await actingAs(orm);
 
     await expect(() =>
       act(orm, () =>
-        service.update({
-          email: 'jane.doe@example.com',
-        }),
+        service.update(
+          {
+            email: 'jane.doe@example.com',
+          },
+          currentUser,
+        ),
       ),
     ).rejects.toThrow(BadRequestException);
   });

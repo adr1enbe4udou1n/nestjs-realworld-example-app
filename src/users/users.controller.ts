@@ -1,5 +1,14 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthService } from '../auth/auth.service';
 import { UserResponse } from '../user/dto/current-user.dto';
 import { LoginUserRequest } from './dto/login.dto';
 import { NewUserRequest } from './dto/register.dto';
@@ -8,7 +17,10 @@ import { UsersService } from './users.service';
 @Controller('users')
 @ApiTags('User and Authentication')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private authService: AuthService,
+  ) {}
 
   @ApiOperation({
     summary: 'Register a new user',
@@ -22,7 +34,11 @@ export class UsersController {
   })
   @ApiResponse({ type: UserResponse })
   async register(@Body() command: NewUserRequest): Promise<UserResponse> {
-    return { user: await this.usersService.register(command.user) };
+    return {
+      user: await this.authService.getUserWithToken(
+        await this.usersService.register(command.user),
+      ),
+    };
   }
 
   @ApiOperation({
@@ -36,7 +52,11 @@ export class UsersController {
     type: LoginUserRequest,
   })
   @ApiResponse({ type: UserResponse })
-  async login(@Body() command: LoginUserRequest): Promise<UserResponse> {
-    return { user: await this.usersService.login(command.user) };
+  @UseGuards(AuthGuard('local'))
+  async login(
+    @Body() command: LoginUserRequest,
+    @Request() req,
+  ): Promise<UserResponse> {
+    return { user: await this.authService.getUserWithToken(req.user) };
   }
 }

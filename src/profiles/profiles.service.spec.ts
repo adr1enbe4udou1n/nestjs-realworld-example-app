@@ -14,7 +14,6 @@ import { ContextIdFactory } from '@nestjs/core';
 describe('ProfilesService', () => {
   let orm: MikroORM;
   let service: ProfilesService;
-  let userService: UserService;
 
   beforeEach(async () => {
     const module = await initializeDbTestBase({
@@ -23,7 +22,6 @@ describe('ProfilesService', () => {
 
     const contextId = ContextIdFactory.create();
     service = await module.resolve(ProfilesService, contextId);
-    userService = await module.resolve(UserService, contextId);
     orm = module.get(MikroORM);
   });
 
@@ -59,7 +57,7 @@ describe('ProfilesService', () => {
   });
 
   it('can get followed profile', async () => {
-    const user = await actingAs(orm, userService, {
+    const user = await actingAs(orm, {
       name: 'John Doe',
       email: 'john.doe@example.com',
       bio: 'My Bio',
@@ -77,7 +75,7 @@ describe('ProfilesService', () => {
     );
     await orm.em.flush();
 
-    const data = await act(orm, () => service.get('Jane Doe'));
+    const data = await act(orm, () => service.get('Jane Doe', user));
 
     expect(data).toMatchObject({
       username: 'Jane Doe',
@@ -88,7 +86,7 @@ describe('ProfilesService', () => {
   });
 
   it('can follow profile', async () => {
-    await actingAs(orm, userService, {
+    const user = await actingAs(orm, {
       name: 'John Doe',
       email: 'john.doe@example.com',
     });
@@ -102,8 +100,8 @@ describe('ProfilesService', () => {
       email: 'alice@example.com',
     });
 
-    await act(orm, () => service.follow('Jane Doe', true));
-    const data = await act(orm, () => service.follow('Jane Doe', true));
+    await act(orm, () => service.follow('Jane Doe', true, user));
+    const data = await act(orm, () => service.follow('Jane Doe', true, user));
 
     expect(data).toMatchObject({
       username: 'Jane Doe',
@@ -120,7 +118,7 @@ describe('ProfilesService', () => {
   });
 
   it('can unfollow profile', async () => {
-    const user = await actingAs(orm, userService, {
+    const user = await actingAs(orm, {
       name: 'John Doe',
       email: 'john.doe@example.com',
     });
@@ -139,7 +137,7 @@ describe('ProfilesService', () => {
     );
     await orm.em.flush();
 
-    const data = await act(orm, () => service.follow('Jane Doe', false));
+    const data = await act(orm, () => service.follow('Jane Doe', false, user));
 
     expect(data).toMatchObject({
       username: 'Jane Doe',

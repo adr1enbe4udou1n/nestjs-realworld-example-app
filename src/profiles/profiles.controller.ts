@@ -5,8 +5,10 @@ import {
   HttpCode,
   Param,
   Post,
+  Request,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -14,7 +16,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from '../auth.guard';
 import { ProfileResponse } from './dto/profile.dto';
 import { ProfilesService } from './profiles.service';
 
@@ -23,6 +24,7 @@ import { ProfilesService } from './profiles.service';
 export class ProfilesController {
   constructor(private profilesService: ProfilesService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: 'Get a profile',
     description: 'Get a profile of a user of the system. Auth is optional',
@@ -33,12 +35,15 @@ export class ProfilesController {
     description: 'Username of the profile to get',
   })
   @ApiResponse({ type: ProfileResponse })
-  async get(@Param('username') username: string): Promise<ProfileResponse> {
-    return { profile: await this.profilesService.get(username) };
+  async get(
+    @Param('username') username: string,
+    @Request() req,
+  ): Promise<ProfileResponse> {
+    return { profile: await this.profilesService.get(username, req.user) };
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @ApiOperation({
     summary: 'Follow a user',
     description: 'Follow a user by username',
@@ -50,12 +55,17 @@ export class ProfilesController {
     description: 'Username of the profile you want to follow',
   })
   @ApiResponse({ type: ProfileResponse })
-  async follow(@Param('username') username: string): Promise<ProfileResponse> {
-    return { profile: await this.profilesService.follow(username, true) };
+  async follow(
+    @Param('username') username: string,
+    @Request() req,
+  ): Promise<ProfileResponse> {
+    return {
+      profile: await this.profilesService.follow(username, true, req.user),
+    };
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @ApiOperation({
     summary: 'Unfollow a user',
     description: 'Unfollow a user by username',
@@ -68,7 +78,10 @@ export class ProfilesController {
   @ApiResponse({ type: ProfileResponse })
   async unfollow(
     @Param('username') username: string,
+    @Request() req,
   ): Promise<ProfileResponse> {
-    return { profile: await this.profilesService.follow(username, false) };
+    return {
+      profile: await this.profilesService.follow(username, false, req.user),
+    };
   }
 }
