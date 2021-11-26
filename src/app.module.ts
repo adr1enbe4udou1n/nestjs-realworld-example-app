@@ -10,11 +10,11 @@ import { MigrateService } from './migrate.service';
 @Module({
   imports: [
     CoreModule,
-    UsersModule,
     TagsModule,
     ArticlesModule,
     ProfilesModule,
     UserModule,
+    UsersModule,
   ],
   providers: [MigrateService],
 })

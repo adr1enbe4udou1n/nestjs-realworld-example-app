@@ -1,6 +1,5 @@
 import { MikroORM } from '@mikro-orm/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/user.entity';
 import {
   initializeDbTestBase,
@@ -9,13 +8,11 @@ import {
   act,
 } from '../db-test-base';
 import { UserService } from './user.service';
-import { UserDTO } from './dto/current-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
 
 describe('UsersService', () => {
   let service: UserService;
   let orm: MikroORM;
-  let jwt: JwtService;
 
   beforeEach(async () => {
     const module = await initializeDbTestBase({
@@ -24,26 +21,10 @@ describe('UsersService', () => {
 
     service = await module.resolve(UserService);
     orm = module.get(MikroORM);
-    jwt = module.get(JwtService);
   });
 
   afterEach(async () => {
     await orm.close(true);
-  });
-
-  it('can fetch user infos', async () => {
-    const currentUser = await actingAs(orm);
-
-    const user = await act<UserDTO>(orm, () => service.current(currentUser));
-
-    expect(user).toMatchObject({
-      email: 'john.doe@example.com',
-      username: 'John Doe',
-    });
-
-    const payload = jwt.decode(user.token);
-    expect(payload['name']).toBe('John Doe');
-    expect(payload['email']).toBe('john.doe@example.com');
   });
 
   it.each([
@@ -81,7 +62,7 @@ describe('UsersService', () => {
 
     expect(user).toMatchObject({
       email: 'jane.doe@example.com',
-      username: 'John Doe',
+      name: 'John Doe',
       bio: 'My Bio',
     });
 
