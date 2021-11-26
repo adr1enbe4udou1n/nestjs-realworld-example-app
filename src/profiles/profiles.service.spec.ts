@@ -9,7 +9,6 @@ import {
 import { ProfilesService } from './profiles.service';
 import { hash } from 'argon2';
 import { UserService } from '../user/user.service';
-import { ContextIdFactory } from '@nestjs/core';
 
 describe('ProfilesService', () => {
   let orm: MikroORM;
@@ -20,8 +19,7 @@ describe('ProfilesService', () => {
       providers: [ProfilesService, UserService],
     });
 
-    const contextId = ContextIdFactory.create();
-    service = await module.resolve(ProfilesService, contextId);
+    service = await module.resolve(ProfilesService);
     orm = module.get(MikroORM);
   });
 

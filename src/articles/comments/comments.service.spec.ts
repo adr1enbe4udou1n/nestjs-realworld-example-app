@@ -5,7 +5,6 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NewCommentDTO } from './dto/comment-create.dto';
 import { Comment } from './comment.entity';
 import { ArticlesService } from '../articles.service';
-import { ContextIdFactory } from '@nestjs/core';
 
 describe('CommentsService', () => {
   let orm: MikroORM;
@@ -19,9 +18,8 @@ describe('CommentsService', () => {
 
     orm = module.get(MikroORM);
 
-    const contextId = ContextIdFactory.create();
-    service = await module.resolve(CommentsService, contextId);
-    articlesService = await module.resolve(ArticlesService, contextId);
+    service = await module.resolve(CommentsService);
+    articlesService = await module.resolve(ArticlesService);
   });
 
   afterEach(async () => {

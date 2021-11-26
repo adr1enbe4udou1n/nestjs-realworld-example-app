@@ -10,7 +10,6 @@ import { CommentsService } from './comments/comments.service';
 import { Comment } from './comments/comment.entity';
 import { User } from '../users/user.entity';
 import { ProfilesService } from '../profiles/profiles.service';
-import { ContextIdFactory } from '@nestjs/core';
 
 describe('ArticlesService', () => {
   let orm: MikroORM;
@@ -25,10 +24,9 @@ describe('ArticlesService', () => {
 
     orm = module.get(MikroORM);
 
-    const contextId = ContextIdFactory.create();
-    commentsService = await module.resolve(CommentsService, contextId);
-    profilesService = await module.resolve(ProfilesService, contextId);
-    service = await module.resolve(ArticlesService, contextId);
+    commentsService = await module.resolve(CommentsService);
+    profilesService = await module.resolve(ProfilesService);
+    service = await module.resolve(ArticlesService);
   });
 
   afterEach(async () => {
