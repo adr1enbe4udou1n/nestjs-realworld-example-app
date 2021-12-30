@@ -13,7 +13,7 @@ const config: Options = {
   dbName: process.env.DB_DATABASE,
   entities: ['dist/**/*.entity.js'],
   entitiesTs: ['src/**/*.entity.ts'],
-  debug: false,
+  debug: process.env.NODE_ENV !== 'production',
   highlighter: new SqlHighlighter(),
   metadataProvider: TsMorphMetadataProvider,
   migrations:
