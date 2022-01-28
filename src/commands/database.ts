@@ -7,7 +7,7 @@ import { Tag } from '../tags/tag.entity';
 import { User } from '../users/user.entity';
 import { hash } from 'argon2';
 import { capitalize } from 'lodash';
-import { name, internet, lorem, random, datatype, unique, date } from 'faker';
+import { faker } from '@faker-js/faker';
 
 @Injectable()
 export class DatabaseRefreshService {
@@ -66,11 +66,11 @@ export class DatabaseRefreshService {
     for (let i = 1; i <= 50; i++) {
       users.push(
         this.em.create(User, {
-          name: name.findName(),
-          email: internet.email(),
+          name: faker.name.findName(),
+          email: faker.internet.email(),
           password: await hash('password'),
-          bio: lorem.paragraphs(3),
-          image: internet.avatar(),
+          bio: faker.lorem.paragraphs(3),
+          image: faker.internet.avatar(),
         }),
       );
     }
@@ -80,27 +80,34 @@ export class DatabaseRefreshService {
     console.info('Users generated !');
 
     users.forEach((u) => {
-      u.followers.add(...random.arrayElements(users, datatype.number(5)));
+      u.followers.add(
+        ...faker.random.arrayElements(users, faker.datatype.number(5)),
+      );
     });
 
     for (let i = 1; i <= 500; i++) {
-      const title = capitalize(unique(() => lorem.words(datatype.number(5))));
+      const title = capitalize(
+        faker.unique(() => faker.lorem.words(faker.datatype.number(5)), []),
+      );
 
       const article = this.em.create(Article, {
         title,
-        description: lorem.paragraph(),
-        body: lorem.paragraphs(5),
-        author: random.arrayElement(users),
-        favoredUsers: random.arrayElements(users, datatype.number(5)),
-        createdAt: date.recent(90),
+        description: faker.lorem.paragraph(),
+        body: faker.lorem.paragraphs(5),
+        author: faker.random.arrayElement(users),
+        favoredUsers: faker.random.arrayElements(
+          users,
+          faker.datatype.number(5),
+        ),
+        createdAt: faker.date.recent(90),
       });
 
-      for (let i = 1; i <= datatype.number(10); i++) {
+      for (let i = 1; i <= faker.datatype.number(10); i++) {
         article.comments.add(
           this.em.create(Comment, {
-            body: lorem.paragraphs(2),
-            author: random.arrayElement(users),
-            createdAt: date.recent(7),
+            body: faker.lorem.paragraphs(2),
+            author: faker.random.arrayElement(users),
+            createdAt: faker.date.recent(7),
           }),
         );
       }
@@ -114,8 +121,11 @@ export class DatabaseRefreshService {
 
     for (let i = 1; i <= 100; i++) {
       const tag = this.em.create(Tag, {
-        name: `${lorem.word()} ${i}`,
-        articles: random.arrayElements(articles, datatype.number(10)),
+        name: `${faker.lorem.word()} ${i}`,
+        articles: faker.random.arrayElements(
+          articles,
+          faker.datatype.number(10),
+        ),
       });
 
       this.em.persist(tag);
