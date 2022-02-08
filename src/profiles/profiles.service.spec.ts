@@ -110,7 +110,7 @@ describe('ProfilesService', () => {
       (
         await orm.em
           .getRepository(User)
-          .findOne({ name: 'Jane Doe' }, ['followers'])
+          .findOne({ name: 'Jane Doe' }, { populate: ['followers'] })
       ).followers.count(),
     ).toBe(1);
   });
@@ -146,7 +146,7 @@ describe('ProfilesService', () => {
       (
         await orm.em
           .getRepository(User)
-          .findOne({ name: 'Alice' }, ['followers'])
+          .findOne({ name: 'Alice' }, { populate: ['followers'] })
       ).followers.count(),
     ).toBe(1);
   });

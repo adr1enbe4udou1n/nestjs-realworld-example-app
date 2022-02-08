@@ -63,10 +63,7 @@ export class ArticlesService {
       'favoredUsers',
     ]);
 
-    return [
-      items.map((a) => ArticleDTO.map(a, currentUser)),
-      parseInt(count, 10),
-    ];
+    return [items.map((a) => ArticleDTO.map(a, currentUser)), +count];
   }
 
   async feed(
@@ -77,24 +74,27 @@ export class ArticlesService {
       {
         author: { followers: { id: currentUser.id } },
       },
-      ['author.followers', 'tags', 'favoredUsers'],
-      { id: 'DESC' },
-      this.limit(query),
-      query.offset,
+      {
+        populate: ['author.followers', 'tags', 'favoredUsers'],
+        orderBy: { id: 'DESC' },
+        limit: this.limit(query),
+        offset: query.offset,
+      },
     );
 
-    return [items.map((a) => ArticleDTO.map(a, currentUser)), count];
+    return [items.map((a) => ArticleDTO.map(a, currentUser)), +count];
   }
 
   async get(
     slug: string,
     currentUser: User | null = null,
   ): Promise<ArticleDTO> {
-    const article = await this.articleRepository.findOneOrFail({ slug }, [
-      'author.followers',
-      'tags',
-      'favoredUsers',
-    ]);
+    const article = await this.articleRepository.findOneOrFail(
+      { slug },
+      {
+        populate: ['author.followers', 'tags', 'favoredUsers'],
+      },
+    );
 
     return ArticleDTO.map(article, currentUser);
   }
@@ -135,11 +135,12 @@ export class ArticlesService {
     dto: UpdateArticleDTO,
     currentUser: User,
   ): Promise<ArticleDTO> {
-    const article = await this.articleRepository.findOneOrFail({ slug }, [
-      'author.followers',
-      'tags',
-      'favoredUsers',
-    ]);
+    const article = await this.articleRepository.findOneOrFail(
+      { slug },
+      {
+        populate: ['author.followers', 'tags', 'favoredUsers'],
+      },
+    );
 
     if (article.author.id !== currentUser.id) {
       throw new BadRequestException(
@@ -155,9 +156,12 @@ export class ArticlesService {
   }
 
   async delete(slug: string, currentUser: User) {
-    const article = await this.articleRepository.findOneOrFail({ slug }, [
-      'comments',
-    ]);
+    const article = await this.articleRepository.findOneOrFail(
+      { slug },
+      {
+        populate: ['comments'],
+      },
+    );
 
     if (article.author.id !== currentUser.id) {
       throw new BadRequestException(
@@ -173,11 +177,12 @@ export class ArticlesService {
     favorite: boolean,
     currentUser: User,
   ): Promise<ArticleDTO> {
-    const article = await this.articleRepository.findOneOrFail({ slug }, [
-      'tags',
-      'favoredUsers',
-      'author.followers',
-    ]);
+    const article = await this.articleRepository.findOneOrFail(
+      { slug },
+      {
+        populate: ['tags', 'favoredUsers', 'author.followers'],
+      },
+    );
 
     const favoredUser = article.favoredUsers
       .getItems()

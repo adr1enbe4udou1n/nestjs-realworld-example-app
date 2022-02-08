@@ -33,6 +33,8 @@ export const initializeDbTestBase = async (metadata: ModuleMetadata) => {
   await orm.em.nativeDelete(Article, {});
   await orm.em.nativeDelete(User, {});
 
+  orm.config.set('allowGlobalContext', true);
+
   return module;
 };
 

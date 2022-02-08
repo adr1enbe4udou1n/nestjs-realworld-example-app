@@ -13,9 +13,12 @@ export class ProfilesService {
     username: string,
     currentUser: User | null = null,
   ): Promise<ProfileDTO> {
-    const user = await this.userRepository.findOneOrFail({ name: username }, [
-      'followers',
-    ]);
+    const user = await this.userRepository.findOneOrFail(
+      { name: username },
+      {
+        populate: ['followers'],
+      },
+    );
     return ProfileDTO.map(user, currentUser);
   }
 
@@ -24,9 +27,12 @@ export class ProfilesService {
     follow: boolean,
     currentUser: User,
   ): Promise<ProfileDTO> {
-    const user = await this.userRepository.findOneOrFail({ name: username }, [
-      'followers',
-    ]);
+    const user = await this.userRepository.findOneOrFail(
+      { name: username },
+      {
+        populate: ['followers'],
+      },
+    );
 
     const followedUser = user.followers
       .getItems()

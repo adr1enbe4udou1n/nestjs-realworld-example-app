@@ -27,7 +27,7 @@ export class Article implements HasTimestamps {
   title: string;
 
   @Property({ unique: true })
-  slug: string;
+  slug?: string;
 
   @Property({ columnType: 'text' })
   description: string;
@@ -51,10 +51,10 @@ export class Article implements HasTimestamps {
   favoredUsers = new Collection<User>(this);
 
   @Property({ columnType: 'timestamp' })
-  createdAt: Date;
+  createdAt?: Date;
 
   @Property({ columnType: 'timestamp' })
-  updatedAt: Date;
+  updatedAt?: Date;
 
   @BeforeCreate()
   async beforeCreate() {

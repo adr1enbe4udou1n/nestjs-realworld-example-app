@@ -277,6 +277,7 @@ describe('ArticlesService', () => {
     });
 
     await orm.em
+      .fork()
       .getRepository(Tag)
       .persistAndFlush(new Tag({ name: 'Existing Tag' }));
 

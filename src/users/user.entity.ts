@@ -57,10 +57,10 @@ export class User implements HasTimestamps {
   favoriteArticles = new Collection<Article>(this);
 
   @Property({ columnType: 'timestamp' })
-  createdAt: Date;
+  createdAt?: Date;
 
   @Property({ columnType: 'timestamp' })
-  updatedAt: Date;
+  updatedAt?: Date;
 
   constructor(user: Partial<User> = {}) {
     Object.assign(this, user);

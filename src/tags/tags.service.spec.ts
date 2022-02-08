@@ -22,6 +22,7 @@ describe('TagsService', () => {
 
   it('can list all tags', async () => {
     await orm.em
+      .fork()
       .getRepository(Tag)
       .persistAndFlush([
         new Tag({ name: 'Tag3' }),

@@ -23,8 +23,10 @@ export class CommentsService {
 
     const comments = await this.commentRepository.find(
       { article },
-      ['author.followers'],
-      { id: 'DESC' },
+      {
+        populate: ['author.followers'],
+        orderBy: { id: 'DESC' },
+      },
     );
 
     return comments.map((c) => CommentDTO.map(c, currentUser));

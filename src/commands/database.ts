@@ -62,10 +62,11 @@ export class DatabaseRefreshService {
 
     const users: User[] = [];
     const articles: Article[] = [];
+    const em = this.em.fork();
 
     for (let i = 1; i <= 50; i++) {
       users.push(
-        this.em.create(User, {
+        em.create(User, {
           name: faker.name.findName(),
           email: faker.internet.email(),
           password: await hash('password'),
@@ -75,7 +76,7 @@ export class DatabaseRefreshService {
       );
     }
 
-    this.em.persist(users);
+    em.persist(users);
 
     console.info('Users generated !');
 
@@ -90,7 +91,7 @@ export class DatabaseRefreshService {
         faker.unique(() => faker.lorem.words(faker.datatype.number(5)), []),
       );
 
-      const article = this.em.create(Article, {
+      const article = em.create(Article, {
         title,
         description: faker.lorem.paragraph(),
         body: faker.lorem.paragraphs(5),
@@ -104,9 +105,10 @@ export class DatabaseRefreshService {
 
       for (let i = 1; i <= faker.datatype.number(10); i++) {
         article.comments.add(
-          this.em.create(Comment, {
-            body: faker.lorem.paragraphs(2),
+          em.create(Comment, {
+            article,
             author: faker.random.arrayElement(users),
+            body: faker.lorem.paragraphs(2),
             createdAt: faker.date.recent(7),
           }),
         );
@@ -115,12 +117,12 @@ export class DatabaseRefreshService {
       articles.push(article);
     }
 
-    this.em.persist(articles);
+    em.persist(articles);
 
     console.info('Articles generated !');
 
     for (let i = 1; i <= 100; i++) {
-      const tag = this.em.create(Tag, {
+      const tag = em.create(Tag, {
         name: `${faker.lorem.word()} ${i}`,
         articles: faker.random.arrayElements(
           articles,
@@ -128,11 +130,11 @@ export class DatabaseRefreshService {
         ),
       });
 
-      this.em.persist(tag);
+      em.persist(tag);
     }
 
     console.info('Tags generated !');
 
-    await this.em.flush();
+    await em.flush();
   };
 }

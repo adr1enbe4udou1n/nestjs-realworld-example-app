@@ -20,10 +20,10 @@ const config: Options = {
     process.env.NODE_ENV === 'production'
       ? {
           path: 'dist/migrations',
-          pattern: /^[\w-]+\d+\.js$/,
+          glob: '!(*.d).{js,ts}',
           disableForeignKeys: false,
         }
-      : { path: 'src/migrations', pattern: /^[\w-]+\d+\.ts$/ },
+      : { path: 'src/migrations', glob: '!(*.d).{js,ts}' },
 };
 
 export default config;
