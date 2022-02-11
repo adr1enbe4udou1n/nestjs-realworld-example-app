@@ -58,6 +58,7 @@ dependencies:
   '@mikro-orm/nestjs': 4.3.1_b51760444781dd7b641eae3fca9e8e76
   '@mikro-orm/postgresql': 5.0.0_5d52ce2663927625a04cfa6921f8d228
   '@mikro-orm/reflection': 5.0.0_@mikro-orm+core@5.0.0
+  '@mikro-orm/seeder': 5.0.0_@mikro-orm+core@5.0.0
   '@mikro-orm/sql-highlighter': 1.0.1
   '@nestjs/common': 8.2.6_41a73a83cecc93a04fa529b9098e66bd
   '@nestjs/config': 1.1.7_b1c87d49cb3cb6bde37bc22ce42ae20e
@@ -80,7 +81,6 @@ dependencies:
   slugify: 1.6.5
 
 devDependencies:
-  '@mikro-orm/seeder': 5.0.0_@mikro-orm+core@5.0.0
   '@nestjs/cli': 8.2.0_eslint@8.8.0
   '@nestjs/schematics': 8.0.6_typescript@4.5.5
   '@nestjs/testing': 8.2.6_732a54a2558f64827b8cc4f9baac4f1f
@@ -575,7 +575,7 @@ packages:
   /@faker-js/faker/6.0.0-alpha.5:
     resolution: {integrity: sha512-8Is/xFxNgricqmhQR/AJ4Vi0cKzSR7FcpE0ImG9dWciuSxUkyCiK+B5/hTQP8jrVbtgTjpFC1AaTCnALJOBDmw==}
     engines: {node: '>=12.0.0', npm: '>=7.0.0'}
-    dev: true
+    dev: false
 
   /@fastify/ajv-compiler/1.1.0:
     resolution: {integrity: sha512-gvCOUNpXsWrIQ3A4aXCLIdblL0tDq42BG/2Xw7oxbil9h11uow10ztS2GuFazNBfjbrsZ5nl+nPl5jDSjj5TSg==}
@@ -1107,7 +1107,7 @@ packages:
     dependencies:
       '@faker-js/faker': 6.0.0-alpha.5
       '@mikro-orm/core': 5.0.0_6aa57b41ea4418c4daaaed0fa8b20fc1
-    dev: true
+    dev: false
 
   /@mikro-orm/sql-highlighter/1.0.1:
     resolution: {integrity: sha512-iO+FwRNuqNDVlIo5zfgOu2mMGVicX/FqzP+F/A0xpJLHyqvWyXzVwntgAMimBjQaxiX9Rpmc0u3Jq6/A6V6JQA==}

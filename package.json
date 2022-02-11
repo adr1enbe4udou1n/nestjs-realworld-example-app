@@ -27,6 +27,7 @@
     "@mikro-orm/nestjs": "^4.3.1",
     "@mikro-orm/postgresql": "^5.0.0",
     "@mikro-orm/reflection": "^5.0.0",
+    "@mikro-orm/seeder": "^5.0.0",
     "@mikro-orm/sql-highlighter": "^1.0.1",
     "@nestjs/common": "^8.2.6",
     "@nestjs/config": "^1.1.7",
@@ -49,7 +50,6 @@
     "slugify": "^1.6.5"
   },
   "devDependencies": {
-    "@mikro-orm/seeder": "^5.0.0",
     "@nestjs/cli": "^8.2.0",
     "@nestjs/schematics": "^8.0.6",
     "@nestjs/testing": "^8.2.6",
