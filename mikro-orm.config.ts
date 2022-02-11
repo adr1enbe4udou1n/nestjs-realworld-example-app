@@ -16,14 +16,6 @@ const config: Options = {
   debug: process.env.NODE_ENV !== 'production',
   highlighter: new SqlHighlighter(),
   metadataProvider: TsMorphMetadataProvider,
-  migrations:
-    process.env.NODE_ENV === 'production'
-      ? {
-          path: 'dist/migrations',
-          glob: '!(*.d).{js,ts}',
-          disableForeignKeys: false,
-        }
-      : { path: 'src/migrations', glob: '!(*.d).{js,ts}' },
 };
 
 export default config;
