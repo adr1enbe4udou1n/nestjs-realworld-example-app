@@ -8,4 +8,4 @@ WORKDIR /app
 RUN curl -f https://get.pnpm.io/v6.7.js | node - add --global pnpm@6
 RUN pnpm i --prod
 
-ENTRYPOINT ["node", "dist/main"]
+ENTRYPOINT ["npm", "start:prod"]
