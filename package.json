@@ -18,9 +18,7 @@
     "test:watch": "jest --watch --no-cache --runInBand",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "console:dev": "ts-node -r tsconfig-paths/register src/console.ts",
-    "console": "node dist/console.js"
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@mikro-orm/cli": "^5.0.0",
@@ -40,10 +38,8 @@
     "argon2": "^0.28.4",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
-    "commander": "^9.0.0",
     "fastify-swagger": "^4.15.0",
     "lodash": "^4.17.21",
-    "nestjs-console": "^7.0.1",
     "passport": "^0.5.2",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
@@ -53,7 +49,7 @@
     "slugify": "^1.6.5"
   },
   "devDependencies": {
-    "@faker-js/faker": "^6.0.0-alpha.6",
+    "@mikro-orm/seeder": "^5.0.0",
     "@nestjs/cli": "^8.2.0",
     "@nestjs/schematics": "^8.0.6",
     "@nestjs/testing": "^8.2.6",

@@ -21,7 +21,7 @@ Two databases will spin up, one for normal development and one dedicated for int
 ```sh
 pnpm i
 pnpm mikro-orm migration:up # migrate database schema
-pnpm console:dev db seed # migrate and fill db with fake data
+pnpm mikro-orm seeder:run # migrate and fill db with fake data
 pnpm start:dev
 ```
 
@@ -32,7 +32,7 @@ And that's all, go to <http://localhost:3000/api>
 Launch follow scripts for validating realworld schema :
 
 ```sh
-pnpm console:dev db fresh # wipe all database for clean state
+# be sure to start with empty database
 pnpm start
 npx newman run postman.json --global-var "APIURL=http://localhost:3000/api" --global-var="USERNAME=johndoe" --global-var="EMAIL=john.doe@example.com" --global-var="PASSWORD=password"
 ```

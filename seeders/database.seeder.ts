@@ -1,68 +1,16 @@
-import { EntityManager, MikroORM } from '@mikro-orm/core';
-import { Injectable } from '@nestjs/common';
-import { ConsoleService } from 'nestjs-console';
-import { Article } from '../articles/article.entity';
-import { Comment } from '../articles/comments/comment.entity';
-import { Tag } from '../tags/tag.entity';
-import { User } from '../users/user.entity';
+import type { EntityManager } from '@mikro-orm/core';
+import { faker, Seeder } from '@mikro-orm/seeder';
 import { hash } from 'argon2';
+import { Article } from '../src/articles/article.entity';
+import { User } from '../src/users/user.entity';
 import { capitalize } from 'lodash';
-import { faker } from '@faker-js/faker';
+import { Tag } from '../src/tags/tag.entity';
+import { Comment } from '../src/articles/comments/comment.entity';
 
-@Injectable()
-export class DatabaseRefreshService {
-  constructor(
-    private readonly consoleService: ConsoleService,
-    private readonly orm: MikroORM,
-    private readonly em: EntityManager,
-  ) {
-    const cli = this.consoleService.getCli();
-
-    const groupCommand = this.consoleService.createGroupCommand(
-      {
-        command: 'db',
-        description: 'Refresh and manage db data',
-      },
-      cli,
-    );
-
-    // create command
-    this.consoleService.createCommand(
-      {
-        command: 'fresh',
-        description: 'Reset database',
-      },
-      this.fresh,
-      groupCommand,
-    );
-
-    this.consoleService.createCommand(
-      {
-        command: 'seed',
-        description: 'Reset and seed fake data',
-      },
-      this.seed,
-      groupCommand,
-    );
-  }
-
-  fresh = async () => {
-    await this.orm.getMigrator().up();
-
-    await this.em.nativeDelete(Tag, {});
-    await this.em.nativeDelete(Comment, {});
-    await this.em.nativeDelete(Article, {});
-    await this.em.nativeDelete(User, {});
-
-    console.info('Database wiped !');
-  };
-
-  seed = async () => {
-    await this.fresh();
-
+export class DatabaseSeeder extends Seeder {
+  async run(em: EntityManager): Promise<void> {
     const users: User[] = [];
     const articles: Article[] = [];
-    const em = this.em.fork();
 
     for (let i = 1; i <= 50; i++) {
       users.push(
@@ -77,8 +25,6 @@ export class DatabaseRefreshService {
     }
 
     em.persist(users);
-
-    console.info('Users generated !');
 
     users.forEach((u) => {
       u.followers.add(
@@ -119,8 +65,6 @@ export class DatabaseRefreshService {
 
     em.persist(articles);
 
-    console.info('Articles generated !');
-
     for (let i = 1; i <= 100; i++) {
       const tag = em.create(Tag, {
         name: `${faker.lorem.word()} ${i}`,
@@ -133,8 +77,6 @@ export class DatabaseRefreshService {
       em.persist(tag);
     }
 
-    console.info('Tags generated !');
-
     await em.flush();
-  };
+  }
 }
