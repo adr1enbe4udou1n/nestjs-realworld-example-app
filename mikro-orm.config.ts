@@ -1,7 +1,7 @@
 import { Options } from '@mikro-orm/core';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
-import { TimestampsSubscriber } from './timestamps.subscriber';
+import { TimestampsSubscriber } from './src/timestamps.subscriber';
 
 const config: Options = {
   subscribers: [new TimestampsSubscriber()],
