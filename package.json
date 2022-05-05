@@ -93,6 +93,10 @@
     "testTimeout": 10000
   },
   "mikro-orm": {
-    "useTsNode": true
+    "useTsNode": true,
+    "configPaths": [
+      "./mikro-orm.config.ts",
+      "./dist/mikro-orm.config.js"
+    ]
   }
 }
