@@ -2,7 +2,9 @@ import { EntityRepository } from '@mikro-orm/postgresql';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { User } from '../users/user.entity';
 import { ProfileDTO } from './dto/profile.dto';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class ProfilesService {
   constructor(
     @InjectRepository(User)

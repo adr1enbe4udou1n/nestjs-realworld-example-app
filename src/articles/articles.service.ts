@@ -1,6 +1,6 @@
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PagedQuery } from '../pagination';
 import { Article } from './article.entity';
 import { NewArticleDTO } from './dto/article-create.dto';
@@ -11,6 +11,7 @@ import { Tag } from '../tags/tag.entity';
 import slugify from 'slugify';
 import { User } from '../users/user.entity';
 
+@Injectable()
 export class ArticlesService {
   constructor(
     @InjectRepository(Article)

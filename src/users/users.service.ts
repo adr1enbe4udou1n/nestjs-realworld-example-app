@@ -1,9 +1,10 @@
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { NewUserDTO } from './dto/register.dto';
 import { User } from './user.entity';
 
+@Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)

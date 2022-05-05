@@ -4,7 +4,9 @@ import { User } from '../users/user.entity';
 import { verify } from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { UserDTO } from '../user/dto/current-user.dto';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
