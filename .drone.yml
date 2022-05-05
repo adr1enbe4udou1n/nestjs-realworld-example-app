@@ -29,6 +29,7 @@ steps:
   - sleep 10 # Wait for PostgreSQL service starting
   - pnpm test
   - pnpm build
+  - pnpm i --prod
 
 - name: image
   image: plugins/docker
