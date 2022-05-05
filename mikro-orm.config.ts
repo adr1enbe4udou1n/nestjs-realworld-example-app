@@ -16,7 +16,6 @@ const config: Options = {
   debug: process.env.NODE_ENV !== 'production',
   highlighter: new SqlHighlighter(),
   metadataProvider: TsMorphMetadataProvider,
-  allowGlobalContext: true,
 };
 
 export default config;
