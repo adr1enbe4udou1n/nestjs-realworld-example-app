@@ -3,8 +3,9 @@ FROM node:16-alpine
 WORKDIR /app
 
 COPY node_modules node_modules/
+COPY package.json ./
 COPY dist dist/
 
-ENV MIKRO_ORM_CLI="./dist/mikro-orm.config.js"
+RUN sed -i /useTsNode/d package.json
 
-ENTRYPOINT ["node", "dist/main"]
+ENTRYPOINT ["npm", "run", "start:prod"]
