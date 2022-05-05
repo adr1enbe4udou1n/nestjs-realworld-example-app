@@ -23,7 +23,7 @@ steps:
     DB_PASSWORD: main
     JWT_SECRET: secret-key
   commands:
-  - curl -f https://get.pnpm.io/v6.7.js | node - add --global pnpm@6
+  - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7
   - pnpm config set store-dir .pnpm-store
   - pnpm i && pnpm lint
   - sleep 10 # Wait for PostgreSQL service starting
