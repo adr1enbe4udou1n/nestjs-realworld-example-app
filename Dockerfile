@@ -6,6 +6,6 @@ COPY node_modules node_modules/
 COPY package.json ./
 COPY dist dist/
 
-RUN sed -i /useTsNode/d package.json
+ENV MIKRO_ORM_CLI_USE_TS_NODE=false
 
-ENTRYPOINT ["npm", "run", "start:prod"]
+ENTRYPOINT ["node", "dist/main"]
