@@ -1,7 +1,7 @@
 import { Options } from '@mikro-orm/core';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
-import { TimestampsSubscriber } from './src/timestamps.subscriber';
+import { TimestampsSubscriber } from './timestamps.subscriber';
 
 const config: Options = {
   subscribers: [new TimestampsSubscriber()],
@@ -16,6 +16,10 @@ const config: Options = {
   debug: process.env.NODE_ENV !== 'production',
   highlighter: new SqlHighlighter(),
   metadataProvider: TsMorphMetadataProvider,
+  migrations: {
+    path: 'dist/migrations',
+    pathTs: 'src/migrations',
+  },
 };
 
 export default config;

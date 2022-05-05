@@ -1,11 +1,11 @@
 import type { EntityManager } from '@mikro-orm/core';
 import { faker, Seeder } from '@mikro-orm/seeder';
 import { hash } from 'argon2';
-import { Article } from '../src/articles/article.entity';
-import { User } from '../src/users/user.entity';
+import { Article } from '../articles/article.entity';
+import { User } from '../users/user.entity';
 import { capitalize } from 'lodash';
-import { Tag } from '../src/tags/tag.entity';
-import { Comment } from '../src/articles/comments/comment.entity';
+import { Tag } from '../tags/tag.entity';
+import { Comment } from '../articles/comments/comment.entity';
 
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
