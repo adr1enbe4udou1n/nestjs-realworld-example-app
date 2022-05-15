@@ -19,6 +19,7 @@ const config: Options = {
   migrations: {
     path: 'dist/migrations',
     pathTs: 'src/migrations',
+    disableForeignKeys: false,
   },
   seeder: {
     path: './src/seeders',
