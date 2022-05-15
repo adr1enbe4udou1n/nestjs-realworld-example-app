@@ -1,11 +1,6 @@
 import type { EntityManager } from '@mikro-orm/core';
 import { faker, Seeder } from '@mikro-orm/seeder';
 import { hash } from 'argon2';
-import { Article } from '../articles/article.entity';
-import { User } from '../users/user.entity';
-import { capitalize } from 'lodash';
-import { Tag } from '../tags/tag.entity';
-import { Comment } from '../articles/comments/comment.entity';
 import { UserFactory } from '../users/user.factory';
 import { TagFactory } from '../tags/tag.factory';
 import { ArticleFactory } from '../articles/article.factory';
