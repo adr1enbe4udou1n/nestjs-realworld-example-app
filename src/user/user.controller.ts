@@ -36,7 +36,7 @@ export class UserController {
   }
 
   @ApiOperation({
-    operationId: 'UpdateUser',
+    operationId: 'UpdateCurrentUser',
     summary: 'Update current user',
     description: 'Updated user information for current user',
   })
