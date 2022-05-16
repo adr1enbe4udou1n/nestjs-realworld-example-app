@@ -57,8 +57,6 @@ describe('UsersService', () => {
     expect(user).toMatchObject({
       email: 'john.doe@example.com',
       name: 'John Doe',
-      bio: null,
-      image: null,
     });
 
     const entity = await orm.em

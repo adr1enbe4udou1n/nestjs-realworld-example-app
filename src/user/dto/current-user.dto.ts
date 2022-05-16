@@ -9,10 +9,10 @@ export class UserDTO {
   username: string;
 
   @ApiProperty()
-  bio?: string;
+  bio: string;
 
   @ApiProperty()
-  image?: string;
+  image: string;
 
   @ApiProperty()
   token: string;
@@ -21,8 +21,8 @@ export class UserDTO {
     const dto = new UserDTO();
     dto.username = user.name;
     dto.email = user.email;
-    dto.bio = user.bio;
-    dto.image = user.image;
+    dto.bio = user.bio || '';
+    dto.image = user.image || '';
     dto.token = token;
     return dto;
   }

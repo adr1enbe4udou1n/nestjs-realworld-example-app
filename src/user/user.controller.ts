@@ -23,6 +23,7 @@ export class UserController {
   ) {}
 
   @ApiOperation({
+    operationId: 'GetCurrentUser',
     summary: 'Get current user',
     description: 'Gets the currently logged-in user',
   })
@@ -35,6 +36,7 @@ export class UserController {
   }
 
   @ApiOperation({
+    operationId: 'UpdateUser',
     summary: 'Update current user',
     description: 'Updated user information for current user',
   })

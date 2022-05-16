@@ -6,7 +6,7 @@ import { Article } from '../article.entity';
 @Entity({ collection: 'comments' })
 export class Comment implements HasTimestamps {
   @PrimaryKey()
-  id?: number;
+  id: number;
 
   @ManyToOne()
   article: Article;
@@ -18,10 +18,10 @@ export class Comment implements HasTimestamps {
   body: string;
 
   @Property({ columnType: 'timestamp' })
-  createdAt?: Date;
+  createdAt: Date;
 
   @Property({ columnType: 'timestamp' })
-  updatedAt?: Date;
+  updatedAt: Date;
 
   constructor(comment: Partial<Comment> = {}) {
     Object.assign(this, comment);

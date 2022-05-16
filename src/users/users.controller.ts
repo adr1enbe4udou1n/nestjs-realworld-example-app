@@ -23,6 +23,7 @@ export class UsersController {
   ) {}
 
   @ApiOperation({
+    operationId: 'CreateUser',
     summary: 'Register a new user',
     description: 'Register a new user',
   })
@@ -42,6 +43,7 @@ export class UsersController {
   }
 
   @ApiOperation({
+    operationId: 'Login',
     summary: 'Existing user login',
     description: 'Login for existing user',
   })

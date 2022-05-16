@@ -84,6 +84,6 @@ describe('UsersService', () => {
     });
 
     const payload = jwt.decode(user.token);
-    expect(payload['username']).toBe('John Doe');
+    expect(payload!['username']).toBe('John Doe');
   });
 });

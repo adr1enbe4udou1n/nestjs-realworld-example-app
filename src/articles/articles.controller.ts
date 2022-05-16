@@ -38,6 +38,7 @@ export class ArticlesController {
   @UseGuards(JwtGuestAuthGuard)
   @ApiTags('Articles')
   @ApiOperation({
+    operationId: 'GetArticles',
     summary: 'Get recent articles globally',
     description:
       'Get most recent articles globally. Use query parameters to filter results. Auth is optional',
@@ -56,6 +57,7 @@ export class ArticlesController {
   @ApiBearerAuth()
   @ApiTags('Articles')
   @ApiOperation({
+    operationId: 'GetArticlesFeed',
     summary: 'Get recent articles from users you follow',
     description:
       'Get most recent articles from users you follow. Use query parameters to limit. Auth is required',
@@ -73,6 +75,7 @@ export class ArticlesController {
   @UseGuards(JwtGuestAuthGuard)
   @ApiTags('Articles')
   @ApiOperation({
+    operationId: 'GetArticle',
     summary: 'Get an article',
     description: 'Get an article. Auth not required',
   })
@@ -90,6 +93,7 @@ export class ArticlesController {
   @ApiBearerAuth()
   @ApiTags('Articles')
   @ApiOperation({
+    operationId: 'CreateArticle',
     summary: 'Create an article',
     description: 'Create an article. Auth is required',
   })
@@ -110,6 +114,7 @@ export class ArticlesController {
   @ApiBearerAuth()
   @ApiTags('Articles')
   @ApiOperation({
+    operationId: 'UpdateArticle',
     summary: 'Update an article',
     description: 'Update an article. Auth is required',
   })
@@ -138,6 +143,7 @@ export class ArticlesController {
   @ApiBearerAuth()
   @ApiTags('Articles')
   @ApiOperation({
+    operationId: 'DeleteArticle',
     summary: 'Delete an article',
     description: 'Delete an article. Auth is required',
   })
@@ -151,6 +157,7 @@ export class ArticlesController {
   @ApiBearerAuth()
   @ApiTags('Favorites')
   @ApiOperation({
+    operationId: 'CreateArticleFavorite',
     summary: 'Favorite an article',
     description: 'Favorite an article. Auth is required',
   })
@@ -174,6 +181,7 @@ export class ArticlesController {
   @ApiBearerAuth()
   @ApiTags('Favorites')
   @ApiOperation({
+    operationId: 'DeleteArticleFavorite',
     summary: 'Unfavorite an article',
     description: 'Unfavorite an article. Auth is required',
   })

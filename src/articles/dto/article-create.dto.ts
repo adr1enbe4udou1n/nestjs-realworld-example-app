@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 import { Article } from '../article.entity';
 
@@ -15,7 +15,7 @@ export class NewArticleDTO {
   @IsNotEmpty()
   body: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   tagList: string[] = [];
 
   static map(dto: NewArticleDTO): Article {

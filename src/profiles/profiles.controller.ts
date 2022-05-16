@@ -27,6 +27,7 @@ export class ProfilesController {
 
   @UseGuards(JwtGuestAuthGuard)
   @ApiOperation({
+    operationId: 'GetProfileByUsername',
     summary: 'Get a profile',
     description: 'Get a profile of a user of the system. Auth is optional',
   })
@@ -46,6 +47,7 @@ export class ProfilesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
+    operationId: 'FollowUserByUsername',
     summary: 'Follow a user',
     description: 'Follow a user by username',
   })
@@ -68,6 +70,7 @@ export class ProfilesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
+    operationId: 'UnfollowUserByUsername',
     summary: 'Unfollow a user',
     description: 'Unfollow a user by username',
   })

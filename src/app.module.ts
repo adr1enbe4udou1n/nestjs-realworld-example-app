@@ -10,7 +10,9 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     MikroOrmModule.forRoot(),
     TagsModule,
     ArticlesModule,

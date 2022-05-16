@@ -1,4 +1,4 @@
 export interface HasTimestamps {
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

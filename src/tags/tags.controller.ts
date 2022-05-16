@@ -9,6 +9,7 @@ export class TagsController {
   constructor(private tagsService: TagsService) {}
 
   @ApiOperation({
+    operationId: 'GetTags',
     summary: 'Get tags',
     description: 'Get tags. Auth not required',
   })
