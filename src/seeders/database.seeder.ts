@@ -14,7 +14,7 @@ export class DatabaseSeeder extends Seeder {
 
     users.forEach((u) => {
       u.followers.add(
-        ...faker.random.arrayElements(users, faker.datatype.number(5)),
+        ...faker.helpers.arrayElements(users, faker.datatype.number(5)),
       );
     });
 
@@ -25,17 +25,17 @@ export class DatabaseSeeder extends Seeder {
         .each((article) => {
           article.comments.set(
             new CommentFactory(em).make(faker.datatype.number(10), {
-              author: faker.random.arrayElement(users),
+              author: faker.helpers.arrayElement(users),
             }),
           );
         })
         .createOne({
-          author: faker.random.arrayElement(users),
-          favoredUsers: faker.random.arrayElements(
+          author: faker.helpers.arrayElement(users),
+          favoredUsers: faker.helpers.arrayElements(
             users,
             faker.datatype.number(5),
           ),
-          tags: faker.random.arrayElements(tags, faker.datatype.number(3)),
+          tags: faker.helpers.arrayElements(tags, faker.datatype.number(3)),
         });
     }
   }

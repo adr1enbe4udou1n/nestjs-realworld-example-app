@@ -30,6 +30,16 @@ steps:
       - pnpm test
       - pnpm build
 
+  - name: rebuild-cache
+    image: drillster/drone-volume-cache
+    volumes:
+      - name: cache
+        path: /cache
+    settings:
+      rebuild: true
+      mount:
+        - ./.pnpm-store
+
   - name: image
     image: plugins/docker
     settings:
@@ -40,16 +50,6 @@ steps:
         from_secret: registry_username
       password:
         from_secret: registry_password
-
-  - name: rebuild-cache
-    image: drillster/drone-volume-cache
-    volumes:
-      - name: cache
-        path: /cache
-    settings:
-      rebuild: true
-      mount:
-        - ./.pnpm-store
 
   - name: deploy
     image: sinlead/drone-kubectl
