@@ -25,6 +25,9 @@ const config: Options = {
     path: 'dist/seeders',
     pathTs: 'src/seeders',
   },
+  replicas: [
+    { name: 'read-1', host: process.env.DB_RO_HOST || process.env.DB_HOST },
+  ],
 };
 
 export default config;
