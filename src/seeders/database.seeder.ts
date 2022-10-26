@@ -14,7 +14,7 @@ export class DatabaseSeeder extends Seeder {
 
     users.forEach((u) => {
       u.followers.add(
-        ...faker.helpers.arrayElements(users, faker.datatype.number(5)),
+        faker.helpers.arrayElements(users, faker.datatype.number(5)),
       );
     });
 

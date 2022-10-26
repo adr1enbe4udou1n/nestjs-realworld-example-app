@@ -117,7 +117,7 @@ export class ArticlesService {
     });
 
     article.tags.add(
-      ...dto.tagList.map((name) => {
+      dto.tagList.map((name) => {
         const tag = existingTags.find((t) => t.name === name);
 
         if (tag) return tag;
