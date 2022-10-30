@@ -6,7 +6,7 @@ export class UserFactory extends Factory<User> {
 
   definition(faker: Faker): Partial<User> {
     return {
-      name: faker.name.findName(),
+      name: faker.name.fullName(),
       email: faker.internet.email(),
       bio: faker.lorem.paragraphs(3),
       image: faker.internet.avatar(),

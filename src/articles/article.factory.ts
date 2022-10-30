@@ -8,7 +8,7 @@ export class ArticleFactory extends Factory<Article> {
   definition(faker: Faker): Partial<Article> {
     return {
       title: capitalize(
-        faker.unique(() => faker.lorem.words(faker.datatype.number(5))),
+        faker.helpers.unique(() => faker.lorem.words(faker.datatype.number(5))),
       ),
       description: faker.lorem.paragraph(),
       body: faker.lorem.paragraphs(5),

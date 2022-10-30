@@ -49,8 +49,9 @@ export class ArticlesService {
     });
 
     const [{ count }, items] = await Promise.all([
-      qb.count('a.id', true).execute('get'),
+      qb.clone().count('a.id', true).execute('get'),
       qb
+        .clone()
         .select('*')
         .orderBy({ id: 'DESC' })
         .limit(this.limit(query))
