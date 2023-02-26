@@ -1,7 +1,12 @@
 import { MikroORM, NotFoundError } from '@mikro-orm/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { Tag } from '../tags/tag.entity';
-import { act, actingAs, initializeDbTestBase } from '../db-test-base';
+import {
+  act,
+  actingAs,
+  initializeDbTestBase,
+  refreshDatabase,
+} from '../db-test-base';
 import { ArticlesService } from './articles.service';
 import { NewArticleDTO } from './dto/article-create.dto';
 import { Article } from './article.entity';
@@ -17,7 +22,7 @@ describe('ArticlesService', () => {
   let commentsService: CommentsService;
   let profilesService: ProfilesService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module = await initializeDbTestBase({
       providers: [ArticlesService, CommentsService, ProfilesService],
     });
@@ -29,8 +34,12 @@ describe('ArticlesService', () => {
     service = await module.resolve(ArticlesService);
   });
 
-  afterEach(async () => {
-    await orm.close(true);
+  beforeEach(async () => {
+    await refreshDatabase(orm);
+  });
+
+  afterAll(async () => {
+    await orm.close();
   });
 
   const createArticlesForAuthor = async (

@@ -5,6 +5,7 @@ import {
   actingAs,
   createUser,
   initializeDbTestBase,
+  refreshDatabase,
 } from '../db-test-base';
 import { ProfilesService } from './profiles.service';
 import { hash } from 'argon2';
@@ -14,7 +15,7 @@ describe('ProfilesService', () => {
   let orm: MikroORM;
   let service: ProfilesService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module = await initializeDbTestBase({
       providers: [ProfilesService, UserService],
     });
@@ -23,8 +24,12 @@ describe('ProfilesService', () => {
     orm = module.get(MikroORM);
   });
 
-  afterEach(async () => {
-    await orm.close(true);
+  beforeEach(async () => {
+    await refreshDatabase(orm);
+  });
+
+  afterAll(async () => {
+    await orm.close();
   });
 
   it('can get profile', async () => {

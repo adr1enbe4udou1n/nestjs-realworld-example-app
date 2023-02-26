@@ -25,17 +25,17 @@ export const initializeDbTestBase = async (metadata: ModuleMetadata) => {
   }).compile();
 
   const orm = module.get<MikroORM>(MikroORM);
-
+  orm.config.set('allowGlobalContext', true);
   await orm.getMigrator().up();
 
+  return module;
+};
+
+export const refreshDatabase = async (orm: MikroORM) => {
   await orm.em.nativeDelete(Tag, {});
   await orm.em.nativeDelete(Comment, {});
   await orm.em.nativeDelete(Article, {});
   await orm.em.nativeDelete(User, {});
-
-  orm.config.set('allowGlobalContext', true);
-
-  return module;
 };
 
 export const createUser = async (orm: MikroORM, data: Partial<User> = {}) => {

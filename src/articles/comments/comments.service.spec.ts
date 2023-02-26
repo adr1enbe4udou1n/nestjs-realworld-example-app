@@ -1,5 +1,10 @@
 import { MikroORM, NotFoundError } from '@mikro-orm/core';
-import { act, actingAs, initializeDbTestBase } from '../../db-test-base';
+import {
+  act,
+  actingAs,
+  initializeDbTestBase,
+  refreshDatabase,
+} from '../../db-test-base';
 import { CommentsService } from './comments.service';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NewCommentDTO } from './dto/comment-create.dto';
@@ -11,7 +16,7 @@ describe('CommentsService', () => {
   let service: CommentsService;
   let articlesService: ArticlesService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module = await initializeDbTestBase({
       providers: [CommentsService, ArticlesService],
     });
@@ -22,8 +27,12 @@ describe('CommentsService', () => {
     articlesService = await module.resolve(ArticlesService);
   });
 
-  afterEach(async () => {
-    await orm.close(true);
+  beforeEach(async () => {
+    await refreshDatabase(orm);
+  });
+
+  afterAll(async () => {
+    await orm.close();
   });
 
   /**

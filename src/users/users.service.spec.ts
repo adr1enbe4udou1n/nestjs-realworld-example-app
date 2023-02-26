@@ -1,6 +1,6 @@
 import { MikroORM } from '@mikro-orm/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { act, initializeDbTestBase } from '../db-test-base';
+import { act, initializeDbTestBase, refreshDatabase } from '../db-test-base';
 import { NewUserDTO } from './dto/register.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
@@ -9,7 +9,7 @@ describe('UsersService', () => {
   let orm: MikroORM;
   let service: UsersService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module = await initializeDbTestBase({
       providers: [UsersService],
     });
@@ -18,8 +18,12 @@ describe('UsersService', () => {
     orm = module.get(MikroORM);
   });
 
-  afterEach(async () => {
-    await orm.close(true);
+  beforeEach(async () => {
+    await refreshDatabase(orm);
+  });
+
+  afterAll(async () => {
+    await orm.close();
   });
 
   it.each([

@@ -1,6 +1,11 @@
 import { MikroORM } from '@mikro-orm/core';
 import { JwtService } from '@nestjs/jwt';
-import { initializeDbTestBase, actingAs, act } from '../db-test-base';
+import {
+  initializeDbTestBase,
+  actingAs,
+  act,
+  refreshDatabase,
+} from '../db-test-base';
 import { AuthService } from './auth.service';
 import { UserDTO } from '../user/dto/current-user.dto';
 import { User } from '../users/user.entity';
@@ -11,7 +16,7 @@ describe('UsersService', () => {
   let orm: MikroORM;
   let jwt: JwtService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module = await initializeDbTestBase({
       providers: [AuthService],
     });
@@ -21,8 +26,12 @@ describe('UsersService', () => {
     jwt = module.get(JwtService);
   });
 
-  afterEach(async () => {
-    await orm.close(true);
+  beforeEach(async () => {
+    await refreshDatabase(orm);
+  });
+
+  afterAll(async () => {
+    await orm.close();
   });
 
   it.each([

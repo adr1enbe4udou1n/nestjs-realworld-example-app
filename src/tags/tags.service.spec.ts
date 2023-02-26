@@ -1,5 +1,5 @@
 import { MikroORM } from '@mikro-orm/core';
-import { act, initializeDbTestBase } from '../db-test-base';
+import { act, initializeDbTestBase, refreshDatabase } from '../db-test-base';
 import { Tag } from './tag.entity';
 import { TagsService } from './tags.service';
 
@@ -7,7 +7,7 @@ describe('TagsService', () => {
   let orm: MikroORM;
   let service: TagsService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module = await initializeDbTestBase({
       providers: [TagsService],
     });
@@ -16,8 +16,12 @@ describe('TagsService', () => {
     service = await module.resolve(TagsService);
   });
 
-  afterEach(async () => {
-    await orm.close(true);
+  beforeEach(async () => {
+    await refreshDatabase(orm);
+  });
+
+  afterAll(async () => {
+    await orm.close();
   });
 
   it('can list all tags', async () => {

@@ -6,6 +6,7 @@ import {
   actingAs,
   createUser,
   act,
+  refreshDatabase,
 } from '../db-test-base';
 import { UserService } from './user.service';
 import { UpdateUserDTO } from './dto/update-user.dto';
@@ -14,7 +15,7 @@ describe('UsersService', () => {
   let service: UserService;
   let orm: MikroORM;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module = await initializeDbTestBase({
       providers: [UserService],
     });
@@ -23,8 +24,12 @@ describe('UsersService', () => {
     orm = module.get(MikroORM);
   });
 
-  afterEach(async () => {
-    await orm.close(true);
+  beforeEach(async () => {
+    await refreshDatabase(orm);
+  });
+
+  afterAll(async () => {
+    await orm.close();
   });
 
   it.each([
