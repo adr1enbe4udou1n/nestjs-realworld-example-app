@@ -1,24 +1,15 @@
-import { EntityRepository } from '@mikro-orm/postgresql';
-import { InjectRepository } from '@mikro-orm/nestjs';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PagedQuery } from '../pagination';
-import { Article } from './article.entity';
 import { NewArticleDTO } from './dto/article-create.dto';
 import { UpdateArticleDTO } from './dto/article-update.dto';
 import { ArticleDTO } from './dto/article.dto';
 import { ArticlesListQuery } from './queries/articles.query';
-import { Tag } from '../tags/tag.entity';
 import slugify from 'slugify';
-import { User } from '../users/user.entity';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ArticlesService {
-  constructor(
-    @InjectRepository(Article)
-    private readonly articleRepository: EntityRepository<Article>,
-    @InjectRepository(Tag)
-    private readonly tagRepository: EntityRepository<Tag>,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   limit(query: PagedQuery) {
     const max = 20;
