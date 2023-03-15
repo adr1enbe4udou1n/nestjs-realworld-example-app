@@ -19,7 +19,7 @@ export class CommentDTO {
   @ApiProperty()
   author: ProfileDTO;
 
-  static map(comment: Comment, currentUser: User | null): CommentDTO {
+  static map(comment: Comment, currentUser: User | null) {
     const dto = new CommentDTO();
     dto.id = comment.id;
     dto.body = comment.body;

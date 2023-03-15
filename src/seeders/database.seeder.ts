@@ -7,7 +7,7 @@ import { ArticleFactory } from '../articles/article.factory';
 import { CommentFactory } from '../articles/comments/comment.factory';
 
 export class DatabaseSeeder extends Seeder {
-  async run(em: EntityManager): Promise<void> {
+  async run(em: EntityManager) {
     const users = await new UserFactory(em).create(50, {
       password: await hash('password'),
     });
