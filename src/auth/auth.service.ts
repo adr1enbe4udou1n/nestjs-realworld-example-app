@@ -14,10 +14,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  public async validateUser(
-    email: string,
-    password: string,
-  ): Promise<User | null> {
+  public async validateUser(email: string, password: string) {
     const user = await this.userRepository.findOne({ email });
 
     if (!user?.password) {

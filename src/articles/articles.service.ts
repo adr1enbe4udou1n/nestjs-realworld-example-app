@@ -25,10 +25,7 @@ export class ArticlesService {
     return Math.min(query.limit ?? max, max);
   }
 
-  async list(
-    query: ArticlesListQuery,
-    currentUser: User | null = null,
-  ): Promise<[ArticleDTO[], number]> {
+  async list(query: ArticlesListQuery, currentUser: User | null = null) {
     const subQb = this.articleRepository
       .createQueryBuilder('a')
       .select('a.id')
@@ -65,13 +62,10 @@ export class ArticlesService {
       'favoredUsers',
     ]);
 
-    return [items.map((a) => ArticleDTO.map(a, currentUser)), +count];
+    return [items.map((a) => ArticleDTO.map(a, currentUser)), +count] as const;
   }
 
-  async feed(
-    query: PagedQuery,
-    currentUser: User,
-  ): Promise<[ArticleDTO[], number]> {
+  async feed(query: PagedQuery, currentUser: User) {
     const [items, count] = await this.articleRepository.findAndCount(
       {
         author: { followers: { id: currentUser.id } },
@@ -84,13 +78,10 @@ export class ArticlesService {
       },
     );
 
-    return [items.map((a) => ArticleDTO.map(a, currentUser)), +count];
+    return [items.map((a) => ArticleDTO.map(a, currentUser)), +count] as const;
   }
 
-  async get(
-    slug: string,
-    currentUser: User | null = null,
-  ): Promise<ArticleDTO> {
+  async get(slug: string, currentUser: User | null = null) {
     const article = await this.articleRepository.findOneOrFail(
       { slug },
       {
@@ -101,7 +92,7 @@ export class ArticlesService {
     return ArticleDTO.map(article, currentUser);
   }
 
-  async create(dto: NewArticleDTO, currentUser: User): Promise<ArticleDTO> {
+  async create(dto: NewArticleDTO, currentUser: User) {
     if (
       (await this.articleRepository.count({
         slug: slugify(dto.title, { lower: true }),
@@ -132,11 +123,7 @@ export class ArticlesService {
     return ArticleDTO.map(article, currentUser);
   }
 
-  async update(
-    slug: string,
-    dto: UpdateArticleDTO,
-    currentUser: User,
-  ): Promise<ArticleDTO> {
+  async update(slug: string, dto: UpdateArticleDTO, currentUser: User) {
     const article = await this.articleRepository.findOneOrFail(
       { slug },
       {
@@ -174,11 +161,7 @@ export class ArticlesService {
     await this.articleRepository.removeAndFlush(article);
   }
 
-  async favorite(
-    slug: string,
-    favorite: boolean,
-    currentUser: User,
-  ): Promise<ArticleDTO> {
+  async favorite(slug: string, favorite: boolean, currentUser: User) {
     const article = await this.articleRepository.findOneOrFail(
       { slug },
       {

@@ -16,10 +16,7 @@ export class CommentsService {
     private readonly commentRepository: EntityRepository<Comment>,
   ) {}
 
-  async list(
-    slug: string,
-    currentUser: User | null = null,
-  ): Promise<CommentDTO[]> {
+  async list(slug: string, currentUser: User | null = null) {
     const article = await this.articleRepository.findOneOrFail({ slug });
 
     const comments = await this.commentRepository.find(
@@ -33,11 +30,7 @@ export class CommentsService {
     return comments.map((c) => CommentDTO.map(c, currentUser));
   }
 
-  async create(
-    slug: string,
-    dto: NewCommentDTO,
-    currentUser: User,
-  ): Promise<CommentDTO> {
+  async create(slug: string, dto: NewCommentDTO, currentUser: User) {
     const article = await this.articleRepository.findOneOrFail({ slug });
 
     const comment = NewCommentDTO.map(dto);

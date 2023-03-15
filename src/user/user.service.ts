@@ -11,7 +11,7 @@ export class UserService {
     private readonly userRepository: EntityRepository<User>,
   ) {}
 
-  public async update(dto: UpdateUserDTO, user: User): Promise<User> {
+  public async update(dto: UpdateUserDTO, user: User) {
     if (
       dto.email &&
       (await this.userRepository.count({

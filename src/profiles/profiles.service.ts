@@ -11,10 +11,7 @@ export class ProfilesService {
     private readonly userRepository: EntityRepository<User>,
   ) {}
 
-  async get(
-    username: string,
-    currentUser: User | null = null,
-  ): Promise<ProfileDTO> {
+  async get(username: string, currentUser: User | null = null) {
     const user = await this.userRepository.findOneOrFail(
       { name: username },
       {
@@ -24,11 +21,7 @@ export class ProfilesService {
     return ProfileDTO.map(user, currentUser);
   }
 
-  async follow(
-    username: string,
-    follow: boolean,
-    currentUser: User,
-  ): Promise<ProfileDTO> {
+  async follow(username: string, follow: boolean, currentUser: User) {
     const user = await this.userRepository.findOneOrFail(
       { name: username },
       {

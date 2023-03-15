@@ -10,7 +10,7 @@ export class TagsService {
     private readonly tagRepository: EntityRepository<Tag>,
   ) {}
 
-  async list(): Promise<string[]> {
+  async list() {
     return (await this.tagRepository.findAll({ orderBy: { name: 'ASC' } })).map(
       (t) => t.name,
     );
