@@ -14,7 +14,7 @@ export class ProfileDTO {
   @ApiProperty()
   following: boolean;
 
-  static map(user: User, currentUser: User | null) {
+  static map(user: User, currentUser: User | null): ProfileDTO {
     const dto = new ProfileDTO();
     dto.username = user.name;
     dto.bio = user.bio;

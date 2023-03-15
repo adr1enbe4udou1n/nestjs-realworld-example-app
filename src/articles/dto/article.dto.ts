@@ -34,7 +34,7 @@ export class ArticleDTO {
   @ApiProperty()
   favoritesCount: number;
 
-  static map(article: Article, currentUser: User | null) {
+  static map(article: Article, currentUser: User | null): ArticleDTO {
     const dto = new ArticleDTO();
     dto.title = article.title;
     dto.slug = article.slug;

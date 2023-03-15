@@ -17,7 +17,7 @@ export class UserDTO {
   @ApiProperty()
   token: string;
 
-  static map(user: User, token: string) {
+  static map(user: User, token: string): UserDTO {
     const dto = new UserDTO();
     dto.username = user.name;
     dto.email = user.email;
