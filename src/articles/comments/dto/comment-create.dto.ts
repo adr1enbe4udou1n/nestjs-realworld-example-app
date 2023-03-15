@@ -7,9 +7,9 @@ export class NewCommentDTO {
   @IsNotEmpty()
   body: string;
 
-  static map(dto: NewCommentDTO): Comment {
+  public map() {
     const comment = new Comment();
-    comment.body = dto.body;
+    comment.body = this.body;
     return comment;
   }
 }

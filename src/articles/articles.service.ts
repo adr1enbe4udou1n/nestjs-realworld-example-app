@@ -101,7 +101,7 @@ export class ArticlesService {
       throw new BadRequestException('Article with same title already exist');
     }
 
-    const article = NewArticleDTO.map(dto);
+    const article = dto.map();
     article.author = currentUser;
 
     const existingTags = await this.tagRepository.find({
@@ -137,9 +137,7 @@ export class ArticlesService {
       );
     }
 
-    await this.articleRepository.persistAndFlush(
-      UpdateArticleDTO.map(dto, article),
-    );
+    await this.articleRepository.persistAndFlush(dto.map(article));
 
     return ArticleDTO.map(article, currentUser);
   }

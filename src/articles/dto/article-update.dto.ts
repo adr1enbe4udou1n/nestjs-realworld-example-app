@@ -18,10 +18,10 @@ export class UpdateArticleDTO {
   @IsNotEmpty()
   body?: string;
 
-  static map(dto: UpdateArticleDTO, article: Article): Article {
-    article.title = dto.title ?? article.title;
-    article.description = dto.description ?? article.description;
-    article.body = dto.body ?? article.body;
+  public map(article: Article) {
+    article.title = this.title ?? article.title;
+    article.description = this.description ?? article.description;
+    article.body = this.body ?? article.body;
     return article;
   }
 }

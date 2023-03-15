@@ -33,7 +33,7 @@ export class CommentsService {
   async create(slug: string, dto: NewCommentDTO, currentUser: User) {
     const article = await this.articleRepository.findOneOrFail({ slug });
 
-    const comment = NewCommentDTO.map(dto);
+    const comment = dto.map();
     comment.article = article;
     comment.author = currentUser;
 

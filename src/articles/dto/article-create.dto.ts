@@ -18,11 +18,11 @@ export class NewArticleDTO {
   @ApiPropertyOptional()
   tagList: string[] = [];
 
-  static map(dto: NewArticleDTO): Article {
+  public map() {
     const article = new Article();
-    article.title = dto.title;
-    article.description = dto.description;
-    article.body = dto.body;
+    article.title = this.title;
+    article.description = this.description;
+    article.body = this.body;
     return article;
   }
 }

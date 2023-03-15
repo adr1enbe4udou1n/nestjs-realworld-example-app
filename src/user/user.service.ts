@@ -22,7 +22,7 @@ export class UserService {
       throw new BadRequestException('This email is already used');
     }
 
-    await this.userRepository.persistAndFlush(UpdateUserDTO.map(dto, user));
+    await this.userRepository.persistAndFlush(dto.map(user));
     return user;
   }
 }
