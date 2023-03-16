@@ -18,7 +18,7 @@ export class NewUserDTO {
   @MinLength(8)
   public password: string;
 
-  static async map(dto: NewUserDTO): Promise<User> {
+  static async map(dto: NewUserDTO) {
     const user = new User();
     user.name = dto.username;
     user.email = dto.email;

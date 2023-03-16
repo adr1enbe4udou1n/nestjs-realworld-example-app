@@ -18,7 +18,7 @@ export class NewArticleDTO {
   @ApiPropertyOptional()
   tagList: string[] = [];
 
-  static map(dto: NewArticleDTO): Article {
+  static map(dto: NewArticleDTO) {
     const article = new Article();
     article.title = dto.title;
     article.description = dto.description;

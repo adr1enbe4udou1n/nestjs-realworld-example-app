@@ -18,7 +18,7 @@ export class UpdateArticleDTO {
   @IsNotEmpty()
   body?: string;
 
-  static map(dto: UpdateArticleDTO, article: Article): Article {
+  static map(dto: UpdateArticleDTO, article: Article) {
     article.title = dto.title ?? article.title;
     article.description = dto.description ?? article.description;
     article.body = dto.body ?? article.body;

@@ -17,7 +17,7 @@ export class UpdateUserDTO {
   @ApiPropertyOptional()
   image?: string;
 
-  static map(dto: UpdateUserDTO, user: User): User {
+  static map(dto: UpdateUserDTO, user: User) {
     user.name = dto.username ?? user.name;
     user.email = dto.email ?? user.email;
     user.bio = dto.bio ?? user.bio;
