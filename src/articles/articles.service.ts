@@ -6,6 +6,7 @@ import { ArticleDTO } from './dto/article.dto';
 import { ArticlesListQuery } from './queries/articles.query';
 import slugify from 'slugify';
 import { PrismaService } from '../prisma/prisma.service';
+import { User, Tag } from '@prisma/client';
 
 @Injectable()
 export class ArticlesService {
@@ -85,8 +86,10 @@ export class ArticlesService {
 
   async create(dto: NewArticleDTO, currentUser: User) {
     if (
-      (await this.articleRepository.count({
-        slug: slugify(dto.title, { lower: true }),
+      (await this.prisma.article.count({
+        where: {
+          slug: slugify(dto.title, { lower: true }),
+        },
       })) > 0
     ) {
       throw new BadRequestException('Article with same title already exist');
@@ -95,8 +98,8 @@ export class ArticlesService {
     const article = NewArticleDTO.map(dto);
     article.author = currentUser;
 
-    const existingTags = await this.tagRepository.find({
-      name: { $in: dto.tagList },
+    const existingTags = await this.prisma.tag.findMany({
+      where: { name: { in: dto.tagList } },
     });
 
     article.tags.add(
@@ -109,18 +112,20 @@ export class ArticlesService {
       }),
     );
 
-    await this.articleRepository.persistAndFlush(article);
+    await this.prisma.article.create(article);
 
     return ArticleDTO.map(article, currentUser);
   }
 
   async update(slug: string, dto: UpdateArticleDTO, currentUser: User) {
-    const article = await this.articleRepository.findOneOrFail(
-      { slug },
-      {
-        populate: ['author.followers', 'tags', 'favoredUsers'],
+    const article = await this.prisma.article.findFirstOrThrow({
+      where: { slug },
+      include: {
+        favoredUsers: true,
+        tags: true,
+        author: { include: { followers: true } },
       },
-    );
+    });
 
     if (article.author.id !== currentUser.id) {
       throw new BadRequestException(
@@ -128,20 +133,18 @@ export class ArticlesService {
       );
     }
 
-    await this.articleRepository.persistAndFlush(
-      UpdateArticleDTO.map(dto, article),
-    );
+    await this.prisma.article.update(UpdateArticleDTO.map(dto, article));
 
     return ArticleDTO.map(article, currentUser);
   }
 
   async delete(slug: string, currentUser: User) {
-    const article = await this.articleRepository.findOneOrFail(
-      { slug },
-      {
-        populate: ['comments'],
+    const article = await this.prisma.article.findFirstOrThrow({
+      where: { slug },
+      include: {
+        author: true,
       },
-    );
+    });
 
     if (article.author.id !== currentUser.id) {
       throw new BadRequestException(
@@ -149,32 +152,53 @@ export class ArticlesService {
       );
     }
 
-    await this.articleRepository.removeAndFlush(article);
+    await this.prisma.article.delete({
+      where: { slug },
+      include: {
+        comments: true,
+      },
+    });
   }
 
   async favorite(slug: string, favorite: boolean, currentUser: User) {
-    const article = await this.articleRepository.findOneOrFail(
-      { slug },
-      {
-        populate: ['tags', 'favoredUsers', 'author.followers'],
+    const article = await this.prisma.article.findFirstOrThrow({
+      where: { slug },
+      include: {
+        favoredUsers: true,
+        tags: true,
+        author: { include: { followers: true } },
       },
-    );
-
-    const favoredUser = article.favoredUsers
-      .getItems()
-      .find((u) => u.id === currentUser.id);
+    });
 
     if (favorite) {
-      if (!favoredUser) {
-        article.favoredUsers.add(currentUser);
-      }
+      await this.prisma.user.update({
+        where: { id: currentUser.id },
+        data: {
+          favoriteArticles: {
+            connect: {
+              articleId_userId: {
+                articleId: article.id,
+                userId: currentUser.id,
+              },
+            },
+          },
+        },
+      });
     } else {
-      if (favoredUser) {
-        article.favoredUsers.remove(favoredUser);
-      }
+      await this.prisma.user.update({
+        where: { id: currentUser.id },
+        data: {
+          favoriteArticles: {
+            disconnect: {
+              articleId_userId: {
+                articleId: article.id,
+                userId: currentUser.id,
+              },
+            },
+          },
+        },
+      });
     }
-
-    await this.articleRepository.flush();
 
     return ArticleDTO.map(article, currentUser);
   }

@@ -27,11 +27,13 @@ export class CommentsService {
       where: { slug },
     });
 
-    const comment = NewCommentDTO.map(dto);
-    comment.article = article;
-    comment.author = currentUser;
-
-    await this.prisma.comment.create(comment);
+    const comment = await this.prisma.comment.create({
+      data: {
+        body: dto.body,
+        articleId: article.id,
+        authorId: currentUser.id,
+      },
+    });
 
     return CommentDTO.map(comment, currentUser);
   }
