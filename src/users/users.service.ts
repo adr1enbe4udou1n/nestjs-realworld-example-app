@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { hash } from 'argon2';
 import { PrismaService } from '../prisma/prisma.service';
 import { NewUserDTO } from './dto/register.dto';
 
@@ -11,9 +12,12 @@ export class UsersService {
       throw new BadRequestException('This email is already used');
     }
 
-    const user = await NewUserDTO.map(dto);
-    await this.prisma.user.create(user);
-
-    return user;
+    return await this.prisma.user.create({
+      data: {
+        name: dto.username,
+        email: dto.email,
+        password: await hash(dto.password),
+      },
+    });
   }
 }

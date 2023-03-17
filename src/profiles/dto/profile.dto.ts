@@ -1,15 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '../../users/user.entity';
+import { User } from '@prisma/client';
 
 export class ProfileDTO {
   @ApiProperty()
   username: string;
 
   @ApiProperty()
-  bio?: string;
+  bio: string | null;
 
   @ApiProperty()
-  image?: string;
+  image: string | null;
 
   @ApiProperty()
   following: boolean;

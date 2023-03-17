@@ -22,7 +22,14 @@ export class UserService {
       throw new BadRequestException('This email is already used');
     }
 
-    await this.prisma.user.update(UpdateUserDTO.map(dto, user));
-    return user;
+    return await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name: dto.username ?? user.name,
+        email: dto.email ?? user.email,
+        bio: dto.bio ?? user.bio,
+        image: dto.image ?? user.image,
+      },
+    });
   }
 }
