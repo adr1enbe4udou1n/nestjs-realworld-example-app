@@ -24,6 +24,7 @@ Two databases will spin up, one for normal development and one dedicated for int
 
 ```sh
 pnpm i
+pnpm prisma generate # generate prisma client
 pnpm prisma migrate deploy # migrate database schema
 pnpm prisma db seed # migrate and fill db with fake data
 pnpm start:dev
