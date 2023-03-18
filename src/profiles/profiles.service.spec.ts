@@ -1,7 +1,4 @@
-import { MikroORM, NotFoundError } from '@mikro-orm/core';
-import { User } from '../users/user.entity';
 import {
-  act,
   actingAs,
   createUser,
   initializeDbTestBase,
@@ -10,9 +7,10 @@ import {
 import { ProfilesService } from './profiles.service';
 import { hash } from 'argon2';
 import { UserService } from '../user/user.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 describe('ProfilesService', () => {
-  let orm: MikroORM;
+  let prisma: PrismaService;
   let service: ProfilesService;
 
   beforeAll(async () => {
@@ -21,19 +19,19 @@ describe('ProfilesService', () => {
     });
 
     service = await module.resolve(ProfilesService);
-    orm = module.get(MikroORM);
+    prisma = module.get(PrismaService);
   });
 
   beforeEach(async () => {
-    await refreshDatabase(orm);
+    await refreshDatabase(prisma);
   });
 
   afterAll(async () => {
-    await orm.close();
+    await prisma.close();
   });
 
   it('can get profile', async () => {
-    await orm.em.getRepository(User).persistAndFlush(
+    await prisma.em.getRepository(User).persistAndFlush(
       new User({
         name: 'John Doe',
         email: 'john.doe@example.com',
@@ -43,7 +41,7 @@ describe('ProfilesService', () => {
       }),
     );
 
-    const data = await act(orm, () => service.get('John Doe'));
+    const data = await service.get('John Doe');
 
     expect(data).toMatchObject({
       username: 'John Doe',
@@ -54,13 +52,11 @@ describe('ProfilesService', () => {
   });
 
   it('cannot get non existent profile', async () => {
-    await expect(() => act(orm, () => service.get('John Doe'))).rejects.toThrow(
-      NotFoundError,
-    );
+    await expect(() => service.get('John Doe')).rejects.toThrow(NotFoundError);
   });
 
   it('can get followed profile', async () => {
-    const user = await actingAs(orm, {
+    const user = await actingAs(prisma, {
       name: 'John Doe',
       email: 'john.doe@example.com',
       bio: 'My Bio',
@@ -76,9 +72,9 @@ describe('ProfilesService', () => {
         image: 'https://i.pravatar.cc/300',
       }),
     );
-    await orm.em.flush();
+    await prisma.em.flush();
 
-    const data = await act(orm, () => service.get('Jane Doe', user));
+    const data = await service.get('Jane Doe', user);
 
     expect(data).toMatchObject({
       username: 'Jane Doe',
@@ -89,23 +85,22 @@ describe('ProfilesService', () => {
   });
 
   it('can follow profile', async () => {
-    const user = await actingAs(orm, {
+    const user = await actingAs(prisma, {
       name: 'John Doe',
       email: 'john.doe@example.com',
     });
 
-    await createUser(orm, {
+    await createUser(prisma, {
       name: 'Jane Doe',
       email: 'jane.doe@example.com',
     });
-    await createUser(orm, {
+    await createUser(prisma, {
       name: 'Alice',
       email: 'alice@example.com',
     });
 
-    await act(orm, () => service.follow('Jane Doe', true, user));
-    const data = await act(orm, () => service.follow('Jane Doe', true, user));
-
+    await service.follow('Jane Doe', true, user);
+    const data = await service.follow('Jane Doe', true, user);
     expect(data).toMatchObject({
       username: 'Jane Doe',
       following: true,
@@ -113,7 +108,7 @@ describe('ProfilesService', () => {
 
     expect(
       (
-        await orm.em
+        await prisma.em
           .getRepository(User)
           .findOne({ name: 'Jane Doe' }, { populate: ['followers'] })
       )?.followers.count(),
@@ -121,7 +116,7 @@ describe('ProfilesService', () => {
   });
 
   it('can unfollow profile', async () => {
-    const user = await actingAs(orm, {
+    const user = await actingAs(prisma, {
       name: 'John Doe',
       email: 'john.doe@example.com',
     });
@@ -138,10 +133,9 @@ describe('ProfilesService', () => {
         password: await hash('password'),
       }),
     );
-    await orm.em.flush();
+    await prisma.em.flush();
 
-    const data = await act(orm, () => service.follow('Jane Doe', false, user));
-
+    const data = await service.follow('Jane Doe', false, user);
     expect(data).toMatchObject({
       username: 'Jane Doe',
       following: false,
@@ -149,7 +143,7 @@ describe('ProfilesService', () => {
 
     expect(
       (
-        await orm.em
+        await prisma.em
           .getRepository(User)
           .findOne({ name: 'Alice' }, { populate: ['followers'] })
       )?.followers.count(),

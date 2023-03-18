@@ -1,12 +1,11 @@
-import { MikroORM } from '@mikro-orm/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { act, initializeDbTestBase, refreshDatabase } from '../db-test-base';
+import { initializeDbTestBase, refreshDatabase } from '../db-test-base';
+import { PrismaService } from '../prisma/prisma.service';
 import { NewUserDTO } from './dto/register.dto';
-import { User } from './user.entity';
 import { UsersService } from './users.service';
 
 describe('UsersService', () => {
-  let orm: MikroORM;
+  let prisma: PrismaService;
   let service: UsersService;
 
   beforeAll(async () => {
@@ -15,15 +14,11 @@ describe('UsersService', () => {
     });
 
     service = await module.resolve(UsersService);
-    orm = module.get(MikroORM);
+    prisma = module.get(PrismaService);
   });
 
   beforeEach(async () => {
-    await refreshDatabase(orm);
-  });
-
-  afterAll(async () => {
-    await orm.close();
+    await refreshDatabase(prisma);
   });
 
   it.each([
@@ -50,7 +45,7 @@ describe('UsersService', () => {
   });
 
   it('can register new users', async () => {
-    const user = await act<User>(orm, () =>
+    const user = await act<User>(prisma, () =>
       service.register({
         email: 'john.doe@example.com',
         username: 'John Doe',
@@ -63,7 +58,7 @@ describe('UsersService', () => {
       name: 'John Doe',
     });
 
-    const entity = await orm.em
+    const entity = await prisma.em
       .getRepository(User)
       .findOne({ email: 'john.doe@example.com' });
 
@@ -71,7 +66,7 @@ describe('UsersService', () => {
   });
 
   it('cannot register twice', async () => {
-    await orm.em.getRepository(User).persistAndFlush(
+    await prisma.em.getRepository(User).persistAndFlush(
       new User({
         email: 'john.doe@example.com',
         name: 'John Doe',
@@ -80,13 +75,11 @@ describe('UsersService', () => {
     );
 
     await expect(() =>
-      act(orm, () =>
-        service.register({
-          email: 'john.doe@example.com',
-          username: 'John Doe',
-          password: 'password',
-        }),
-      ),
+      service.register({
+        email: 'john.doe@example.com',
+        username: 'John Doe',
+        password: 'password',
+      }),
     ).rejects.toThrow(BadRequestException);
   });
 });
