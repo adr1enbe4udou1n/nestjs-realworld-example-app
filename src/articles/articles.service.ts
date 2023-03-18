@@ -72,7 +72,7 @@ export class ArticlesService {
   }
 
   async get(slug: string, currentUser: User | null = null) {
-    const article = await this.prisma.article.findFirstOrThrow({
+    const article = await this.prisma.article.findUniqueOrThrow({
       where: { slug },
       include: {
         favoredUsers: { include: { user: true } },
@@ -134,7 +134,7 @@ export class ArticlesService {
   }
 
   async update(slug: string, dto: UpdateArticleDTO, currentUser: User) {
-    const article = await this.prisma.article.findFirstOrThrow({
+    const article = await this.prisma.article.findUniqueOrThrow({
       where: { slug },
       include: {
         author: true,
@@ -165,7 +165,7 @@ export class ArticlesService {
   }
 
   async delete(slug: string, currentUser: User) {
-    const article = await this.prisma.article.findFirstOrThrow({
+    const article = await this.prisma.article.findUniqueOrThrow({
       where: { slug },
       include: {
         author: true,
@@ -184,7 +184,7 @@ export class ArticlesService {
   }
 
   async favorite(slug: string, favorite: boolean, currentUser: User) {
-    const article = await this.prisma.article.findFirstOrThrow({
+    const article = await this.prisma.article.findUniqueOrThrow({
       where: { slug },
     });
 

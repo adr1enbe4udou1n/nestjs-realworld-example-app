@@ -8,7 +8,7 @@ export class ProfilesService {
   constructor(private prisma: PrismaService) {}
 
   async get(username: string, currentUser: User | null = null) {
-    const user = await this.prisma.user.findFirstOrThrow({
+    const user = await this.prisma.user.findUniqueOrThrow({
       where: { name: username },
       include: { followers: true },
     });
@@ -16,7 +16,7 @@ export class ProfilesService {
   }
 
   async follow(username: string, follow: boolean, currentUser: User) {
-    const user = await this.prisma.user.findFirstOrThrow({
+    const user = await this.prisma.user.findUniqueOrThrow({
       where: { name: username },
     });
 

@@ -9,7 +9,7 @@ export class CommentsService {
   constructor(private prisma: PrismaService) {}
 
   async list(slug: string, currentUser: User | null = null) {
-    const article = await this.prisma.article.findFirstOrThrow({
+    const article = await this.prisma.article.findUniqueOrThrow({
       where: { slug },
     });
 
@@ -23,7 +23,7 @@ export class CommentsService {
   }
 
   async create(slug: string, dto: NewCommentDTO, currentUser: User) {
-    const article = await this.prisma.article.findFirstOrThrow({
+    const article = await this.prisma.article.findUniqueOrThrow({
       where: { slug },
     });
 
@@ -40,16 +40,19 @@ export class CommentsService {
   }
 
   async delete(slug: string, commentId: number, currentUser: User) {
-    const article = await this.prisma.article.findFirstOrThrow({
+    const article = await this.prisma.article.findUniqueOrThrow({
       where: { slug },
     });
 
-    const comment = await this.prisma.comment.findFirstOrThrow({
+    const comment = await this.prisma.comment.findUniqueOrThrow({
       where: {
         id: commentId,
-        article,
       },
     });
+
+    if (article.id !== comment.articleId) {
+      throw new BadRequestException('Comment not found');
+    }
 
     if (
       article.authorId !== currentUser.id &&
