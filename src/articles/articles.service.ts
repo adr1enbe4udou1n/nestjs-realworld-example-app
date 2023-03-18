@@ -1,24 +1,16 @@
-import { EntityRepository } from '@mikro-orm/postgresql';
-import { InjectRepository } from '@mikro-orm/nestjs';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PagedQuery } from '../pagination';
-import { Article } from './article.entity';
 import { NewArticleDTO } from './dto/article-create.dto';
 import { UpdateArticleDTO } from './dto/article-update.dto';
 import { ArticleDTO } from './dto/article.dto';
 import { ArticlesListQuery } from './queries/articles.query';
-import { Tag } from '../tags/tag.entity';
 import slugify from 'slugify';
-import { User } from '../users/user.entity';
+import { PrismaService } from '../prisma/prisma.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class ArticlesService {
-  constructor(
-    @InjectRepository(Article)
-    private readonly articleRepository: EntityRepository<Article>,
-    @InjectRepository(Tag)
-    private readonly tagRepository: EntityRepository<Tag>,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   limit(query: PagedQuery) {
     const max = 20;
@@ -26,110 +18,128 @@ export class ArticlesService {
   }
 
   async list(query: ArticlesListQuery, currentUser: User | null = null) {
-    const subQb = this.articleRepository
-      .createQueryBuilder('a')
-      .select('a.id')
-      .where({
-        ...(query.author && {
-          author: { name: { $like: `%${query.author}%` } },
-        }),
-        ...(query.tag && {
-          tags: { name: query.tag },
-        }),
-        ...(query.favorited && {
-          favoredUsers: { name: { $like: `%${query.favorited}%` } },
-        }),
-      });
+    const where = {
+      ...(query.author && {
+        author: { name: { contains: query.author } },
+      }),
+      ...(query.tag && {
+        tags: { some: { tag: { name: query.tag } } },
+      }),
+      ...(query.favorited && {
+        favoredUsers: { some: { user: { name: query.favorited } } },
+      }),
+    };
 
-    const qb = this.articleRepository.createQueryBuilder('a').where({
-      id: { $in: subQb.getKnexQuery() },
-    });
-
-    const [{ count }, items] = await Promise.all([
-      qb.clone().count('a.id', true).execute('get'),
-      qb
-        .clone()
-        .select('*')
-        .orderBy({ id: 'DESC' })
-        .limit(this.limit(query))
-        .offset(query.offset)
-        .getResult(),
-    ]);
-
-    await this.articleRepository.populate(items, [
-      'author.followers',
-      'tags',
-      'favoredUsers',
+    const [items, count] = await this.prisma.$transaction([
+      this.prisma.article.findMany({
+        where,
+        orderBy: { id: 'desc' },
+        take: this.limit(query),
+        skip: query.offset,
+        include: {
+          favoredUsers: { include: { user: true } },
+          tags: { include: { tag: true } },
+          author: { include: { following: true } },
+        },
+      }),
+      this.prisma.article.count({ where }),
     ]);
 
     return [items.map((a) => ArticleDTO.map(a, currentUser)), +count] as const;
   }
 
   async feed(query: PagedQuery, currentUser: User) {
-    const [items, count] = await this.articleRepository.findAndCount(
-      {
-        author: { followers: { id: currentUser.id } },
-      },
-      {
-        populate: ['author.followers', 'tags', 'favoredUsers'],
-        orderBy: { id: 'DESC' },
-        limit: this.limit(query),
-        offset: query.offset,
-      },
-    );
+    const where = {
+      author: { following: { some: { followerId: currentUser.id } } },
+    };
+
+    const [items, count] = await this.prisma.$transaction([
+      this.prisma.article.findMany({
+        where,
+        orderBy: { id: 'desc' },
+        take: this.limit(query),
+        skip: query.offset,
+        include: {
+          favoredUsers: { include: { user: true } },
+          tags: { include: { tag: true } },
+          author: { include: { following: true } },
+        },
+      }),
+      this.prisma.article.count({ where }),
+    ]);
 
     return [items.map((a) => ArticleDTO.map(a, currentUser)), +count] as const;
   }
 
   async get(slug: string, currentUser: User | null = null) {
-    const article = await this.articleRepository.findOneOrFail(
-      { slug },
-      {
-        populate: ['author.followers', 'tags', 'favoredUsers'],
+    const article = await this.prisma.article.findUniqueOrThrow({
+      where: { slug },
+      include: {
+        favoredUsers: { include: { user: true } },
+        tags: { include: { tag: true } },
+        author: { include: { following: true } },
       },
-    );
+    });
 
     return ArticleDTO.map(article, currentUser);
   }
 
   async create(dto: NewArticleDTO, currentUser: User) {
     if (
-      (await this.articleRepository.count({
-        slug: slugify(dto.title, { lower: true }),
+      (await this.prisma.article.count({
+        where: {
+          slug: slugify(dto.title, { lower: true }),
+        },
       })) > 0
     ) {
       throw new BadRequestException('Article with same title already exist');
     }
 
-    const article = NewArticleDTO.map(dto);
-    article.author = currentUser;
-
-    const existingTags = await this.tagRepository.find({
-      name: { $in: dto.tagList },
+    const createdArticle = await this.prisma.article.create({
+      data: {
+        title: dto.title,
+        slug: slugify(dto.title, { lower: true }),
+        description: dto.description,
+        body: dto.body,
+        authorId: currentUser.id,
+      },
     });
 
-    article.tags.add(
-      dto.tagList.map((name) => {
-        const tag = existingTags.find((t) => t.name === name);
+    await this.prisma.tag.createMany({
+      skipDuplicates: true,
+      data: dto.tagList.map((name) => ({ name })),
+    });
 
-        if (tag) return tag;
+    const allTags = await this.prisma.tag.findMany({
+      where: { name: { in: dto.tagList } },
+    });
 
-        return new Tag({ name });
-      }),
-    );
+    const updatedArticle = await this.prisma.article.update({
+      where: { id: createdArticle.id },
+      data: {
+        tags: {
+          createMany: {
+            data: allTags.map((tag) => ({ tagId: tag.id })),
+          },
+        },
+      },
+      include: {
+        favoredUsers: { include: { user: true } },
+        tags: { include: { tag: true } },
+        author: { include: { following: true } },
+      },
+    });
 
-    await this.articleRepository.persistAndFlush(article);
-
-    return ArticleDTO.map(article, currentUser);
+    return ArticleDTO.map(updatedArticle, currentUser);
   }
 
   async update(slug: string, dto: UpdateArticleDTO, currentUser: User) {
-    const article = await this.articleRepository.findOneOrFail(
-      { slug },
-      {
-        populate: ['author.followers', 'tags', 'favoredUsers'],
+    const article = await this.prisma.article.findUniqueOrThrow({
+      where: { slug },
+      include: {
+        author: true,
       },
-    );
+    });
 
     if (article.author.id !== currentUser.id) {
       throw new BadRequestException(
@@ -137,20 +147,30 @@ export class ArticlesService {
       );
     }
 
-    await this.articleRepository.persistAndFlush(
-      UpdateArticleDTO.map(dto, article),
-    );
+    const updatedArticle = await this.prisma.article.update({
+      where: { slug },
+      include: {
+        favoredUsers: { include: { user: true } },
+        tags: { include: { tag: true } },
+        author: { include: { following: true } },
+      },
+      data: {
+        title: dto.title ?? article.title,
+        description: dto.description ?? article.description,
+        body: dto.body ?? article.body,
+      },
+    });
 
-    return ArticleDTO.map(article, currentUser);
+    return ArticleDTO.map(updatedArticle, currentUser);
   }
 
   async delete(slug: string, currentUser: User) {
-    const article = await this.articleRepository.findOneOrFail(
-      { slug },
-      {
-        populate: ['comments'],
+    const article = await this.prisma.article.findUniqueOrThrow({
+      where: { slug },
+      include: {
+        author: true,
       },
-    );
+    });
 
     if (article.author.id !== currentUser.id) {
       throw new BadRequestException(
@@ -158,33 +178,51 @@ export class ArticlesService {
       );
     }
 
-    await this.articleRepository.removeAndFlush(article);
+    await this.prisma.article.delete({
+      where: { slug },
+    });
   }
 
   async favorite(slug: string, favorite: boolean, currentUser: User) {
-    const article = await this.articleRepository.findOneOrFail(
-      { slug },
-      {
-        populate: ['tags', 'favoredUsers', 'author.followers'],
-      },
-    );
+    const article = await this.prisma.article.findUniqueOrThrow({
+      where: { slug },
+    });
 
-    const favoredUser = article.favoredUsers
-      .getItems()
-      .find((u) => u.id === currentUser.id);
+    const updatedArticle = favorite
+      ? await this.prisma.article.update({
+          where: { slug },
+          data: {
+            favoredUsers: {
+              create: {
+                userId: currentUser.id,
+              },
+            },
+          },
+          include: {
+            favoredUsers: { include: { user: true } },
+            tags: { include: { tag: true } },
+            author: { include: { following: true } },
+          },
+        })
+      : await this.prisma.article.update({
+          where: { slug },
+          data: {
+            favoredUsers: {
+              delete: {
+                articleId_userId: {
+                  articleId: article.id,
+                  userId: currentUser.id,
+                },
+              },
+            },
+          },
+          include: {
+            favoredUsers: { include: { user: true } },
+            tags: { include: { tag: true } },
+            author: { include: { following: true } },
+          },
+        });
 
-    if (favorite) {
-      if (!favoredUser) {
-        article.favoredUsers.add(currentUser);
-      }
-    } else {
-      if (favoredUser) {
-        article.favoredUsers.remove(favoredUser);
-      }
-    }
-
-    await this.articleRepository.flush();
-
-    return ArticleDTO.map(article, currentUser);
+    return ArticleDTO.map(updatedArticle, currentUser);
   }
 }

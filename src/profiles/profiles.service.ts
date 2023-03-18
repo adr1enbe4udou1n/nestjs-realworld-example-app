@@ -1,50 +1,52 @@
-import { EntityRepository } from '@mikro-orm/postgresql';
-import { InjectRepository } from '@mikro-orm/nestjs';
-import { User } from '../users/user.entity';
 import { ProfileDTO } from './dto/profile.dto';
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class ProfilesService {
-  constructor(
-    @InjectRepository(User)
-    private readonly userRepository: EntityRepository<User>,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async get(username: string, currentUser: User | null = null) {
-    const user = await this.userRepository.findOneOrFail(
-      { name: username },
-      {
-        populate: ['followers'],
-      },
-    );
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { name: username },
+      include: { following: true },
+    });
     return ProfileDTO.map(user, currentUser);
   }
 
   async follow(username: string, follow: boolean, currentUser: User) {
-    const user = await this.userRepository.findOneOrFail(
-      { name: username },
-      {
-        populate: ['followers'],
-      },
-    );
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { name: username },
+    });
 
-    const followedUser = user.followers
-      .getItems()
-      .find((u) => u.id === currentUser.id);
+    const updatedUser = follow
+      ? await this.prisma.user.update({
+          where: { id: user.id },
+          data: {
+            following: {
+              create: {
+                followerId: currentUser.id,
+              },
+            },
+          },
+          include: { following: true },
+        })
+      : await this.prisma.user.update({
+          where: { id: user.id },
+          data: {
+            following: {
+              delete: {
+                followerId_followingId: {
+                  followerId: currentUser.id,
+                  followingId: user.id,
+                },
+              },
+            },
+          },
+          include: { following: true },
+        });
 
-    if (follow) {
-      if (!followedUser) {
-        user.followers.add(currentUser);
-      }
-    } else {
-      if (followedUser) {
-        user.followers.remove(followedUser);
-      }
-    }
-
-    await this.userRepository.flush();
-
-    return ProfileDTO.map(user, currentUser);
+    return ProfileDTO.map(updatedUser, currentUser);
   }
 }

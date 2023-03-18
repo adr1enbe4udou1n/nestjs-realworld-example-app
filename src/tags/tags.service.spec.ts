@@ -1,10 +1,9 @@
-import { MikroORM } from '@mikro-orm/core';
-import { act, initializeDbTestBase, refreshDatabase } from '../db-test-base';
-import { Tag } from './tag.entity';
+import { initializeDbTestBase, refreshDatabase } from '../db-test-base';
+import { PrismaService } from '../prisma/prisma.service';
 import { TagsService } from './tags.service';
 
 describe('TagsService', () => {
-  let orm: MikroORM;
+  let prisma: PrismaService;
   let service: TagsService;
 
   beforeAll(async () => {
@@ -12,32 +11,19 @@ describe('TagsService', () => {
       providers: [TagsService],
     });
 
-    orm = module.get(MikroORM);
+    prisma = module.get(PrismaService);
     service = await module.resolve(TagsService);
   });
 
   beforeEach(async () => {
-    await refreshDatabase(orm);
-  });
-
-  afterAll(async () => {
-    await orm.close();
+    await refreshDatabase(prisma);
   });
 
   it('can list all tags', async () => {
-    await orm.em
-      .fork()
-      .getRepository(Tag)
-      .persistAndFlush([
-        new Tag({ name: 'Tag3' }),
-        new Tag({ name: 'Tag2' }),
-        new Tag({ name: 'Tag1' }),
-      ]);
+    await prisma.tag.createMany({
+      data: [{ name: 'Tag3' }, { name: 'Tag2' }, { name: 'Tag1' }],
+    });
 
-    expect(await act(orm, () => service.list())).toEqual([
-      'Tag1',
-      'Tag2',
-      'Tag3',
-    ]);
+    expect(await service.list()).toEqual(['Tag1', 'Tag2', 'Tag3']);
   });
 });

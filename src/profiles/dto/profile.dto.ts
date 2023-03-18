@@ -1,27 +1,32 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '../../users/user.entity';
+import { FollowerUser, User } from '@prisma/client';
 
 export class ProfileDTO {
   @ApiProperty()
   username: string;
 
   @ApiProperty()
-  bio?: string;
+  bio: string | null;
 
   @ApiProperty()
-  image?: string;
+  image: string | null;
 
   @ApiProperty()
   following: boolean;
 
-  static map(user: User, currentUser: User | null) {
+  static map(
+    user: User & {
+      following: FollowerUser[];
+    },
+    currentUser: User | null,
+  ) {
     const dto = new ProfileDTO();
     dto.username = user.name;
     dto.bio = user.bio;
     dto.image = user.image;
-    dto.following = user.followers
-      .toArray()
-      .some((u) => u.id === currentUser?.id);
+    dto.following = user.following.some(
+      (follower) => follower.followerId === currentUser?.id,
+    );
     return dto;
   }
 }

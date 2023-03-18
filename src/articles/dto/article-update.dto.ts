@@ -1,6 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, ValidateIf } from 'class-validator';
-import { Article } from '../article.entity';
 
 export class UpdateArticleDTO {
   @ApiPropertyOptional()
@@ -17,13 +16,6 @@ export class UpdateArticleDTO {
   @ValidateIf((a) => a.body !== null)
   @IsNotEmpty()
   body?: string;
-
-  static map(dto: UpdateArticleDTO, article: Article) {
-    article.title = dto.title ?? article.title;
-    article.description = dto.description ?? article.description;
-    article.body = dto.body ?? article.body;
-    return article;
-  }
 }
 
 export class UpdateArticleRequest {

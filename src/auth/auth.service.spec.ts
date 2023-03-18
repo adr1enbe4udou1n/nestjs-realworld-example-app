@@ -1,19 +1,16 @@
-import { MikroORM } from '@mikro-orm/core';
 import { JwtService } from '@nestjs/jwt';
 import {
   initializeDbTestBase,
   actingAs,
-  act,
   refreshDatabase,
 } from '../db-test-base';
 import { AuthService } from './auth.service';
-import { UserDTO } from '../user/dto/current-user.dto';
-import { User } from '../users/user.entity';
 import { hash } from 'argon2';
+import { PrismaService } from '../prisma/prisma.service';
 
 describe('UsersService', () => {
   let service: AuthService;
-  let orm: MikroORM;
+  let prisma: PrismaService;
   let jwt: JwtService;
 
   beforeAll(async () => {
@@ -22,16 +19,12 @@ describe('UsersService', () => {
     });
 
     service = await module.resolve(AuthService);
-    orm = module.get(MikroORM);
+    prisma = module.get(PrismaService);
     jwt = module.get(JwtService);
   });
 
   beforeEach(async () => {
-    await refreshDatabase(orm);
-  });
-
-  afterAll(async () => {
-    await orm.close();
+    await refreshDatabase(prisma);
   });
 
   it.each([
@@ -44,34 +37,28 @@ describe('UsersService', () => {
       password: 'badpassword',
     },
   ])('cannot login with invalid data', async (data) => {
-    await orm.em.getRepository(User).persistAndFlush(
-      new User({
+    await prisma.user.create({
+      data: {
         email: 'john.doe@example.com',
         name: 'John Doe',
         password: await hash('password'),
-      }),
-    );
+      },
+    });
 
-    const user = await act(orm, () =>
-      service.validateUser(data.email, data.password),
-    );
-
+    const user = await service.validateUser(data.email, data.password);
     expect(user).toBeNull();
   });
 
   it('can login', async () => {
-    await orm.em.getRepository(User).persistAndFlush(
-      new User({
+    await prisma.user.create({
+      data: {
         email: 'john.doe@example.com',
         name: 'John Doe',
         password: await hash('password'),
-      }),
-    );
+      },
+    });
 
-    const user = await act(orm, () =>
-      service.validateUser('john.doe@example.com', 'password'),
-    );
-
+    const user = await service.validateUser('john.doe@example.com', 'password');
     expect(user).toMatchObject({
       email: 'john.doe@example.com',
       name: 'John Doe',
@@ -81,12 +68,9 @@ describe('UsersService', () => {
   });
 
   it('can fetch user infos', async () => {
-    const currentUser = await actingAs(orm);
+    const currentUser = await actingAs(prisma);
 
-    const user = await act<UserDTO>(orm, () =>
-      service.getUserWithToken(currentUser),
-    );
-
+    const user = await service.getUserWithToken(currentUser);
     expect(user).toMatchObject({
       email: 'john.doe@example.com',
       username: 'John Doe',

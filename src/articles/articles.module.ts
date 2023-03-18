@@ -3,14 +3,10 @@ import { ArticlesController } from './articles.controller';
 import { CommentsController } from './comments/comments.controller';
 import { ArticlesService } from './articles.service';
 import { CommentsService } from './comments/comments.service';
-import { Article } from './article.entity';
-import { Comment } from './comments/comment.entity';
-import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { User } from '../users/user.entity';
-import { Tag } from '../tags/tag.entity';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([Article, Tag, Comment, User])],
+  imports: [PrismaModule],
   controllers: [ArticlesController, CommentsController],
   providers: [ArticlesService, CommentsService],
 })

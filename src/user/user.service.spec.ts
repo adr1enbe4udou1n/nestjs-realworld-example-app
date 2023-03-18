@@ -1,19 +1,17 @@
-import { MikroORM } from '@mikro-orm/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { User } from '../users/user.entity';
 import {
   initializeDbTestBase,
   actingAs,
   createUser,
-  act,
   refreshDatabase,
 } from '../db-test-base';
 import { UserService } from './user.service';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 describe('UsersService', () => {
   let service: UserService;
-  let orm: MikroORM;
+  let prisma: PrismaService;
 
   beforeAll(async () => {
     const module = await initializeDbTestBase({
@@ -21,15 +19,11 @@ describe('UsersService', () => {
     });
 
     service = await module.resolve(UserService);
-    orm = module.get(MikroORM);
+    prisma = module.get(PrismaService);
   });
 
   beforeEach(async () => {
-    await refreshDatabase(orm);
-  });
-
-  afterAll(async () => {
-    await orm.close();
+    await refreshDatabase(prisma);
   });
 
   it.each([
@@ -53,46 +47,43 @@ describe('UsersService', () => {
   });
 
   it('can update infos', async () => {
-    const currentUser = await actingAs(orm);
+    const currentUser = await actingAs(prisma);
 
-    const user = await act(orm, () =>
-      service.update(
-        {
-          email: 'jane.doe@example.com',
-          bio: 'My Bio',
-        },
-        currentUser,
-      ),
+    const user = await service.update(
+      {
+        email: 'jane.doe@example.com',
+        bio: 'My Bio',
+      },
+      currentUser,
     );
-
     expect(user).toMatchObject({
       email: 'jane.doe@example.com',
       name: 'John Doe',
       bio: 'My Bio',
     });
 
-    const entity = await orm.em
-      .getRepository(User)
-      .findOne({ email: 'jane.doe@example.com' });
+    const entity = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+    });
 
     expect(entity).not.toBeNull();
   });
 
   it('cannot update with already used email', async () => {
-    await createUser(orm, {
+    await createUser(prisma, {
       name: 'Jane Doe',
       email: 'jane.doe@example.com',
     });
-    const currentUser = await actingAs(orm);
+    const currentUser = await actingAs(prisma);
 
     await expect(() =>
-      act(orm, () =>
-        service.update(
-          {
-            email: 'jane.doe@example.com',
-          },
-          currentUser,
-        ),
+      service.update(
+        {
+          email: 'jane.doe@example.com',
+        },
+        currentUser,
       ),
     ).rejects.toThrow(BadRequestException);
   });

@@ -1,11 +1,10 @@
-import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Module } from '@nestjs/common';
-import { User } from '../users/user.entity';
+import { PrismaModule } from '../prisma/prisma.module';
 import { ProfilesController } from './profiles.controller';
 import { ProfilesService } from './profiles.service';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([User])],
+  imports: [PrismaModule],
   controllers: [ProfilesController],
   providers: [ProfilesService],
 })

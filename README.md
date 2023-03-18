@@ -24,8 +24,8 @@ Two databases will spin up, one for normal development and one dedicated for int
 
 ```sh
 pnpm i
-pnpm mikro-orm migration:up # migrate database schema
-pnpm mikro-orm seeder:run # migrate and fill db with fake data
+pnpm prisma migrate deploy # migrate database schema
+pnpm prisma db seed # migrate and fill db with fake data
 pnpm start:dev
 ```
 

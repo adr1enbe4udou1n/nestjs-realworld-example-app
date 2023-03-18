@@ -1,24 +1,23 @@
-import { EntityRepository } from '@mikro-orm/postgresql';
-import { InjectRepository } from '@mikro-orm/nestjs';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { hash } from 'argon2';
+import { PrismaService } from '../prisma/prisma.service';
 import { NewUserDTO } from './dto/register.dto';
-import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User)
-    private readonly userRepository: EntityRepository<User>,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   public async register(dto: NewUserDTO) {
-    if ((await this.userRepository.count({ email: dto.email })) > 0) {
+    if ((await this.prisma.user.count({ where: { email: dto.email } })) > 0) {
       throw new BadRequestException('This email is already used');
     }
 
-    const user = await NewUserDTO.map(dto);
-    await this.userRepository.persistAndFlush(user);
-
-    return user;
+    return await this.prisma.user.create({
+      data: {
+        name: dto.username,
+        email: dto.email,
+        password: await hash(dto.password),
+      },
+    });
   }
 }

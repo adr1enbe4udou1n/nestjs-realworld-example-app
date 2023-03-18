@@ -1,17 +1,12 @@
-import { EntityRepository } from '@mikro-orm/postgresql';
-import { InjectRepository } from '@mikro-orm/nestjs';
-import { Tag } from './tag.entity';
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TagsService {
-  constructor(
-    @InjectRepository(Tag)
-    private readonly tagRepository: EntityRepository<Tag>,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async list() {
-    return (await this.tagRepository.findAll({ orderBy: { name: 'ASC' } })).map(
+    return (await this.prisma.tag.findMany({ orderBy: { name: 'asc' } })).map(
       (t) => t.name,
     );
   }

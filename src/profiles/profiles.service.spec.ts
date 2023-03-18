@@ -1,7 +1,4 @@
-import { MikroORM, NotFoundError } from '@mikro-orm/core';
-import { User } from '../users/user.entity';
 import {
-  act,
   actingAs,
   createUser,
   initializeDbTestBase,
@@ -10,9 +7,11 @@ import {
 import { ProfilesService } from './profiles.service';
 import { hash } from 'argon2';
 import { UserService } from '../user/user.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 describe('ProfilesService', () => {
-  let orm: MikroORM;
+  let prisma: PrismaService;
   let service: ProfilesService;
 
   beforeAll(async () => {
@@ -21,29 +20,25 @@ describe('ProfilesService', () => {
     });
 
     service = await module.resolve(ProfilesService);
-    orm = module.get(MikroORM);
+    prisma = module.get(PrismaService);
   });
 
   beforeEach(async () => {
-    await refreshDatabase(orm);
-  });
-
-  afterAll(async () => {
-    await orm.close();
+    await refreshDatabase(prisma);
   });
 
   it('can get profile', async () => {
-    await orm.em.getRepository(User).persistAndFlush(
-      new User({
+    await prisma.user.create({
+      data: {
         name: 'John Doe',
         email: 'john.doe@example.com',
         password: await hash('password'),
         bio: 'My Bio',
         image: 'https://i.pravatar.cc/300',
-      }),
-    );
+      },
+    });
 
-    const data = await act(orm, () => service.get('John Doe'));
+    const data = await service.get('John Doe');
 
     expect(data).toMatchObject({
       username: 'John Doe',
@@ -54,31 +49,39 @@ describe('ProfilesService', () => {
   });
 
   it('cannot get non existent profile', async () => {
-    await expect(() => act(orm, () => service.get('John Doe'))).rejects.toThrow(
-      NotFoundError,
+    await expect(() => service.get('John Doe')).rejects.toThrow(
+      Prisma.PrismaClientKnownRequestError,
     );
   });
 
   it('can get followed profile', async () => {
-    const user = await actingAs(orm, {
+    const user = await actingAs(prisma, {
       name: 'John Doe',
       email: 'john.doe@example.com',
       bio: 'My Bio',
       image: 'https://i.pravatar.cc/300',
     });
 
-    user.following.add(
-      new User({
-        name: 'Jane Doe',
-        email: 'jane.doe@example.com',
-        password: await hash('password'),
-        bio: 'My Bio',
-        image: 'https://i.pravatar.cc/300',
-      }),
-    );
-    await orm.em.flush();
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        followers: {
+          create: {
+            following: {
+              create: {
+                name: 'Jane Doe',
+                email: 'jane.doe@example.com',
+                password: await hash('password'),
+                bio: 'My Bio',
+                image: 'https://i.pravatar.cc/300',
+              },
+            },
+          },
+        },
+      },
+    });
 
-    const data = await act(orm, () => service.get('Jane Doe', user));
+    const data = await service.get('Jane Doe', user);
 
     expect(data).toMatchObject({
       username: 'Jane Doe',
@@ -89,23 +92,21 @@ describe('ProfilesService', () => {
   });
 
   it('can follow profile', async () => {
-    const user = await actingAs(orm, {
+    const user = await actingAs(prisma, {
       name: 'John Doe',
       email: 'john.doe@example.com',
     });
 
-    await createUser(orm, {
+    await createUser(prisma, {
       name: 'Jane Doe',
       email: 'jane.doe@example.com',
     });
-    await createUser(orm, {
+    await createUser(prisma, {
       name: 'Alice',
       email: 'alice@example.com',
     });
 
-    await act(orm, () => service.follow('Jane Doe', true, user));
-    const data = await act(orm, () => service.follow('Jane Doe', true, user));
-
+    const data = await service.follow('Jane Doe', true, user);
     expect(data).toMatchObject({
       username: 'Jane Doe',
       following: true,
@@ -113,35 +114,49 @@ describe('ProfilesService', () => {
 
     expect(
       (
-        await orm.em
-          .getRepository(User)
-          .findOne({ name: 'Jane Doe' }, { populate: ['followers'] })
-      )?.followers.count(),
+        await prisma.user.findUnique({
+          where: { name: 'Jane Doe' },
+          include: { following: true },
+        })
+      )?.following.length,
     ).toBe(1);
   });
 
   it('can unfollow profile', async () => {
-    const user = await actingAs(orm, {
+    const user = await actingAs(prisma, {
       name: 'John Doe',
       email: 'john.doe@example.com',
     });
 
-    user.following.add(
-      new User({
-        name: 'Jane Doe',
-        email: 'jane.doe@example.com',
-        password: await hash('password'),
-      }),
-      new User({
-        name: 'Alice',
-        email: 'alice@example.com',
-        password: await hash('password'),
-      }),
-    );
-    await orm.em.flush();
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        followers: {
+          create: [
+            {
+              following: {
+                create: {
+                  name: 'Jane Doe',
+                  email: 'jane.doe@example.com',
+                  password: await hash('password'),
+                },
+              },
+            },
+            {
+              following: {
+                create: {
+                  name: 'Alice',
+                  email: 'alice@example.com',
+                  password: await hash('password'),
+                },
+              },
+            },
+          ],
+        },
+      },
+    });
 
-    const data = await act(orm, () => service.follow('Jane Doe', false, user));
-
+    const data = await service.follow('Jane Doe', false, user);
     expect(data).toMatchObject({
       username: 'Jane Doe',
       following: false,
@@ -149,10 +164,11 @@ describe('ProfilesService', () => {
 
     expect(
       (
-        await orm.em
-          .getRepository(User)
-          .findOne({ name: 'Alice' }, { populate: ['followers'] })
-      )?.followers.count(),
+        await prisma.user.findUnique({
+          where: { name: 'Alice' },
+          include: { following: true },
+        })
+      )?.following.length,
     ).toBe(1);
   });
 });
