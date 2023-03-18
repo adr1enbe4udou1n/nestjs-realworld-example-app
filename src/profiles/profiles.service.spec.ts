@@ -8,6 +8,7 @@ import { ProfilesService } from './profiles.service';
 import { hash } from 'argon2';
 import { UserService } from '../user/user.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 describe('ProfilesService', () => {
   let prisma: PrismaService;
@@ -26,20 +27,16 @@ describe('ProfilesService', () => {
     await refreshDatabase(prisma);
   });
 
-  afterAll(async () => {
-    await prisma.close();
-  });
-
   it('can get profile', async () => {
-    await prisma.em.getRepository(User).persistAndFlush(
-      new User({
+    await prisma.user.create({
+      data: {
         name: 'John Doe',
         email: 'john.doe@example.com',
         password: await hash('password'),
         bio: 'My Bio',
         image: 'https://i.pravatar.cc/300',
-      }),
-    );
+      },
+    });
 
     const data = await service.get('John Doe');
 
@@ -52,7 +49,9 @@ describe('ProfilesService', () => {
   });
 
   it('cannot get non existent profile', async () => {
-    await expect(() => service.get('John Doe')).rejects.toThrow(NotFoundError);
+    await expect(() => service.get('John Doe')).rejects.toThrow(
+      Prisma.PrismaClientKnownRequestError,
+    );
   });
 
   it('can get followed profile', async () => {
@@ -63,16 +62,24 @@ describe('ProfilesService', () => {
       image: 'https://i.pravatar.cc/300',
     });
 
-    user.following.add(
-      new User({
-        name: 'Jane Doe',
-        email: 'jane.doe@example.com',
-        password: await hash('password'),
-        bio: 'My Bio',
-        image: 'https://i.pravatar.cc/300',
-      }),
-    );
-    await prisma.em.flush();
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        followers: {
+          create: {
+            following: {
+              create: {
+                name: 'Jane Doe',
+                email: 'jane.doe@example.com',
+                password: await hash('password'),
+                bio: 'My Bio',
+                image: 'https://i.pravatar.cc/300',
+              },
+            },
+          },
+        },
+      },
+    });
 
     const data = await service.get('Jane Doe', user);
 
@@ -99,7 +106,6 @@ describe('ProfilesService', () => {
       email: 'alice@example.com',
     });
 
-    await service.follow('Jane Doe', true, user);
     const data = await service.follow('Jane Doe', true, user);
     expect(data).toMatchObject({
       username: 'Jane Doe',
@@ -108,10 +114,11 @@ describe('ProfilesService', () => {
 
     expect(
       (
-        await prisma.em
-          .getRepository(User)
-          .findOne({ name: 'Jane Doe' }, { populate: ['followers'] })
-      )?.followers.count(),
+        await prisma.user.findUnique({
+          where: { name: 'Jane Doe' },
+          include: { following: true },
+        })
+      )?.following.length,
     ).toBe(1);
   });
 
@@ -121,19 +128,33 @@ describe('ProfilesService', () => {
       email: 'john.doe@example.com',
     });
 
-    user.following.add(
-      new User({
-        name: 'Jane Doe',
-        email: 'jane.doe@example.com',
-        password: await hash('password'),
-      }),
-      new User({
-        name: 'Alice',
-        email: 'alice@example.com',
-        password: await hash('password'),
-      }),
-    );
-    await prisma.em.flush();
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        followers: {
+          create: [
+            {
+              following: {
+                create: {
+                  name: 'Jane Doe',
+                  email: 'jane.doe@example.com',
+                  password: await hash('password'),
+                },
+              },
+            },
+            {
+              following: {
+                create: {
+                  name: 'Alice',
+                  email: 'alice@example.com',
+                  password: await hash('password'),
+                },
+              },
+            },
+          ],
+        },
+      },
+    });
 
     const data = await service.follow('Jane Doe', false, user);
     expect(data).toMatchObject({
@@ -143,10 +164,11 @@ describe('ProfilesService', () => {
 
     expect(
       (
-        await prisma.em
-          .getRepository(User)
-          .findOne({ name: 'Alice' }, { populate: ['followers'] })
-      )?.followers.count(),
+        await prisma.user.findUnique({
+          where: { name: 'Alice' },
+          include: { following: true },
+        })
+      )?.following.length,
     ).toBe(1);
   });
 });

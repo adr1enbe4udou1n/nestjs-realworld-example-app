@@ -8,6 +8,7 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NewCommentDTO } from './dto/comment-create.dto';
 import { ArticlesService } from '../articles.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 describe('CommentsService', () => {
   let prisma: PrismaService;
@@ -91,7 +92,7 @@ describe('CommentsService', () => {
 
   it('cannot list all comments of non existent article', async () => {
     await expect(() => service.list('test-article')).rejects.toThrow(
-      NotFoundError,
+      Prisma.PrismaClientKnownRequestError,
     );
   });
 
@@ -127,7 +128,11 @@ describe('CommentsService', () => {
     });
 
     expect(
-      await prisma.em.getRepository(Comment).count({ body: 'New Comment' }),
+      await prisma.comment.count({
+        where: {
+          body: 'New Comment',
+        },
+      }),
     ).toBe(1);
   });
 
@@ -155,7 +160,7 @@ describe('CommentsService', () => {
         },
         user,
       ),
-    ).rejects.toThrow(NotFoundError);
+    ).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
   });
 
   /**
@@ -185,7 +190,7 @@ describe('CommentsService', () => {
 
     await service.delete('test-article', comment.id, user);
 
-    expect(await prisma.em.getRepository(Comment).count()).toBe(0);
+    expect(await prisma.comment.count()).toBe(0);
   });
 
   it('can delete all comments of own article', async () => {
@@ -224,7 +229,7 @@ describe('CommentsService', () => {
 
     await service.delete('test-article', comment.id, user);
 
-    expect(await prisma.em.getRepository(Comment).count()).toBe(1);
+    expect(await prisma.comment.count()).toBe(1);
   });
 
   it('cannot delete comment of other author', async () => {
@@ -291,14 +296,14 @@ describe('CommentsService', () => {
 
     await expect(() =>
       service.delete('bad-article', comment.id, user),
-    ).rejects.toThrow(NotFoundError);
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('cannot delete comment with inexisting article', async () => {
     const user = await actingAs(prisma);
 
     await expect(() => service.delete('test-article', 1, user)).rejects.toThrow(
-      NotFoundError,
+      Prisma.PrismaClientKnownRequestError,
     );
   });
 
@@ -316,7 +321,7 @@ describe('CommentsService', () => {
     );
 
     await expect(() => service.delete('test-article', 1, user)).rejects.toThrow(
-      NotFoundError,
+      Prisma.PrismaClientKnownRequestError,
     );
   });
 });

@@ -16,7 +16,7 @@ export class ProfileDTO {
 
   static map(
     user: User & {
-      followers: FollowerUser[];
+      following: FollowerUser[];
     },
     currentUser: User | null,
   ) {
@@ -24,8 +24,8 @@ export class ProfileDTO {
     dto.username = user.name;
     dto.bio = user.bio;
     dto.image = user.image;
-    dto.following = user.followers.some(
-      (u) => u.followerId === currentUser?.id,
+    dto.following = user.following.some(
+      (follower) => follower.followerId === currentUser?.id,
     );
     return dto;
   }

@@ -49,7 +49,7 @@ export class ArticleDTO {
         tag: Tag;
       })[];
       author: User & {
-        followers: FollowerUser[];
+        following: FollowerUser[];
       };
     },
     currentUser: User | null,

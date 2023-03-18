@@ -21,7 +21,7 @@ export class CommentDTO {
   static map(
     comment: Comment & {
       author: User & {
-        followers: FollowerUser[];
+        following: FollowerUser[];
       };
     },
     currentUser: User | null,

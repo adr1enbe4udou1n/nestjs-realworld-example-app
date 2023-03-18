@@ -10,6 +10,7 @@ import { UpdateArticleDTO } from './dto/article-update.dto';
 import { CommentsService } from './comments/comments.service';
 import { ProfilesService } from '../profiles/profiles.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { Prisma, User } from '@prisma/client';
 
 describe('ArticlesService', () => {
   let prisma: PrismaService;
@@ -158,7 +159,7 @@ describe('ArticlesService', () => {
       {
         limit: 10,
         offset: 0,
-        favorited: 'Jane',
+        favorited: 'Jane Doe',
       },
       jane,
     );
@@ -248,7 +249,7 @@ describe('ArticlesService', () => {
 
   it('cannot get non existent article', async () => {
     await expect(() => service.get('test-article')).rejects.toThrow(
-      NotFoundError,
+      Prisma.PrismaClientKnownRequestError,
     );
   });
 
@@ -262,10 +263,11 @@ describe('ArticlesService', () => {
       image: 'https://i.pravatar.cc/300',
     });
 
-    await prisma.em
-      .fork()
-      .getRepository(Tag)
-      .persistAndFlush(new Tag({ name: 'Existing Tag' }));
+    await prisma.tag.create({
+      data: {
+        name: 'Existing Tag',
+      },
+    });
 
     const article = await service.create(
       {
@@ -289,8 +291,8 @@ describe('ArticlesService', () => {
       tagList: ['Existing Tag', 'Test Tag 1', 'Test Tag 2'],
     });
 
-    expect(await prisma.em.getRepository(Article).count()).toBe(1);
-    expect(await prisma.em.getRepository(Tag).count()).toBe(3);
+    expect(await prisma.article.count()).toBe(1);
+    expect(await prisma.tag.count()).toBe(3);
   });
 
   it.each([
@@ -384,9 +386,9 @@ describe('ArticlesService', () => {
       tagList: [],
     });
 
-    expect(
-      await prisma.em.getRepository(Article).count({ title: 'New Title' }),
-    ).toBe(1);
+    expect(await prisma.article.count({ where: { title: 'New Title' } })).toBe(
+      1,
+    );
   });
 
   it.each([
@@ -417,7 +419,7 @@ describe('ArticlesService', () => {
         },
         user,
       ),
-    ).rejects.toThrow(NotFoundError);
+    ).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
   });
 
   it('cannot update article of other author', async () => {
@@ -486,8 +488,8 @@ describe('ArticlesService', () => {
 
     await service.delete('test-article', user);
 
-    expect(await prisma.em.getRepository(Article).count()).toBe(0);
-    expect(await prisma.em.getRepository(Comment).count()).toBe(0);
+    expect(await prisma.article.count()).toBe(0);
+    expect(await prisma.comment.count()).toBe(0);
   });
 
   it('cannot delete article of other author', async () => {
@@ -517,7 +519,7 @@ describe('ArticlesService', () => {
     const user = await actingAs(prisma);
 
     await expect(() => service.delete('test-article', user)).rejects.toThrow(
-      NotFoundError,
+      Prisma.PrismaClientKnownRequestError,
     );
   });
 
@@ -572,6 +574,6 @@ describe('ArticlesService', () => {
 
     await expect(() =>
       service.favorite('test-article', true, user),
-    ).rejects.toThrow(NotFoundError);
+    ).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
   });
 });

@@ -62,9 +62,11 @@ describe('UsersService', () => {
       bio: 'My Bio',
     });
 
-    const entity = await prisma.em
-      .getRepository(User)
-      .findOne({ email: 'jane.doe@example.com' });
+    const entity = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+    });
 
     expect(entity).not.toBeNull();
   });

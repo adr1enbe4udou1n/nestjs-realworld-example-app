@@ -45,34 +45,33 @@ describe('UsersService', () => {
   });
 
   it('can register new users', async () => {
-    const user = await act<User>(prisma, () =>
-      service.register({
-        email: 'john.doe@example.com',
-        username: 'John Doe',
-        password: 'password',
-      }),
-    );
-
+    const user = await service.register({
+      email: 'john.doe@example.com',
+      username: 'John Doe',
+      password: 'password',
+    });
     expect(user).toMatchObject({
       email: 'john.doe@example.com',
       name: 'John Doe',
     });
 
-    const entity = await prisma.em
-      .getRepository(User)
-      .findOne({ email: 'john.doe@example.com' });
+    const entity = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+    });
 
     expect(entity).not.toBeNull();
   });
 
   it('cannot register twice', async () => {
-    await prisma.em.getRepository(User).persistAndFlush(
-      new User({
+    await prisma.user.create({
+      data: {
         email: 'john.doe@example.com',
         name: 'John Doe',
         password: 'password',
-      }),
-    );
+      },
+    });
 
     await expect(() =>
       service.register({

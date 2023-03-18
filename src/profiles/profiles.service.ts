@@ -10,7 +10,7 @@ export class ProfilesService {
   async get(username: string, currentUser: User | null = null) {
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { name: username },
-      include: { followers: true },
+      include: { following: true },
     });
     return ProfileDTO.map(user, currentUser);
   }
@@ -22,7 +22,7 @@ export class ProfilesService {
 
     const updatedUser = follow
       ? await this.prisma.user.update({
-          where: { id: currentUser.id },
+          where: { id: user.id },
           data: {
             following: {
               create: {
@@ -30,10 +30,10 @@ export class ProfilesService {
               },
             },
           },
-          include: { followers: true },
+          include: { following: true },
         })
       : await this.prisma.user.update({
-          where: { id: currentUser.id },
+          where: { id: user.id },
           data: {
             following: {
               delete: {
@@ -44,7 +44,7 @@ export class ProfilesService {
               },
             },
           },
-          include: { followers: true },
+          include: { following: true },
         });
 
     return ProfileDTO.map(updatedUser, currentUser);

@@ -16,7 +16,7 @@ export class CommentsService {
     const comments = await this.prisma.comment.findMany({
       where: { article },
       orderBy: { id: 'desc' },
-      include: { author: { include: { followers: true } } },
+      include: { author: { include: { following: true } } },
     });
 
     return comments.map((c) => CommentDTO.map(c, currentUser));
@@ -33,7 +33,7 @@ export class CommentsService {
         articleId: article.id,
         authorId: currentUser.id,
       },
-      include: { author: { include: { followers: true } } },
+      include: { author: { include: { following: true } } },
     });
 
     return CommentDTO.map(comment, currentUser);

@@ -39,7 +39,7 @@ export class ArticlesService {
         include: {
           favoredUsers: { include: { user: true } },
           tags: { include: { tag: true } },
-          author: { include: { followers: true } },
+          author: { include: { following: true } },
         },
       }),
       this.prisma.article.count({ where }),
@@ -62,7 +62,7 @@ export class ArticlesService {
         include: {
           favoredUsers: { include: { user: true } },
           tags: { include: { tag: true } },
-          author: { include: { followers: true } },
+          author: { include: { following: true } },
         },
       }),
       this.prisma.article.count({ where }),
@@ -77,7 +77,7 @@ export class ArticlesService {
       include: {
         favoredUsers: { include: { user: true } },
         tags: { include: { tag: true } },
-        author: { include: { followers: true } },
+        author: { include: { following: true } },
       },
     });
 
@@ -103,11 +103,6 @@ export class ArticlesService {
         body: dto.body,
         authorId: currentUser.id,
       },
-      include: {
-        favoredUsers: { include: { user: true } },
-        tags: { include: { tag: true } },
-        author: { include: { followers: true } },
-      },
     });
 
     await this.prisma.tag.createMany({
@@ -119,7 +114,7 @@ export class ArticlesService {
       where: { name: { in: dto.tagList } },
     });
 
-    await this.prisma.article.update({
+    const updatedArticle = await this.prisma.article.update({
       where: { id: createdArticle.id },
       data: {
         tags: {
@@ -128,9 +123,14 @@ export class ArticlesService {
           },
         },
       },
+      include: {
+        favoredUsers: { include: { user: true } },
+        tags: { include: { tag: true } },
+        author: { include: { following: true } },
+      },
     });
 
-    return ArticleDTO.map(createdArticle, currentUser);
+    return ArticleDTO.map(updatedArticle, currentUser);
   }
 
   async update(slug: string, dto: UpdateArticleDTO, currentUser: User) {
@@ -152,7 +152,7 @@ export class ArticlesService {
       include: {
         favoredUsers: { include: { user: true } },
         tags: { include: { tag: true } },
-        author: { include: { followers: true } },
+        author: { include: { following: true } },
       },
       data: {
         title: dto.title ?? article.title,
@@ -201,7 +201,7 @@ export class ArticlesService {
           include: {
             favoredUsers: { include: { user: true } },
             tags: { include: { tag: true } },
-            author: { include: { followers: true } },
+            author: { include: { following: true } },
           },
         })
       : await this.prisma.article.update({
@@ -219,7 +219,7 @@ export class ArticlesService {
           include: {
             favoredUsers: { include: { user: true } },
             tags: { include: { tag: true } },
-            author: { include: { followers: true } },
+            author: { include: { following: true } },
           },
         });
 

@@ -5,7 +5,6 @@ import {
   refreshDatabase,
 } from '../db-test-base';
 import { AuthService } from './auth.service';
-import { UserDTO } from '../user/dto/current-user.dto';
 import { hash } from 'argon2';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -38,26 +37,26 @@ describe('UsersService', () => {
       password: 'badpassword',
     },
   ])('cannot login with invalid data', async (data) => {
-    await prisma.em.getRepository(User).persistAndFlush(
-      new User({
+    await prisma.user.create({
+      data: {
         email: 'john.doe@example.com',
         name: 'John Doe',
         password: await hash('password'),
-      }),
-    );
+      },
+    });
 
     const user = await service.validateUser(data.email, data.password);
     expect(user).toBeNull();
   });
 
   it('can login', async () => {
-    await prisma.em.getRepository(User).persistAndFlush(
-      new User({
+    await prisma.user.create({
+      data: {
         email: 'john.doe@example.com',
         name: 'John Doe',
         password: await hash('password'),
-      }),
-    );
+      },
+    });
 
     const user = await service.validateUser('john.doe@example.com', 'password');
     expect(user).toMatchObject({
@@ -71,10 +70,7 @@ describe('UsersService', () => {
   it('can fetch user infos', async () => {
     const currentUser = await actingAs(prisma);
 
-    const user = await act<UserDTO>(prisma, () =>
-      service.getUserWithToken(currentUser),
-    );
-
+    const user = await service.getUserWithToken(currentUser);
     expect(user).toMatchObject({
       email: 'john.doe@example.com',
       username: 'John Doe',
