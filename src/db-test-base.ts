@@ -1,21 +1,17 @@
-import { MikroORM } from '@mikro-orm/core';
-import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ModuleMetadata } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
+import { User } from '@prisma/client';
 import { hash } from 'argon2';
-import { Article } from './articles/article.entity';
-import { Comment } from './articles/comments/comment.entity';
-import { Tag } from './tags/tag.entity';
-import { User } from './users/user.entity';
+import { PrismaModule } from './prisma/prisma.module';
+import { PrismaService } from './prisma/prisma.service';
 
 export const initializeDbTestBase = async (metadata: ModuleMetadata) => {
   const module: TestingModule = await Test.createTestingModule({
     imports: [
       ConfigModule.forRoot({ envFilePath: '.env.testing' }),
-      MikroOrmModule.forRoot(),
-      MikroOrmModule.forFeature([User, Tag, Article, Comment]),
+      PrismaModule,
       JwtModule.register({
         secret: 'my super secret key',
         signOptions: { expiresIn: '60s' },
@@ -24,39 +20,36 @@ export const initializeDbTestBase = async (metadata: ModuleMetadata) => {
     ...metadata,
   }).compile();
 
-  const orm = module.get<MikroORM>(MikroORM);
-  orm.config.set('allowGlobalContext', true);
-  await orm.getMigrator().up();
-
   return module;
 };
 
-export const refreshDatabase = async (orm: MikroORM) => {
-  await orm.em.nativeDelete(Tag, {});
-  await orm.em.nativeDelete(Comment, {});
-  await orm.em.nativeDelete(Article, {});
-  await orm.em.nativeDelete(User, {});
+export const refreshDatabase = async (prisma: PrismaService) => {
+  await prisma.articleTag.deleteMany();
+  await prisma.articleFavorite.deleteMany();
+  await prisma.comment.deleteMany();
+  await prisma.article.deleteMany();
+  await prisma.tag.deleteMany();
+  await prisma.followerUser.deleteMany();
+  await prisma.user.deleteMany();
 };
 
-export const createUser = async (orm: MikroORM, data: Partial<User> = {}) => {
-  const user = new User({
-    email: 'john.doe@example.com',
-    name: 'John Doe',
-    password: await hash('password'),
-    ...data,
+export const createUser = async (
+  prisma: PrismaService,
+  data: Partial<User> = {},
+) => {
+  return await prisma.user.create({
+    data: {
+      email: 'john.doe@example.com',
+      name: 'John Doe',
+      password: await hash('password'),
+      ...data,
+    },
   });
-
-  await orm.em.getRepository(User).persistAndFlush(user);
-
-  return user;
 };
 
-export const actingAs = async (orm: MikroORM, data: Partial<User> = {}) => {
-  return await createUser(orm, data);
-};
-
-export const act = async <T>(orm: MikroORM, action: () => Promise<T>) => {
-  orm.em.clear();
-
-  return await action();
+export const actingAs = async (
+  prisma: PrismaService,
+  data: Partial<User> = {},
+) => {
+  return await createUser(prisma, data);
 };

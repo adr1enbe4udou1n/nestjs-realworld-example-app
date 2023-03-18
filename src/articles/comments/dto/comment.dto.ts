@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Comment, FollowerUser, User } from '@prisma/client';
 import { ProfileDTO } from '../../../profiles/dto/profile.dto';
-import { User } from '../../../users/user.entity';
-import { Comment } from '../comment.entity';
 
 export class CommentDTO {
   @ApiProperty()
@@ -19,7 +18,14 @@ export class CommentDTO {
   @ApiProperty()
   author: ProfileDTO;
 
-  static map(comment: Comment, currentUser: User | null) {
+  static map(
+    comment: Comment & {
+      author: User & {
+        followers: FollowerUser[];
+      };
+    },
+    currentUser: User | null,
+  ) {
     const dto = new CommentDTO();
     dto.id = comment.id;
     dto.body = comment.body;

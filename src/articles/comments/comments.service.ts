@@ -33,6 +33,7 @@ export class CommentsService {
         articleId: article.id,
         authorId: currentUser.id,
       },
+      include: { author: { include: { followers: true } } },
     });
 
     return CommentDTO.map(comment, currentUser);

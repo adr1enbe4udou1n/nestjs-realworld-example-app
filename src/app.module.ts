@@ -4,7 +4,6 @@ import { TagsModule } from './tags/tags.module';
 import { ArticlesModule } from './articles/articles.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { UserModule } from './user/user.module';
-import { MigrateService } from './migrate.service';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -20,6 +19,5 @@ import { PrismaModule } from './prisma/prisma.module';
     UserModule,
     UsersModule,
   ],
-  providers: [MigrateService],
 })
 export class AppModule {}

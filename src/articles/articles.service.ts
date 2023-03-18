@@ -37,8 +37,8 @@ export class ArticlesService {
         take: this.limit(query),
         skip: query.offset,
         include: {
-          favoredUsers: true,
-          tags: true,
+          favoredUsers: { include: { user: true } },
+          tags: { include: { tag: true } },
           author: { include: { followers: true } },
         },
       }),
@@ -60,8 +60,8 @@ export class ArticlesService {
         take: this.limit(query),
         skip: query.offset,
         include: {
-          favoredUsers: true,
-          tags: true,
+          favoredUsers: { include: { user: true } },
+          tags: { include: { tag: true } },
           author: { include: { followers: true } },
         },
       }),
@@ -75,8 +75,8 @@ export class ArticlesService {
     const article = await this.prisma.article.findFirstOrThrow({
       where: { slug },
       include: {
-        favoredUsers: true,
-        tags: true,
+        favoredUsers: { include: { user: true } },
+        tags: { include: { tag: true } },
         author: { include: { followers: true } },
       },
     });
@@ -102,6 +102,11 @@ export class ArticlesService {
         description: dto.description,
         body: dto.body,
         authorId: currentUser.id,
+      },
+      include: {
+        favoredUsers: { include: { user: true } },
+        tags: { include: { tag: true } },
+        author: { include: { followers: true } },
       },
     });
 
@@ -148,8 +153,8 @@ export class ArticlesService {
     const updatedArticle = await this.prisma.article.update({
       where: { slug },
       include: {
-        favoredUsers: true,
-        tags: true,
+        favoredUsers: { include: { user: true } },
+        tags: { include: { tag: true } },
         author: { include: { followers: true } },
       },
       data: {
@@ -188,8 +193,8 @@ export class ArticlesService {
     const article = await this.prisma.article.findFirstOrThrow({
       where: { slug },
       include: {
-        favoredUsers: true,
-        tags: true,
+        favoredUsers: { include: { user: true } },
+        tags: { include: { tag: true } },
         author: { include: { followers: true } },
       },
     });

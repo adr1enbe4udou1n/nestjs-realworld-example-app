@@ -1,10 +1,10 @@
-import { NotFoundError } from '@mikro-orm/core';
 import { ExceptionFilter, Catch, ArgumentsHost } from '@nestjs/common';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { Response } from 'express';
 
-@Catch(NotFoundError)
+@Catch(PrismaClientKnownRequestError)
 export class EntityNotFoundFilter implements ExceptionFilter {
-  catch(exception: NotFoundError, host: ArgumentsHost) {
+  catch(exception: PrismaClientKnownRequestError, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
