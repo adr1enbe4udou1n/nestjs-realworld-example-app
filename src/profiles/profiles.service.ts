@@ -18,39 +18,35 @@ export class ProfilesService {
   async follow(username: string, follow: boolean, currentUser: User) {
     const user = await this.prisma.user.findFirstOrThrow({
       where: { name: username },
-      include: { followers: true },
     });
 
-    if (follow) {
-      await this.prisma.user.update({
-        where: { id: currentUser.id },
-        data: {
-          following: {
-            connect: {
-              followerId_followingId: {
+    const updatedUser = follow
+      ? await this.prisma.user.update({
+          where: { id: currentUser.id },
+          data: {
+            following: {
+              create: {
                 followerId: currentUser.id,
-                followingId: user.id,
               },
             },
           },
-        },
-      });
-    } else {
-      await this.prisma.user.update({
-        where: { id: currentUser.id },
-        data: {
-          following: {
-            disconnect: {
-              followerId_followingId: {
-                followerId: currentUser.id,
-                followingId: user.id,
+          include: { followers: true },
+        })
+      : await this.prisma.user.update({
+          where: { id: currentUser.id },
+          data: {
+            following: {
+              delete: {
+                followerId_followingId: {
+                  followerId: currentUser.id,
+                  followingId: user.id,
+                },
               },
             },
           },
-        },
-      });
-    }
+          include: { followers: true },
+        });
 
-    return ProfileDTO.map(user, currentUser);
+    return ProfileDTO.map(updatedUser, currentUser);
   }
 }

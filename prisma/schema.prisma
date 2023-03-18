@@ -38,7 +38,7 @@ model FollowerUser {
 model Article {
   id           Int               @id @default(autoincrement())
   authorId     Int
-  author       User              @relation(fields: [authorId], references: [id])
+  author       User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
   title        String
   slug         String            @unique
   description  String
@@ -53,9 +53,9 @@ model Article {
 model Comment {
   id        Int      @id @default(autoincrement())
   authorId  Int
-  author    User     @relation(fields: [authorId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   articleId Int
-  article   Article  @relation(fields: [articleId], references: [id])
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
   body      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -69,18 +69,18 @@ model Tag {
 
 model ArticleTag {
   articleId Int
-  article   Article @relation(fields: [articleId], references: [id])
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
   tagId     Int
-  tag       Tag     @relation(fields: [tagId], references: [id])
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([articleId, tagId])
 }
 
 model ArticleFavorite {
   articleId Int
-  article   Article @relation(fields: [articleId], references: [id])
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
   userId    Int
-  user      User    @relation(fields: [userId], references: [id])
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([articleId, userId])
 }

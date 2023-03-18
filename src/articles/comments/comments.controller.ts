@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Param,
+  ParseIntPipe,
   Post,
   Request,
   UseGuards,
@@ -100,7 +101,7 @@ export class CommentsController {
   })
   async delete(
     @Param('slug') slug: string,
-    @Param('commentId') commentId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
     @Request() req,
   ) {
     return {

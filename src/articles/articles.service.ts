@@ -123,12 +123,9 @@ export class ArticlesService {
       where: { id: createdArticle.id },
       data: {
         tags: {
-          connect: allTags.map((t) => ({
-            articleId_tagId: {
-              articleId: createdArticle.id,
-              tagId: t.id,
-            },
-          })),
+          createMany: {
+            data: allTags.map((tag) => ({ tagId: tag.id })),
+          },
         },
       },
     });
@@ -183,52 +180,49 @@ export class ArticlesService {
 
     await this.prisma.article.delete({
       where: { slug },
-      include: {
-        comments: true,
-      },
     });
   }
 
   async favorite(slug: string, favorite: boolean, currentUser: User) {
     const article = await this.prisma.article.findFirstOrThrow({
       where: { slug },
-      include: {
-        favoredUsers: { include: { user: true } },
-        tags: { include: { tag: true } },
-        author: { include: { followers: true } },
-      },
     });
 
-    if (favorite) {
-      await this.prisma.user.update({
-        where: { id: currentUser.id },
-        data: {
-          favoriteArticles: {
-            connect: {
-              articleId_userId: {
-                articleId: article.id,
+    const updatedArticle = favorite
+      ? await this.prisma.article.update({
+          where: { slug },
+          data: {
+            favoredUsers: {
+              create: {
                 userId: currentUser.id,
               },
             },
           },
-        },
-      });
-    } else {
-      await this.prisma.user.update({
-        where: { id: currentUser.id },
-        data: {
-          favoriteArticles: {
-            disconnect: {
-              articleId_userId: {
-                articleId: article.id,
-                userId: currentUser.id,
+          include: {
+            favoredUsers: { include: { user: true } },
+            tags: { include: { tag: true } },
+            author: { include: { followers: true } },
+          },
+        })
+      : await this.prisma.article.update({
+          where: { slug },
+          data: {
+            favoredUsers: {
+              delete: {
+                articleId_userId: {
+                  articleId: article.id,
+                  userId: currentUser.id,
+                },
               },
             },
           },
-        },
-      });
-    }
+          include: {
+            favoredUsers: { include: { user: true } },
+            tags: { include: { tag: true } },
+            author: { include: { followers: true } },
+          },
+        });
 
-    return ArticleDTO.map(article, currentUser);
+    return ArticleDTO.map(updatedArticle, currentUser);
   }
 }
