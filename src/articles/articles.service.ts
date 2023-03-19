@@ -186,42 +186,52 @@ export class ArticlesService {
   async favorite(slug: string, favorite: boolean, currentUser: User) {
     const article = await this.prisma.article.findUniqueOrThrow({
       where: { slug },
+      include: {
+        favoredUsers: { include: { user: true } },
+        tags: { include: { tag: true } },
+        author: { include: { following: true } },
+      },
     });
 
-    const updatedArticle = favorite
-      ? await this.prisma.article.update({
-          where: { slug },
-          data: {
-            favoredUsers: {
-              create: {
+    if (
+      favorite &&
+      article.favoredUsers.some((u) => u.user.id === currentUser.id)
+    ) {
+      return ArticleDTO.map(article, currentUser);
+    }
+
+    if (
+      !favorite &&
+      !article.favoredUsers.some((u) => u.user.id === currentUser.id)
+    ) {
+      return ArticleDTO.map(article, currentUser);
+    }
+
+    const updatedArticle = await this.prisma.article.update({
+      where: { slug },
+      data: {
+        favoredUsers: {
+          ...(favorite && {
+            create: {
+              userId: currentUser.id,
+            },
+          }),
+          ...(!favorite && {
+            delete: {
+              articleId_userId: {
+                articleId: article.id,
                 userId: currentUser.id,
               },
             },
-          },
-          include: {
-            favoredUsers: { include: { user: true } },
-            tags: { include: { tag: true } },
-            author: { include: { following: true } },
-          },
-        })
-      : await this.prisma.article.update({
-          where: { slug },
-          data: {
-            favoredUsers: {
-              delete: {
-                articleId_userId: {
-                  articleId: article.id,
-                  userId: currentUser.id,
-                },
-              },
-            },
-          },
-          include: {
-            favoredUsers: { include: { user: true } },
-            tags: { include: { tag: true } },
-            author: { include: { following: true } },
-          },
-        });
+          }),
+        },
+      },
+      include: {
+        favoredUsers: { include: { user: true } },
+        tags: { include: { tag: true } },
+        author: { include: { following: true } },
+      },
+    });
 
     return ArticleDTO.map(updatedArticle, currentUser);
   }

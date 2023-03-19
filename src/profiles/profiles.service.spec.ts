@@ -107,6 +107,7 @@ describe('ProfilesService', () => {
     });
 
     const data = await service.follow('Jane Doe', true, user);
+    await service.follow('Jane Doe', true, user);
     expect(data).toMatchObject({
       username: 'Jane Doe',
       following: true,

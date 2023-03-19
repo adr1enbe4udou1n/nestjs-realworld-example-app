@@ -184,16 +184,16 @@ describe('ArticlesService', () => {
    */
 
   it('can paginate articles of followed authors', async () => {
-    const [john] = await createArticles();
+    const [, jane] = await createArticles();
 
-    await profilesService.follow('John Doe', true, john);
+    await profilesService.follow('John Doe', true, jane);
 
     const [items, count] = await service.feed(
       {
         limit: 10,
         offset: 0,
       },
-      john,
+      jane,
     );
     expect(items.length).toBe(10);
     expect(count).toBe(30);
