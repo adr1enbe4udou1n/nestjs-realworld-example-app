@@ -31,7 +31,7 @@ export class ProfilesController {
     summary: 'Get a profile',
     description: 'Get a profile of a user of the system. Auth is optional',
   })
-  @Get('celeb_:username')
+  @Get(':username')
   @ApiParam({
     name: 'username',
     description: 'Username of the profile to get',
@@ -51,7 +51,7 @@ export class ProfilesController {
     summary: 'Follow a user',
     description: 'Follow a user by username',
   })
-  @Post('celeb_:username/follow')
+  @Post(':username/follow')
   @HttpCode(200)
   @ApiParam({
     name: 'username',
@@ -74,7 +74,7 @@ export class ProfilesController {
     summary: 'Unfollow a user',
     description: 'Unfollow a user by username',
   })
-  @Delete('celeb_:username/follow')
+  @Delete(':username/follow')
   @ApiParam({
     name: 'username',
     description: 'Username of the profile you want to unfollow',
