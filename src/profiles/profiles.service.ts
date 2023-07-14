@@ -1,11 +1,10 @@
 import { ProfileDTO } from './dto/profile.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 
 @Injectable()
 export class ProfilesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaClient) {}
 
   async get(username: string, currentUser: User | null = null) {
     const user = await this.prisma.user.findUniqueOrThrow({

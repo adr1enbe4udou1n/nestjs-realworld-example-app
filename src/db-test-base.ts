@@ -2,10 +2,9 @@ import { ModuleMetadata } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { User } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import { hash } from 'argon2';
 import { PrismaModule } from './prisma/prisma.module';
-import { PrismaService } from './prisma/prisma.service';
 
 export const initializeDbTestBase = async (metadata: ModuleMetadata) => {
   const module: TestingModule = await Test.createTestingModule({
@@ -23,7 +22,7 @@ export const initializeDbTestBase = async (metadata: ModuleMetadata) => {
   return module;
 };
 
-export const refreshDatabase = async (prisma: PrismaService) => {
+export const refreshDatabase = async (prisma: PrismaClient) => {
   await prisma.articleTag.deleteMany();
   await prisma.articleFavorite.deleteMany();
   await prisma.comment.deleteMany();
@@ -34,7 +33,7 @@ export const refreshDatabase = async (prisma: PrismaService) => {
 };
 
 export const createUser = async (
-  prisma: PrismaService,
+  prisma: PrismaClient,
   data: Partial<User> = {},
 ) => {
   return await prisma.user.create({
@@ -48,7 +47,7 @@ export const createUser = async (
 };
 
 export const actingAs = async (
-  prisma: PrismaService,
+  prisma: PrismaClient,
   data: Partial<User> = {},
 ) => {
   return await createUser(prisma, data);

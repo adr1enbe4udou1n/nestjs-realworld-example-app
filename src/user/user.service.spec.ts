@@ -7,11 +7,11 @@ import {
 } from '../db-test-base';
 import { UserService } from './user.service';
 import { UpdateUserDTO } from './dto/update-user.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaClient } from '@prisma/client';
 
 describe('UsersService', () => {
   let service: UserService;
-  let prisma: PrismaService;
+  let prisma: PrismaClient;
 
   beforeAll(async () => {
     const module = await initializeDbTestBase({
@@ -19,7 +19,7 @@ describe('UsersService', () => {
     });
 
     service = await module.resolve(UserService);
-    prisma = module.get(PrismaService);
+    prisma = module.get(PrismaClient);
   });
 
   beforeEach(async () => {

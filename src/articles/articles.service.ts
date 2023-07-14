@@ -5,12 +5,11 @@ import { UpdateArticleDTO } from './dto/article-update.dto';
 import { ArticleDTO } from './dto/article.dto';
 import { ArticlesListQuery } from './queries/articles.query';
 import slugify from 'slugify';
-import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 
 @Injectable()
 export class ArticlesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaClient) {}
 
   limit(query: PagedQuery) {
     const max = 20;

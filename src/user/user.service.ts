@@ -1,11 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaClient, User } from '@prisma/client';
 import { UpdateUserDTO } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaClient) {}
 
   public async update(dto: UpdateUserDTO, user: User) {
     if (

@@ -1,12 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaClient, User } from '@prisma/client';
 import { NewCommentDTO } from './dto/comment-create.dto';
 import { CommentDTO } from './dto/comment.dto';
 
 @Injectable()
 export class CommentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaClient) {}
 
   async list(slug: string, currentUser: User | null = null) {
     const article = await this.prisma.article.findUniqueOrThrow({

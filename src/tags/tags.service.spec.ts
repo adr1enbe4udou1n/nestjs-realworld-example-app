@@ -1,9 +1,9 @@
+import { PrismaClient } from '@prisma/client';
 import { initializeDbTestBase, refreshDatabase } from '../db-test-base';
-import { PrismaService } from '../prisma/prisma.service';
 import { TagsService } from './tags.service';
 
 describe('TagsService', () => {
-  let prisma: PrismaService;
+  let prisma: PrismaClient;
   let service: TagsService;
 
   beforeAll(async () => {
@@ -11,7 +11,7 @@ describe('TagsService', () => {
       providers: [TagsService],
     });
 
-    prisma = module.get(PrismaService);
+    prisma = module.get(PrismaClient);
     service = await module.resolve(TagsService);
   });
 

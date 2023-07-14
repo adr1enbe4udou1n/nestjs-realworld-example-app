@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { PrismaClient } from '@prisma/client';
 import { hash } from 'argon2';
 import { capitalize } from 'lodash';
+import { UniqueEnforcer } from 'enforce-unique';
 
 const prisma = new PrismaClient();
 
@@ -18,7 +19,7 @@ async function main() {
 
   await prisma.user.createMany({
     data: Array.from({ length: 50 }, () => ({
-      name: faker.name.fullName(),
+      name: faker.person.fullName(),
       email: faker.internet.email(),
       bio: faker.lorem.paragraphs(3),
       image: faker.internet.avatar(),
@@ -29,10 +30,7 @@ async function main() {
   const users = await prisma.user.findMany();
 
   for (const user of users) {
-    const followers = faker.helpers.arrayElements(
-      users,
-      faker.datatype.number(5),
-    );
+    const followers = faker.helpers.arrayElements(users, faker.number.int(5));
     for (const follower of followers) {
       await prisma.followerUser.create({
         data: {
@@ -43,16 +41,24 @@ async function main() {
     }
   }
 
+  const uniqueEnforcerWord = new UniqueEnforcer();
+
   await prisma.tag.createMany({
     data: Array.from({ length: 30 }, () => ({
-      name: faker.helpers.unique(faker.lorem.word),
+      name: uniqueEnforcerWord.enforce(() => {
+        return faker.lorem.word();
+      }),
     })),
   });
+
+  const uniqueEnforcerTitle = new UniqueEnforcer();
 
   await prisma.article.createMany({
     data: Array.from({ length: 500 }, () => {
       const title = capitalize(
-        faker.helpers.unique(() => faker.lorem.words(faker.datatype.number(5))),
+        uniqueEnforcerTitle.enforce(() => {
+          return faker.lorem.words(faker.number.int(5));
+        }),
       );
       return {
         title,
@@ -60,7 +66,7 @@ async function main() {
         authorId: faker.helpers.arrayElement(users).id,
         description: faker.lorem.paragraph(),
         body: faker.lorem.paragraphs(5),
-        createdAt: faker.date.recent(90),
+        createdAt: faker.date.recent({ days: 90 }),
       };
     }),
   });
@@ -69,17 +75,17 @@ async function main() {
 
   for (const article of articles) {
     await prisma.comment.createMany({
-      data: Array.from({ length: faker.datatype.number(10) }, () => ({
+      data: Array.from({ length: faker.number.int(10) }, () => ({
         body: faker.lorem.paragraphs(2),
         authorId: faker.helpers.arrayElement(users).id,
         articleId: article.id,
-        createdAt: faker.date.recent(7),
+        createdAt: faker.date.recent({ days: 7 }),
       })),
     });
 
     const favoredUsers = faker.helpers.arrayElements(
       users,
-      faker.datatype.number(5),
+      faker.number.int(5),
     );
     for (const favoredUser of favoredUsers) {
       await prisma.articleFavorite.create({
@@ -92,7 +98,7 @@ async function main() {
 
     const tags = faker.helpers.arrayElements(
       await prisma.tag.findMany(),
-      faker.datatype.number(3),
+      faker.number.int(3),
     );
 
     for (const tag of tags) {
