@@ -53,9 +53,6 @@ dependencies:
   passport-local:
     specifier: ^1.0.0
     version: 1.0.0
-  reflect-metadata:
-    specifier: ^0.1.14
-    version: 0.1.14
   rimraf:
     specifier: ^5.0.5
     version: 5.0.5
