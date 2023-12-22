@@ -10,7 +10,7 @@ async function bootstrap() {
   });
 
   app
-    .useGlobalPipes(new ValidationPipe())
+    .useGlobalPipes(new ValidationPipe({ transform: true }))
     .setGlobalPrefix('api')
     .useGlobalFilters(new EntityNotFoundFilter());
 

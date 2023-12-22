@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class PagedQuery {
   @ApiProperty({
@@ -6,6 +7,7 @@ export class PagedQuery {
     default: 20,
     required: false,
   })
+  @Type(() => Number)
   limit = 20;
 
   @ApiProperty({
@@ -13,6 +15,7 @@ export class PagedQuery {
     default: 0,
     required: false,
   })
+  @Type(() => Number)
   offset = 0;
 }
 
