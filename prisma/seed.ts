@@ -74,15 +74,6 @@ async function main() {
   const articles = await prisma.article.findMany();
 
   for (const article of articles) {
-    await prisma.comment.createMany({
-      data: Array.from({ length: faker.number.int(10) }, () => ({
-        body: faker.lorem.paragraphs(2),
-        authorId: faker.helpers.arrayElement(users).id,
-        articleId: article.id,
-        createdAt: faker.date.recent({ days: 7 }),
-      })),
-    });
-
     const favoredUsers = faker.helpers.arrayElements(
       users,
       faker.number.int(5),
@@ -110,6 +101,17 @@ async function main() {
       });
     }
   }
+
+  await prisma.comment.createMany({
+    data: Array.from({ length: 5000 }, () => {
+      return {
+        body: faker.lorem.paragraphs(2),
+        authorId: faker.helpers.arrayElement(users).id,
+        articleId: faker.helpers.arrayElement(articles).id,
+        createdAt: faker.date.recent({ days: 7 }),
+      };
+    }),
+  });
 }
 
 main()
