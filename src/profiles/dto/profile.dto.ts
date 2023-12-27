@@ -24,9 +24,9 @@ export class ProfileDTO {
     dto.username = user.name;
     dto.bio = user.bio;
     dto.image = user.image;
-    dto.following = user.following.some(
-      (follower) => follower.followerId === currentUser?.id,
-    );
+    dto.following =
+      currentUser != null &&
+      user.following.some((follower) => follower.followerId === currentUser.id);
     return dto;
   }
 }
