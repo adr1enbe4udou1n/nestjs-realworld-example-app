@@ -22,7 +22,7 @@ async function main() {
       name: faker.person.fullName(),
       email: faker.internet.email(),
       bio: faker.lorem.paragraphs(3),
-      image: faker.internet.avatar(),
+      image: faker.image.avatar(),
       password,
     })),
   });
