@@ -1,0 +1,22 @@
+version: "3"
+
+tasks:
+  prepare:
+    cmds:
+      - corepack enable
+      - corepack prepare pnpm@latest-8 --activate
+      - pnpm config set store-dir .pnpm-store
+  install:
+    cmds:
+      - pnpm i
+  lint:
+    cmds:
+      - pnpm lint
+  build:
+    cmds:
+      - pnpm prisma generate
+      - pnpm build
+  test:
+    cmds:
+      - pnpm prisma migrate deploy
+      - pnpm test
