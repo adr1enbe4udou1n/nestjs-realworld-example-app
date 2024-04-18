@@ -56,9 +56,6 @@ importers:
       passport-local:
         specifier: ^1.0.0
         version: 1.0.0
-      rimraf:
-        specifier: ^5.0.5
-        version: 5.0.5
       rxjs:
         specifier: ^7.8.1
         version: 7.8.1
@@ -1672,11 +1669,6 @@ packages:
     engines: {node: '>=16 || 14 >=14.17'}
     hasBin: true
 
-  glob@10.3.12:
-    resolution: {integrity: sha512-TCNv8vJ+xz4QiqTpfOJA7HvYv+tNIRHKfUWw/q+v2jdgN4ebz+KY9tGx5J4rHP0o84mNP+ApH66HRX8us3Khqg==}
-    engines: {node: '>=16 || 14 >=14.17'}
-    hasBin: true
-
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
 
@@ -2563,11 +2555,6 @@ packages:
 
   rimraf@4.4.1:
     resolution: {integrity: sha512-Gk8NlF062+T9CqNGn6h4tls3k6T1+/nXdOcSZVikNVtlRdYpA7wRJJMoXmuvOnLW844rPjdQ7JgXCYM6PPC/og==}
-    engines: {node: '>=14'}
-    hasBin: true
-
-  rimraf@5.0.5:
-    resolution: {integrity: sha512-CqDakW+hMe/Bz202FPEymy68P+G50RfMQK+Qo5YUqc9SPipvbGjCGKd0RSKEelbsfQuw3g5NZDSrlZZAJurH1A==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -4921,14 +4908,6 @@ snapshots:
       minipass: 7.0.4
       path-scurry: 1.10.2
 
-  glob@10.3.12:
-    dependencies:
-      foreground-child: 3.1.1
-      jackspeak: 2.3.6
-      minimatch: 9.0.4
-      minipass: 7.0.4
-      path-scurry: 1.10.2
-
   glob@7.2.3:
     dependencies:
       fs.realpath: 1.0.0
@@ -5948,10 +5927,6 @@ snapshots:
   rimraf@4.4.1:
     dependencies:
       glob: 9.3.5
-
-  rimraf@5.0.5:
-    dependencies:
-      glob: 10.3.12
 
   run-async@2.4.1: {}
 
