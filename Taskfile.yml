@@ -19,4 +19,4 @@ tasks:
   test:
     cmds:
       - pnpm prisma migrate deploy
-      - pnpm test
+      - pnpm test -- --coverage
