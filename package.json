@@ -82,10 +82,6 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "coverageReporters": [
-      "text",
-      "clover"
-    ],
     "testEnvironment": "node",
     "testTimeout": 10000
   },
