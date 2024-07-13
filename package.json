@@ -60,12 +60,12 @@
     "prettier": "^3.3.2",
     "prisma": "^5.16.2",
     "supertest": "^7.0.0",
-    "ts-jest": "^29.2.0",
+    "ts-jest": "^29.2.2",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.5.3",
-    "webpack": "^5.92.1"
+    "webpack": "^5.93.0"
   },
   "jest": {
     "moduleFileExtensions": [
