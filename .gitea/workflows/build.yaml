@@ -8,9 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: postgres://test:test@${{ vars.POSTGRESQL_HOST }}:5432/conduit_nestjs_test
-      JWT_SECRET: secret-key
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -21,6 +18,9 @@ jobs:
           node-version: 20
           cache: "pnpm"
       - uses: https://gitea.okami101.io/okami101/actions/task@main
+        env:
+          DATABASE_URL: postgres://test:test@${{ vars.POSTGRESQL_HOST }}:5432/conduit_nestjs_test
+          JWT_SECRET: secret-key
       - uses: sonarsource/sonarqube-scan-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
