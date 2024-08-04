@@ -21,6 +21,11 @@ jobs:
         env:
           DATABASE_URL: postgres://test:test@${{ vars.POSTGRESQL_HOST }}:5432/conduit_nestjs_test
           JWT_SECRET: secret-key
+      - name: Cache sonar
+        uses: actions/cache@v4
+        with:
+          path: /opt/sonar-scanner/.sonar/cache
+          key: ${{ runner.os }}-sonar
       - uses: sonarsource/sonarqube-scan-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
