@@ -6,7 +6,6 @@
   "private": true,
   "license": "MIT",
   "packageManager": "pnpm@9.6.0",
-  "type": "module",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
