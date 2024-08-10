@@ -2,8 +2,6 @@
 
 NestJS codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
 
-[![CI](https://concourse.okami101.io/api/v1/teams/main/pipelines/conduit-nestjs/badge)](https://concourse.okami101.io/teams/main/pipelines/conduit-nestjs)
-
 ## [RealWorld](https://github.com/gothinkster/realworld)
 
 This codebase was created to demonstrate a fully fledged fullstack application built with NestJS (with Feature orientation) including CRUD operations, authentication, routing, pagination, and more.
