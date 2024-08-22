@@ -2,13 +2,10 @@ on:
   push:
     branches:
       - main
-    tags:
-      - "v*"
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ !startsWith(gitea.ref, 'refs/tags/v') }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -34,8 +31,5 @@ jobs:
       - uses: https://gitea.okami101.io/okami101/actions/docker@main
         with:
           password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
-
-  deploy:
-    uses: https://gitea.okami101.io/okami101/actions/.gitea/workflows/release.yaml@main
-    secrets:
-      password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
+          gitea-token: ${{ secrets.RELEASE_TOKEN }}
+          release: true
