@@ -6,6 +6,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
+          POSTGRES_DB: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -17,7 +29,7 @@ jobs:
           cache: "pnpm"
       - uses: https://gitea.okami101.io/okami101/actions/task@main
         env:
-          DATABASE_URL: postgres://test:test@${{ vars.POSTGRESQL_HOST }}:5432/conduit_nestjs_test
+          DATABASE_URL: postgres://test:test@postgres:5432/test
           JWT_SECRET: secret-key
       - name: Cache sonar
         uses: actions/cache@v4
