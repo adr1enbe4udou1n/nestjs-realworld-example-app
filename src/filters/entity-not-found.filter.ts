@@ -1,6 +1,6 @@
 import { ExceptionFilter, Catch, ArgumentsHost } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { Response } from 'express';
+import { FastifyReply } from 'fastify';
 
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class EntityNotFoundFilter implements ExceptionFilter {
@@ -10,7 +10,7 @@ export class EntityNotFoundFilter implements ExceptionFilter {
     }
 
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
+    const response = ctx.getResponse<FastifyReply>();
 
     response.status(404).send({
       statusCode: 404,
