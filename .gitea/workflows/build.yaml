@@ -25,7 +25,7 @@ jobs:
           run_install: false
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: "pnpm"
       - uses: https://gitea.okami101.io/okami101/actions/task@main
         env:
