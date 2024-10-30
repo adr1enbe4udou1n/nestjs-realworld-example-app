@@ -3,10 +3,8 @@ import { ArticlesController } from './articles.controller';
 import { CommentsController } from './comments/comments.controller';
 import { ArticlesService } from './articles.service';
 import { CommentsService } from './comments/comments.service';
-import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-  imports: [PrismaModule],
   controllers: [ArticlesController, CommentsController],
   providers: [ArticlesService, CommentsService],
 })

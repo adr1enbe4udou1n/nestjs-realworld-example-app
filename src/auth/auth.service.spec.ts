@@ -6,11 +6,11 @@ import {
 } from '../db-test-base';
 import { AuthService } from './auth.service';
 import { hash } from 'argon2';
-import { PrismaClient } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 describe('UsersService', () => {
   let service: AuthService;
-  let prisma: PrismaClient;
+  let prisma: PrismaService;
   let jwt: JwtService;
 
   beforeAll(async () => {
@@ -19,7 +19,7 @@ describe('UsersService', () => {
     });
 
     service = await module.resolve(AuthService);
-    prisma = module.get(PrismaClient);
+    prisma = module.get(PrismaService);
     jwt = module.get(JwtService);
   });
 

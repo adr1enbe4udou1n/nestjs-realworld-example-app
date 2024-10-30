@@ -9,10 +9,11 @@ import { NewArticleDTO } from './dto/article-create.dto';
 import { UpdateArticleDTO } from './dto/article-update.dto';
 import { CommentsService } from './comments/comments.service';
 import { ProfilesService } from '../profiles/profiles.service';
-import { Prisma, PrismaClient, User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 describe('ArticlesService', () => {
-  let prisma: PrismaClient;
+  let prisma: PrismaService;
   let service: ArticlesService;
   let commentsService: CommentsService;
   let profilesService: ProfilesService;
@@ -22,7 +23,7 @@ describe('ArticlesService', () => {
       providers: [ArticlesService, CommentsService, ProfilesService],
     });
 
-    prisma = module.get(PrismaClient);
+    prisma = module.get(PrismaService);
 
     commentsService = await module.resolve(CommentsService);
     profilesService = await module.resolve(ProfilesService);

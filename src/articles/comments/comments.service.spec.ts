@@ -7,10 +7,11 @@ import { CommentsService } from './comments.service';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NewCommentDTO } from './dto/comment-create.dto';
 import { ArticlesService } from '../articles.service';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from '../../prisma/prisma.service';
 
 describe('CommentsService', () => {
-  let prisma: PrismaClient;
+  let prisma: PrismaService;
   let service: CommentsService;
   let articlesService: ArticlesService;
 
@@ -19,7 +20,7 @@ describe('CommentsService', () => {
       providers: [CommentsService, ArticlesService],
     });
 
-    prisma = module.get(PrismaClient);
+    prisma = module.get(PrismaService);
 
     service = await module.resolve(CommentsService);
     articlesService = await module.resolve(ArticlesService);

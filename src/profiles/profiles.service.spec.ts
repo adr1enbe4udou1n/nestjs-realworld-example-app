@@ -7,10 +7,11 @@ import {
 import { ProfilesService } from './profiles.service';
 import { hash } from 'argon2';
 import { UserService } from '../user/user.service';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 describe('ProfilesService', () => {
-  let prisma: PrismaClient;
+  let prisma: PrismaService;
   let service: ProfilesService;
 
   beforeAll(async () => {
@@ -19,7 +20,7 @@ describe('ProfilesService', () => {
     });
 
     service = await module.resolve(ProfilesService);
-    prisma = module.get(PrismaClient);
+    prisma = module.get(PrismaService);
   });
 
   beforeEach(async () => {

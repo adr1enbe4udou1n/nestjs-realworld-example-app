@@ -2,10 +2,10 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { initializeDbTestBase, refreshDatabase } from '../db-test-base';
 import { NewUserDTO } from './dto/register.dto';
 import { UsersService } from './users.service';
-import { PrismaClient } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 describe('UsersService', () => {
-  let prisma: PrismaClient;
+  let prisma: PrismaService;
   let service: UsersService;
 
   beforeAll(async () => {
@@ -14,7 +14,7 @@ describe('UsersService', () => {
     });
 
     service = await module.resolve(UsersService);
-    prisma = module.get(PrismaClient);
+    prisma = module.get(PrismaService);
   });
 
   beforeEach(async () => {

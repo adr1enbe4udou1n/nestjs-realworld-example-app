@@ -2,12 +2,13 @@ import { verify } from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { UserDTO } from '../user/dto/current-user.dto';
 import { Injectable } from '@nestjs/common';
-import { PrismaClient, User } from '@prisma/client';
+import { User } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaClient,
+    private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
 
