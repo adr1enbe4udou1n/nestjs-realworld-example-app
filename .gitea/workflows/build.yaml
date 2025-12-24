@@ -29,7 +29,6 @@ jobs:
           cache: "pnpm"
       - uses: jdx/mise-action@v3
         with:
-          cache: false
           install: false
         env:
           DATABASE_URL: postgres://test:test@postgres:5432/test
