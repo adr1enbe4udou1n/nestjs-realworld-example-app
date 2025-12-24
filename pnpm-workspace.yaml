@@ -1,8 +1,7 @@
 onlyBuiltDependencies:
-  - "@nestjs/core"
-  - "@prisma/client"
-  - "@prisma/engines"
-  - "@scarf/scarf"
+  - '@nestjs/core'
+  - '@prisma/engines'
+  - '@scarf/scarf'
   - argon2
   - esbuild
   - prisma
