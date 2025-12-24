@@ -1,0 +1,21 @@
+[tasks.vendor]
+run = "pnpm i"
+
+[tasks.lint]
+run = "pnpm lint"
+
+[tasks.build]
+run = [
+  "pnpm prisma generate",
+  "pnpm build"
+]
+
+[tasks.test]
+run = [
+  "pnpm prisma migrate deploy",
+  "pnpm test --coverage"
+]
+
+[tools]
+node = "24"
+pnpm = "10"

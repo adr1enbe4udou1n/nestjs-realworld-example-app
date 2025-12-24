@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:17
+    image: postgres:18
     environment:
       POSTGRES_USER: main
       POSTGRES_PASSWORD: main
@@ -9,7 +9,7 @@ services:
       - 5433:5432
 
   db_test:
-    image: postgres:17
+    image: postgres:18
     environment:
       POSTGRES_USER: main
       POSTGRES_PASSWORD: main
