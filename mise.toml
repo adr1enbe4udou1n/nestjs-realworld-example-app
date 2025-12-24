@@ -16,6 +16,14 @@ run = [
   "pnpm test --coverage"
 ]
 
+[tasks.ci]
+run = [
+  { task = "vendor" },
+  { task = "lint" },
+  { task = "build" },
+  { task = "test" },
+]
+
 [tools]
 node = "24"
 pnpm = "10"
