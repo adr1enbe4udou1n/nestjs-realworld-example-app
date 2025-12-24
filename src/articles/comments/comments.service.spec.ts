@@ -7,7 +7,7 @@ import { CommentsService } from './comments.service';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NewCommentDTO } from './dto/comment-create.dto';
 import { ArticlesService } from '../articles.service';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../generated/prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 describe('CommentsService', () => {

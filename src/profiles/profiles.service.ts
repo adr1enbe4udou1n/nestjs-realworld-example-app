@@ -1,6 +1,6 @@
 import { ProfileDTO } from './dto/profile.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { User } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()

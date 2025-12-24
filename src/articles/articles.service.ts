@@ -5,7 +5,7 @@ import { UpdateArticleDTO } from './dto/article-update.dto';
 import { ArticleDTO } from './dto/article.dto';
 import { ArticlesListQuery } from './queries/articles.query';
 import slugify from 'slugify';
-import { User } from '@prisma/client';
+import { User } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()

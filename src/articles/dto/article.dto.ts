@@ -7,7 +7,7 @@ import {
   FollowerUser,
   Tag,
   User,
-} from '@prisma/client';
+} from '../../generated/prisma/client';
 
 export class ArticleDTO {
   @ApiProperty()

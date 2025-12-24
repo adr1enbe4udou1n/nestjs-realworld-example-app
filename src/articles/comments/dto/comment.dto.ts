@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Comment, FollowerUser, User } from '@prisma/client';
+import { Comment, FollowerUser, User } from '../../../generated/prisma/client';
 import { ProfileDTO } from '../../../profiles/dto/profile.dto';
 
 export class CommentDTO {

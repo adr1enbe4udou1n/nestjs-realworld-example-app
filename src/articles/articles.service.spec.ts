@@ -9,7 +9,7 @@ import { NewArticleDTO } from './dto/article-create.dto';
 import { UpdateArticleDTO } from './dto/article-update.dto';
 import { CommentsService } from './comments/comments.service';
 import { ProfilesService } from '../profiles/profiles.service';
-import { Prisma, User } from '@prisma/client';
+import { Prisma, User } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 describe('ArticlesService', () => {

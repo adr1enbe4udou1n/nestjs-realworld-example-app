@@ -2,7 +2,7 @@ import { ModuleMetadata } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient, User } from './generated/prisma/client';
 import { hash } from 'argon2';
 import { PrismaModule } from './prisma/prisma.module';
 

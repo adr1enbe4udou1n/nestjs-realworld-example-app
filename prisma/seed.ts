@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../src/generated/prisma/client';
 import { hash } from 'argon2';
 import { capitalize } from 'lodash';
 import { UniqueEnforcer } from 'enforce-unique';
