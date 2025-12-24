@@ -42,6 +42,6 @@ npx newman run postman.json --global-var "APIURL=http://localhost:3000/api" --gl
 
 ### Full test suite
 
-This project is fully tested via Jest, just run `pnpm test` for launching it.
+This project is fully tested via Jest, just run `pnpm dotenv -e .env.testing -- prisma migrate deploy` then `pnpm test` for launching it.
 
 Use `pnpm test:watch` for realtime test watching, perfect for TDD.
