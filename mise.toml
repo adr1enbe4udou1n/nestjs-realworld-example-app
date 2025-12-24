@@ -12,7 +12,7 @@ run = [
 
 [tasks.test]
 run = [
-  "pnpm prisma migrate deploy",
+  "pnpm dotenv -e .env.testing -- prisma migrate deploy",
   "pnpm test --coverage"
 ]
 
