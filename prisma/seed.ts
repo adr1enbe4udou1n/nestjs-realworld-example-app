@@ -3,8 +3,10 @@ import { PrismaClient } from '@prisma/client';
 import { hash } from 'argon2';
 import { capitalize } from 'lodash';
 import { UniqueEnforcer } from 'enforce-unique';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   await prisma.articleTag.deleteMany();
