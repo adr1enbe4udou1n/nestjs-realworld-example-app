@@ -23,6 +23,11 @@ jobs:
       - uses: jdx/mise-action@v3
         with:
           github_token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+      - name: pnpm cache
+        uses: actions/cache@v5
+        with:
+          path: .pnpm-store
+          key: ${{ runner.os }}-pnpm
       - name: sonar cache
         uses: actions/cache@v5
         with:
