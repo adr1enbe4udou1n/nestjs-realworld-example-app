@@ -29,19 +29,16 @@ jobs:
           cache: "pnpm"
       - uses: jdx/mise-action@v3
         with:
-          install: false
-      - run: mise ci
-        env:
-          MISE_TASK_RUN_AUTO_INSTALL: false
-          DATABASE_URL: postgres://test:test@postgres:5432/test
-          JWT_SECRET: secret-key
-      - name: Cache sonar
+          github_token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+      - name: sonar cache
         uses: actions/cache@v5
         with:
-          path: /opt/sonar-scanner/.sonar/cache
+          path: /root/.sonar/cache
           key: ${{ runner.os }}-sonar
-      - uses: https://github.com/sonarsource/sonarqube-scan-action@v7
+      - run: "mise ci ::: scan"
         env:
+          DATABASE_URL: postgres://test:test@postgres:5432/test
+          JWT_SECRET: secret-key
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
       - uses: https://gitea.okami101.io/okami101/actions/docker@main

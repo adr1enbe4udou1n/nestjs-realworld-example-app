@@ -16,14 +16,16 @@ run = [
   "pnpm test --coverage"
 ]
 
+[tasks.scan]
+run = "sonar-scanner"
+
 [tasks.ci]
 run = [
-  { task = "vendor" },
-  { task = "lint" },
-  { task = "build" },
-  { task = "test" },
+  { tasks = ["lint", "build", "test"] },
 ]
+depends = ["vendor"]
 
 [tools]
 node = "24"
 pnpm = "10"
+sonar-scanner-cli = "8"
