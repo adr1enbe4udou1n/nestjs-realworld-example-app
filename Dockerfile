@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 COPY node_modules node_modules/
-COPY package.json ./
+COPY package.json prisma.config.ts ./
 COPY prisma prisma/
 COPY dist dist/
 
