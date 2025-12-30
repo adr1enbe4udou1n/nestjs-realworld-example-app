@@ -1,7 +1,7 @@
 {
     "typescript.tsdk": "node_modules\\typescript\\lib",
     "sonarlint.connectedMode.project": {
-        "connectionId": "sonarqube-okami101",
+        "connectionId": "okami101",
         "projectKey": "nestjs-realworld"
     }
 }
