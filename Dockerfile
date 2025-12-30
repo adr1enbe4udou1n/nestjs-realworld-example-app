@@ -1,8 +1,8 @@
 FROM node:lts-slim
 
-RUN apt-get update && apt-get install -y \
-  openssl \
-  && rm -rf /var/lib/apt/lists/*
+RUN npm install pm2 -g && \
+  apt-get update && apt-get install -y openssl && \
+  rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -11,4 +11,4 @@ COPY package.json prisma.config.ts ./
 COPY prisma prisma/
 COPY dist dist/
 
-ENTRYPOINT ["node", "dist/src/main"]
+ENTRYPOINT ["pm2-runtime", "dist/src/main.js", "-i", "max"]
