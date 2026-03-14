@@ -1,14 +1,17 @@
 FROM node:lts-slim
 
-RUN npm install pm2 -g && \
-  apt-get update && apt-get install -y openssl && \
-  rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y openssl && \
+  rm -rf /var/lib/apt/lists/* && \
+  corepack enable && corepack prepare pnpm@latest --activate && \
+  npm install pm2 -g
 
 WORKDIR /app
 
-COPY node_modules node_modules/
-COPY package.json prisma.config.ts ./
+COPY package.json pnpm-lock.yaml prisma.config.ts ./
 COPY prisma prisma/
+
+RUN pnpm install --frozen-lockfile --prod
+
 COPY dist dist/
 
 ENTRYPOINT ["pm2-runtime", "dist/src/main.js", "-i", "max"]
