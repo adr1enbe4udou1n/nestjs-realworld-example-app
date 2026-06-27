@@ -26,6 +26,6 @@ run = [
 depends = ["vendor"]
 
 [tools]
-node = "24"
-pnpm = "10"
+node = "lts"
+pnpm = "11"
 sonar-scanner-cli = "8"
