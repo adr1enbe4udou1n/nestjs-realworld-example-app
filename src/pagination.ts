@@ -4,6 +4,7 @@ import { Type } from 'class-transformer';
 export class PagedQuery {
   @ApiProperty({
     description: 'Limit number of articles returned (default is 20)',
+    type: Number,
     default: 20,
     required: false,
   })
@@ -12,6 +13,7 @@ export class PagedQuery {
 
   @ApiProperty({
     description: 'Offset/skip number of articles (default is 0)',
+    type: Number,
     default: 0,
     required: false,
   })
