@@ -30,3 +30,4 @@ lerna-debug.log*
 .env
 
 /src/generated/prisma
+.scannerwork/
