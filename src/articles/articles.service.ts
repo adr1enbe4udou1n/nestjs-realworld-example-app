@@ -12,6 +12,23 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ArticlesService {
   constructor(private prisma: PrismaService) {}
 
+  // Prisma's pg adapter concurrently reads sibling relations when a write and
+  // a multi-relation `include` are combined in the same call, which trips a
+  // pg deprecation warning (https://github.com/prisma/prisma/issues/29407).
+  // Writes below omit `include` and re-fetch with it as a separate read.
+  private readonly include = {
+    favoredUsers: { include: { user: true } },
+    tags: { include: { tag: true } },
+    author: { include: { following: true } },
+  };
+
+  private findBySlug(slug: string) {
+    return this.prisma.article.findUniqueOrThrow({
+      where: { slug },
+      include: this.include,
+    });
+  }
+
   limit(query: PagedQuery) {
     const max = 20;
     return Math.min(query.limit ?? max, max);
@@ -30,17 +47,13 @@ export class ArticlesService {
       }),
     };
 
-    const [items, count] = await this.prisma.$transaction([
+    const [items, count] = await Promise.all([
       this.prisma.article.findMany({
         where,
         orderBy: { id: 'desc' },
         take: this.limit(query),
         skip: query.offset,
-        include: {
-          favoredUsers: { include: { user: true } },
-          tags: { include: { tag: true } },
-          author: { include: { following: true } },
-        },
+        include: this.include,
       }),
       this.prisma.article.count({ where }),
     ]);
@@ -53,17 +66,13 @@ export class ArticlesService {
       author: { following: { some: { followerId: currentUser.id } } },
     };
 
-    const [items, count] = await this.prisma.$transaction([
+    const [items, count] = await Promise.all([
       this.prisma.article.findMany({
         where,
         orderBy: { id: 'desc' },
         take: this.limit(query),
         skip: query.offset,
-        include: {
-          favoredUsers: { include: { user: true } },
-          tags: { include: { tag: true } },
-          author: { include: { following: true } },
-        },
+        include: this.include,
       }),
       this.prisma.article.count({ where }),
     ]);
@@ -72,14 +81,7 @@ export class ArticlesService {
   }
 
   async get(slug: string, currentUser: User | null = null) {
-    const article = await this.prisma.article.findUniqueOrThrow({
-      where: { slug },
-      include: {
-        favoredUsers: { include: { user: true } },
-        tags: { include: { tag: true } },
-        author: { include: { following: true } },
-      },
-    });
+    const article = await this.findBySlug(slug);
 
     return ArticleDTO.map(article, currentUser);
   }
@@ -114,7 +116,7 @@ export class ArticlesService {
       where: { name: { in: dto.tagList } },
     });
 
-    const updatedArticle = await this.prisma.article.update({
+    await this.prisma.article.update({
       where: { id: createdArticle.id },
       data: {
         tags: {
@@ -123,14 +125,12 @@ export class ArticlesService {
           },
         },
       },
-      include: {
-        favoredUsers: { include: { user: true } },
-        tags: { include: { tag: true } },
-        author: { include: { following: true } },
-      },
     });
 
-    return ArticleDTO.map(updatedArticle, currentUser);
+    return ArticleDTO.map(
+      await this.findBySlug(createdArticle.slug),
+      currentUser,
+    );
   }
 
   async update(slug: string, dto: UpdateArticleDTO, currentUser: User) {
@@ -147,13 +147,8 @@ export class ArticlesService {
       );
     }
 
-    const updatedArticle = await this.prisma.article.update({
+    await this.prisma.article.update({
       where: { slug },
-      include: {
-        favoredUsers: { include: { user: true } },
-        tags: { include: { tag: true } },
-        author: { include: { following: true } },
-      },
       data: {
         title: dto.title ?? article.title,
         description: dto.description ?? article.description,
@@ -161,7 +156,7 @@ export class ArticlesService {
       },
     });
 
-    return ArticleDTO.map(updatedArticle, currentUser);
+    return ArticleDTO.map(await this.findBySlug(slug), currentUser);
   }
 
   async delete(slug: string, currentUser: User) {
@@ -184,14 +179,7 @@ export class ArticlesService {
   }
 
   async favorite(slug: string, favorite: boolean, currentUser: User) {
-    const article = await this.prisma.article.findUniqueOrThrow({
-      where: { slug },
-      include: {
-        favoredUsers: { include: { user: true } },
-        tags: { include: { tag: true } },
-        author: { include: { following: true } },
-      },
-    });
+    const article = await this.findBySlug(slug);
 
     if (
       favorite &&
@@ -207,7 +195,7 @@ export class ArticlesService {
       return ArticleDTO.map(article, currentUser);
     }
 
-    const updatedArticle = await this.prisma.article.update({
+    await this.prisma.article.update({
       where: { slug },
       data: {
         favoredUsers: {
@@ -226,13 +214,8 @@ export class ArticlesService {
           }),
         },
       },
-      include: {
-        favoredUsers: { include: { user: true } },
-        tags: { include: { tag: true } },
-        author: { include: { following: true } },
-      },
     });
 
-    return ArticleDTO.map(updatedArticle, currentUser);
+    return ArticleDTO.map(await this.findBySlug(slug), currentUser);
   }
 }
