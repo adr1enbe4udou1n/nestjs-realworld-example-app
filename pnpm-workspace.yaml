@@ -1,11 +1,14 @@
 allowBuilds:
   '@nestjs/core': set this to true or false
+  '@parcel/watcher': true
   '@prisma/engines': true
   '@scarf/scarf': true
   argon2: true
   esbuild: true
+  msgpackr-extract: true
   prisma: true
   unrs-resolver: true
+  workerd: true
 onlyBuiltDependencies:
   - '@nestjs/core'
   - '@prisma/engines'
