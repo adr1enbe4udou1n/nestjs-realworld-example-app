@@ -27,5 +27,5 @@ depends = ["vendor"]
 
 [tools]
 node = "lts"
-pnpm = "11"
+pnpm = "12"
 sonar-scanner-cli = "8"
